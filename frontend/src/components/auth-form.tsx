@@ -39,15 +39,6 @@ export function AuthForm() {
         });
         if (signUpError) throw signUpError;
 
-        if (data.user) {
-          await supabase.from("profiles").upsert({
-            id: data.user.id,
-            full_name: fullName,
-            phone,
-            role: "customer",
-          });
-        }
-
         if (!data.session) {
           setMessage("Account created. Check your email to confirm, then sign in.");
           return;

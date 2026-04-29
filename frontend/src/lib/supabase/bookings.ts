@@ -16,7 +16,7 @@ export type BookingFormValues = {
 };
 
 export type BookingInsert = {
-  user_id: string | null;
+  user_id: string;
   car_id: string;
   full_name: string;
   email: string;
@@ -31,7 +31,7 @@ export type BookingInsert = {
 
 export type BookingRow = {
   id: string;
-  user_id: string | null;
+  user_id: string;
   car_id: string;
   full_name: string | null;
   email: string | null;
@@ -45,9 +45,9 @@ export type BookingRow = {
   created_at: string;
 };
 
-export function buildBookingInsert(values: BookingFormValues, userId?: string | null): BookingInsert {
+export function buildBookingInsert(values: BookingFormValues, userId: string): BookingInsert {
   return {
-    user_id: userId ?? null,
+    user_id: userId,
     car_id: values.carId,
     full_name: values.fullName,
     email: values.email,

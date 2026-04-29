@@ -84,10 +84,15 @@ export function BookingForm() {
 
       const supabase = createClient();
       if (supabase) {
-        const { data: userData } = await supabase.auth.getUser();
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (!userData.user) {
+          throw new Error("Please sign in before submitting a real booking request.");
+        }
+
         const { error: insertError } = await supabase
           .from("bookings")
-          .insert(buildBookingInsert({ ...values, estimatedTotal: booking.estimatedTotal }, userData.user?.id));
+          .insert(buildBookingInsert({ ...values, estimatedTotal: booking.estimatedTotal }, userData.user.id));
         if (insertError) throw insertError;
         setSavedToSupabase(true);
       } else {
@@ -118,7 +123,7 @@ export function BookingForm() {
         <div>
           <h2 className="text-3xl font-black">Request your booking</h2>
           <p className="mt-2 text-slate-300">
-            {supabaseReady ? "Real Supabase storage is ready. Sign in first if you want the booking attached to your account." : "Demo mode saves locally. Add Supabase keys for real backend storage."}
+            {supabaseReady ? "Real Supabase storage is ready. Sign in first to submit a booking request." : "Demo mode saves locally. Add Supabase keys for real backend storage."}
           </p>
         </div>
       </div>
