@@ -78,6 +78,21 @@ alter table public.profiles enable row level security;
 alter table public.cars enable row level security;
 alter table public.bookings enable row level security;
 
+create or replace function public.is_admin(user_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where profiles.id = user_id
+      and profiles.role = 'admin'
+  );
+$$;
+
 drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"
   on public.cars for select
@@ -87,6 +102,11 @@ drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"
   on public.profiles for select
   using (auth.uid() = id);
+
+drop policy if exists "Admins can read all profiles" on public.profiles;
+create policy "Admins can read all profiles"
+  on public.profiles for select
+  using (public.is_admin(auth.uid()));
 
 drop policy if exists "Users can create own profile" on public.profiles;
 create policy "Users can create own profile"
@@ -117,6 +137,17 @@ drop policy if exists "Users can read own bookings" on public.bookings;
 create policy "Users can read own bookings"
   on public.bookings for select
   using (auth.uid() = user_id);
+
+drop policy if exists "Admins can read all bookings" on public.bookings;
+create policy "Admins can read all bookings"
+  on public.bookings for select
+  using (public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can update booking statuses" on public.bookings;
+create policy "Admins can update booking statuses"
+  on public.bookings for update
+  using (public.is_admin(auth.uid()))
+  with check (public.is_admin(auth.uid()));
 
 -- Create customer profile automatically when a new user registers.
 -- This avoids login/signup breaking when email confirmation is enabled.

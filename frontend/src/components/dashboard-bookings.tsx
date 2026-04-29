@@ -61,7 +61,7 @@ export function DashboardBookings() {
   async function signOut() {
     const supabase = createClient();
     await supabase?.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/";
   }
 
   if (isLoading) {

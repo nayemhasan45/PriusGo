@@ -9,9 +9,35 @@ export function AuthForm() {
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const supabaseReady = Boolean(createClient());
+
+  async function signInWithGoogle() {
+    setIsGoogleSubmitting(true);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      if (!supabase) {
+        throw new Error("Supabase keys are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local first.");
+      }
+
+      const { error: googleError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (googleError) throw googleError;
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Google sign in failed. Please try again.");
+      setIsGoogleSubmitting(false);
+    }
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,6 +114,26 @@ export function AuthForm() {
       {message && <div className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-700">{message}</div>}
       {error && <div className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-700">{error}</div>}
 
+      <button
+        type="button"
+        onClick={signInWithGoogle}
+        disabled={isGoogleSubmitting || isSubmitting || !supabaseReady}
+        className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-6 py-3 font-black text-slate-800 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isGoogleSubmitting ? (
+          <Loader2 className="size-5 animate-spin" />
+        ) : (
+          <span className="flex size-6 items-center justify-center rounded-full bg-white text-lg font-black text-red-500 shadow-sm ring-1 ring-slate-200">G</span>
+        )}
+        Continue with Google
+      </button>
+
+      <div className="mt-6 flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+        <span className="h-px flex-1 bg-slate-200" />
+        or
+        <span className="h-px flex-1 bg-slate-200" />
+      </div>
+
       <form onSubmit={onSubmit} className="mt-6 grid gap-4">
         {mode === "signup" && (
           <>
@@ -109,7 +155,7 @@ export function AuthForm() {
           Password
           <input name="password" required type="password" minLength={6} placeholder="••••••••" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
         </label>
-        <button disabled={isSubmitting || !supabaseReady} className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+        <button disabled={isSubmitting || isGoogleSubmitting || !supabaseReady} className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
           {isSubmitting ? <Loader2 className="size-5 animate-spin" /> : mode === "signin" ? <LogIn className="size-5" /> : <UserPlus className="size-5" />}
           {mode === "signin" ? "Sign in" : "Create account"}
         </button>
