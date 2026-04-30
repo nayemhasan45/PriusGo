@@ -26,16 +26,28 @@ const bookingSchema = z.object({
 const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
 const pricePerWeek = 100;
 
+const DRAFT_KEY = "priusgo:booking-draft";
+
 export function BookingForm() {
+  const [draft] = useState<{ carId?: string; fullName?: string; email?: string; phone?: string } | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (!saved) return null;
+      sessionStorage.removeItem(DRAFT_KEY);
+      return JSON.parse(saved) as { carId?: string; fullName?: string; email?: string; phone?: string };
+    } catch { return null; }
+  });
+
   const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
-  const [selectedCarId, setSelectedCarId] = useState("");
+  const [selectedCarId, setSelectedCarId] = useState(draft?.carId ?? "");
   const [bookingBlocks, setBookingBlocks] = useState<CarBookingBlock[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [success, setSuccess] = useState(false);
-  const [savedToSupabase, setSavedToSupabase] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const selectedCar = availableCars.find((car) => car.id === selectedCarId);
   const supabaseReady = Boolean(createClient());
@@ -100,7 +112,6 @@ export function BookingForm() {
     setIsSubmitting(true);
     setError(null);
     setSuccess(false);
-    setSavedToSupabase(false);
 
     try {
       const form = event.currentTarget;
@@ -137,9 +148,15 @@ export function BookingForm() {
 
       const supabase = createClient();
       if (supabase) {
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
+        const { data: userData } = await supabase.auth.getUser();
         if (!userData.user) {
+          sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+            carId: selectedCarId,
+            fullName: values.fullName,
+            email: values.email,
+            phone: values.phone,
+          }));
+          setIsRedirecting(true);
           window.location.href = `/login?redirectTo=${encodeURIComponent("/#booking")}`;
           return;
         }
@@ -157,7 +174,6 @@ export function BookingForm() {
           .from("bookings")
           .insert(buildBookingInsert({ ...values, estimatedTotal: booking.estimatedTotal }, userData.user.id));
         if (insertError) throw insertError;
-        setSavedToSupabase(true);
       } else {
         const saved = JSON.parse(localStorage.getItem("priusgo-bookings") ?? "[]") as BookingRequest[];
         localStorage.setItem("priusgo-bookings", JSON.stringify([booking, ...saved]));
@@ -179,7 +195,13 @@ export function BookingForm() {
   }
 
   return (
-    <div id="booking" className="rounded-[2rem] bg-[#161616] p-6 text-white ring-1 ring-white/5 sm:p-8">
+    <div id="booking" className="relative rounded-[2rem] bg-[#161616] p-6 text-white ring-1 ring-white/5 sm:p-8">
+      {isRedirecting && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 rounded-[2rem] bg-[#161616]/90 backdrop-blur-sm">
+          <Loader2 className="size-10 animate-spin text-[#ff3600]" />
+          <p className="text-sm font-semibold text-white/70">Taking you to login...</p>
+        </div>
+      )}
       <div className="mb-8 flex items-start gap-4">
         <div className="rounded-2xl bg-[#ff3600] p-3 text-white"><CalendarDays className="size-6" /></div>
         <div>
@@ -191,9 +213,31 @@ export function BookingForm() {
       </div>
 
       {success && (
-        <div className="mb-6 rounded-2xl bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-500/20">
-          <div className="flex items-center gap-3"><CheckCircle2 className="size-5" /> Booking request saved {savedToSupabase ? "to Supabase" : "locally"}.</div>
-          <Link href="/dashboard" className="mt-2 inline-flex text-emerald-200 underline underline-offset-4">Check dashboard</Link>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[2rem] bg-[#161616] p-8 ring-1 ring-white/10 shadow-2xl text-center">
+            <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[#ff3600]/15 ring-1 ring-[#ff3600]/30">
+              <CheckCircle2 className="size-10 text-[#ff3600]" />
+            </div>
+            <h3 className="mt-6 font-heading text-2xl font-black text-white">Booking request sent!</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              Your rental request has been submitted. We&apos;ll review it and get back to you to confirm the details.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/dashboard"
+                className="flex-1 inline-flex items-center justify-center rounded-full bg-[#ff3600] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#cc2b00]"
+              >
+                View my bookings
+              </Link>
+              <button
+                type="button"
+                onClick={() => setSuccess(false)}
+                className="flex-1 inline-flex items-center justify-center rounded-full border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
       {error && (
@@ -238,9 +282,9 @@ export function BookingForm() {
           </a>
         </div>
 
-        <Field label="Full name"><input name="fullName" required placeholder="Al Amin" /></Field>
-        <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" /></Field>
-        <Field label="Phone"><input name="phone" required placeholder="+370 ..." /></Field>
+        <Field label="Full name"><input name="fullName" required placeholder="Al Amin" defaultValue={draft?.fullName ?? ""} /></Field>
+        <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" defaultValue={draft?.email ?? ""} /></Field>
+        <Field label="Phone"><input name="phone" required placeholder="+370 ..." defaultValue={draft?.phone ?? ""} /></Field>
         <Field label="Pickup location"><input name="pickupLocation" required defaultValue="Šiauliai" /></Field>
 
         <input type="hidden" name="startDate" value={startDate} />

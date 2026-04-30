@@ -12,6 +12,7 @@ export function AuthForm() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const supabaseReady = Boolean(createClient());
@@ -76,6 +77,7 @@ export function AuthForm() {
         if (signInError) throw signInError;
       }
 
+      setIsNavigating(true);
       router.push(redirectTo);
       router.refresh();
     } catch (caughtError) {
@@ -86,7 +88,13 @@ export function AuthForm() {
   }
 
   return (
-    <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl">
+    <div className="relative rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl">
+      {isNavigating && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 rounded-[2rem] bg-white/90 backdrop-blur-sm">
+          <Loader2 className="size-10 animate-spin text-[#ff3600]" />
+          <p className="text-sm font-semibold text-slate-600">Signing you in...</p>
+        </div>
+      )}
       <div className="flex rounded-full bg-slate-100 p-1">
         <button
           type="button"

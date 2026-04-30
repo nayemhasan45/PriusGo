@@ -72,8 +72,8 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
     if (!current) return "text-slate-200 cursor-default";
     if (isPast && !isToday) return "text-slate-300 cursor-default";
     if (isToday) return isBlocked(dateStr, blocks)
-      ? "bg-red-500 text-white ring-2 ring-[#ff3600] ring-offset-1 rounded-full font-black"
-      : "bg-[#ff3600] text-white rounded-full font-black";
+      ? "bg-red-100 text-red-600 ring-2 ring-[#ff3600] rounded-full font-black"
+      : "ring-2 ring-[#ff3600] text-[#ff3600] rounded-full font-black";
     if (isBlocked(dateStr, blocks)) return "bg-red-100 text-red-600 rounded-full font-semibold";
     return "bg-emerald-100 text-emerald-700 rounded-full font-semibold";
   }
@@ -137,7 +137,7 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
         </div>
         {!hasBlocked && (
           <div className="flex items-center gap-1.5">
-            <span className="size-3 rounded-full bg-[#ff3600]" />
+            <span className="size-3 rounded-full ring-2 ring-[#ff3600]" />
             <span className="text-[11px] font-semibold text-[#616161]">Today</span>
           </div>
         )}
