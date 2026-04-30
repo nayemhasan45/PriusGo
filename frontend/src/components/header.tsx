@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 const navItems = [
   { href: "/#cars", label: "Fleet" },
   { href: "/#pricing", label: "Pricing" },
-  { href: "/#booking", label: "Book" },
+  { href: "/#cars", label: "Book" },
   { href: "/#faq", label: "FAQ" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -71,7 +71,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#616161] md:flex">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="transition-colors hover:text-[#0b0b0b]">
+            <Link key={item.label} href={item.href} className="transition-colors hover:text-[#0b0b0b]">
               {item.label}
             </Link>
           ))}
@@ -98,7 +98,7 @@ export function Header() {
               <Link href="/login" className="text-sm font-medium text-[#616161] transition hover:text-[#0b0b0b]">
                 Login
               </Link>
-              <Link href="/#booking" className="rounded-full bg-[#ff3600] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#cc2b00]">
+              <Link href="/#cars" className="rounded-full bg-[#ff3600] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#cc2b00]">
                 Book Now
               </Link>
             </>
@@ -118,7 +118,7 @@ export function Header() {
         <div className="border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 md:hidden">
           <nav className="flex flex-col gap-4 text-sm font-medium text-[#616161]">
             {navItems.map((item) => (
-              <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">
+              <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">
                 {item.label}
               </Link>
             ))}
@@ -139,7 +139,7 @@ export function Header() {
               </>
             ) : (
               <>
-                <Link href="/#booking" onClick={() => setMobileOpen(false)} className="rounded-full bg-[#ff3600] px-5 py-3 text-center text-sm font-semibold text-white">
+                <Link href="/#cars" onClick={() => setMobileOpen(false)} className="rounded-full bg-[#ff3600] px-5 py-3 text-center text-sm font-semibold text-white">
                   Book Now
                 </Link>
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-full border border-[#e9e9e9] px-5 py-3 text-center text-sm font-medium text-[#0b0b0b]">

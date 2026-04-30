@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, CheckCircle2, Loader2 } from "lucide-react";
+import { CalendarDays, CarFront, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
@@ -27,7 +27,7 @@ const pricePerWeek = 100;
 
 export function BookingForm() {
   const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
-  const [selectedCarId, setSelectedCarId] = useState(fallbackCars[0]?.id ?? "");
+  const [selectedCarId, setSelectedCarId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [success, setSuccess] = useState(false);
@@ -48,7 +48,7 @@ export function BookingForm() {
 
       const mappedCars = (data as CarRow[]).map(mapCarRowToCar);
       setAvailableCars(mappedCars);
-      setSelectedCarId((current) => (mappedCars.some((car) => car.id === current) ? current : mappedCars[0]?.id ?? ""));
+      setSelectedCarId((current) => (mappedCars.some((car) => car.id === current) ? current : ""));
     }
 
     void loadAvailableCars();
@@ -88,7 +88,7 @@ export function BookingForm() {
       const form = event.currentTarget;
       const formData = new FormData(form);
       const values = bookingSchema.parse({
-        carId: String(formData.get("carId") ?? ""),
+        carId: selectedCarId,
         fullName: String(formData.get("fullName") ?? ""),
         email: String(formData.get("email") ?? ""),
         phone: String(formData.get("phone") ?? ""),
@@ -146,7 +146,6 @@ export function BookingForm() {
 
       setSuccess(true);
       form.reset();
-      setSelectedCarId(availableCars[0]?.id ?? "");
       setStartDate("");
       setEndDate("");
     } catch (caughtError) {
@@ -182,13 +181,43 @@ export function BookingForm() {
         <div className="mb-6 rounded-2xl bg-red-500/10 p-4 text-sm font-semibold text-red-300 ring-1 ring-red-500/20">{error}</div>
       )}
 
+      {!selectedCar ? (
+        <div className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-6 text-center sm:p-8">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#ff3600] text-white">
+            <CarFront className="size-7" />
+          </div>
+          <h3 className="mt-5 font-heading text-2xl font-black text-white">Choose a car from the fleet first</h3>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/55">
+            Booking is car-specific. Pick MJO146, MHP235, or another available car from the fleet, then this form will lock to that exact car.
+          </p>
+          <a href="#cars" className="mt-6 inline-flex rounded-full bg-[#ff3600] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#cc2b00]">
+            View fleet
+          </a>
+        </div>
+      ) : (
       <form onSubmit={onSubmit} className="grid gap-5 md:grid-cols-2">
-        <label className="grid gap-2 md:col-span-2">
-          <span className="text-sm font-medium text-white/60">Choose car</span>
-          <select name="carId" value={selectedCarId} onChange={(event) => setSelectedCarId(event.target.value)} className="rounded-2xl border border-white/8 bg-white/8 px-4 py-3 text-white outline-none ring-[#ff3600] transition focus:ring-2">
-            {availableCars.map((car) => <option key={car.id} value={car.id} className="text-[#0b0b0b]">{car.name} — €{car.pricePerDay}/day · €{pricePerWeek}/week</option>)}
-          </select>
-        </label>
+        <input type="hidden" name="carId" value={selectedCar.id} />
+
+        <div className="md:col-span-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Selected car</p>
+              <h3 className="mt-2 font-heading text-2xl font-black text-white">
+                {selectedCar.plateNumber ?? selectedCar.id.toUpperCase()} — {selectedCar.name}
+              </h3>
+              <p className="mt-1 text-sm text-white/50">
+                {selectedCar.year} · {selectedCar.fuelType} · {selectedCar.transmission} · {selectedCar.seats} seats
+              </p>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="font-heading text-3xl font-black text-[#ff3600]">€{selectedCar.pricePerDay}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">per day · €{pricePerWeek}/week</p>
+            </div>
+          </div>
+          <a href="#cars" className="mt-4 inline-flex text-sm font-semibold text-white/65 underline underline-offset-4 transition hover:text-white">
+            Change car
+          </a>
+        </div>
 
         <Field label="Full name"><input name="fullName" required placeholder="Al Amin" /></Field>
         <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" /></Field>
@@ -209,9 +238,10 @@ export function BookingForm() {
         </div>
 
         <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff3600] px-6 py-4 font-semibold text-white transition hover:bg-[#cc2b00] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2">
-          {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit rental request
+          {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit rental request for {selectedCar.plateNumber ?? selectedCar.id.toUpperCase()}
         </button>
       </form>
+      )}
     </div>
   );
 }

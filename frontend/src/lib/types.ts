@@ -12,6 +12,8 @@ export type Car = {
   pricePerDay: number;
   status: CarStatus;
   imageGradient: string;
+  imageUrl?: string | null;
+  plateNumber?: string;
   features: string[];
 };
 

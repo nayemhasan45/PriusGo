@@ -41,9 +41,11 @@ const gradients = [
 export function mapCarRowToCar(row: CarRow): Car {
   const gradientIndex = Math.abs(hashString(row.id)) % gradients.length;
 
+  const plateNumber = getPlateNumber(row.id, row.name);
+
   return {
     id: row.id,
-    name: row.name,
+    name: plateNumber ? `Toyota Prius ${plateNumber}` : row.name,
     brand: row.brand,
     model: row.model,
     year: row.year,
@@ -53,6 +55,8 @@ export function mapCarRowToCar(row: CarRow): Car {
     pricePerDay: Number(row.price_per_day),
     status: row.status,
     imageGradient: gradients[gradientIndex],
+    imageUrl: row.image_url ?? "/images/prius-fleet.jpg",
+    plateNumber,
     features: ["Hybrid economy", row.transmission, `${row.seats} seats`, "Daily rental"],
   };
 }
@@ -99,4 +103,13 @@ export function getCustomerCarAvailability(status: CarStatus) {
 
 function hashString(value: string) {
   return value.split("").reduce((hash, char) => hash + char.charCodeAt(0), 0);
+}
+
+function getPlateNumber(id: string, name: string) {
+  const legacyPlateNumbers: Record<string, string> = {
+    "toyota-prius-white-2014": "MJO146",
+    "toyota-prius-silver-2015": "MHP235",
+  };
+  const platePattern = /\b[A-Z]{3}\d{3}\b/;
+  return legacyPlateNumbers[id] ?? name.match(platePattern)?.[0] ?? id.match(platePattern)?.[0];
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { CarFront, Loader2, Save, ShieldCheck } from "lucide-react";
+import { CarFront, Loader2, Plus, Save, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getCarStatusTone, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
@@ -9,12 +9,28 @@ import type { Car, CarStatus } from "@/lib/types";
 
 const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
 
+type NewCarForm = {
+  plateNumber: string;
+  year: string;
+  pricePerDay: string;
+  imageUrl: string;
+};
+
+const emptyNewCarForm: NewCarForm = {
+  plateNumber: "",
+  year: "",
+  pricePerDay: "20",
+  imageUrl: "/images/prius-fleet.jpg",
+};
+
 export function AdminCars() {
   const [cars, setCars] = useState<Car[]>([]);
   const [blocksByCar, setBlocksByCar] = useState<ReturnType<typeof groupBookingBlocksByCar>>({});
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingCarId, setUpdatingCarId] = useState<string | null>(null);
+  const [newCar, setNewCar] = useState<NewCarForm>(emptyNewCarForm);
+  const [isAddingCar, setIsAddingCar] = useState(false);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +108,64 @@ export function AdminCars() {
     }
   }
 
+  async function addCar() {
+    const plateNumber = newCar.plateNumber.trim().toUpperCase();
+    const year = Number(newCar.year);
+    const pricePerDay = Number(newCar.pricePerDay);
+
+    if (!/^[A-Z]{3}\d{3}$/.test(plateNumber)) {
+      setError("Use the Lithuanian plate format like MJO146.");
+      return;
+    }
+
+    if (!Number.isInteger(year) || year < 1997 || year > new Date().getFullYear() + 1) {
+      setError("Enter a valid car year.");
+      return;
+    }
+
+    if (!Number.isFinite(pricePerDay) || pricePerDay <= 0) {
+      setError("Enter a valid daily price.");
+      return;
+    }
+
+    setIsAddingCar(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      if (!supabase) throw new Error("Supabase is not configured.");
+
+      const { data, error: insertError } = await supabase
+        .from("cars")
+        .insert({
+          id: plateNumber,
+          name: `Toyota Prius ${plateNumber}`,
+          brand: "Toyota",
+          model: "Prius",
+          year,
+          fuel_type: "Hybrid petrol",
+          transmission: "Automatic",
+          seats: 5,
+          price_per_day: pricePerDay,
+          image_url: newCar.imageUrl.trim() || "/images/prius-fleet.jpg",
+          status: "available",
+        })
+        .select(carColumns)
+        .single();
+
+      if (insertError) throw insertError;
+
+      const addedCar = mapCarRowToCar(data as CarRow);
+      setCars((current) => [...current, addedCar].sort((a, b) => a.name.localeCompare(b.name)));
+      setNewCar(emptyNewCarForm);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Could not add car.");
+    } finally {
+      setIsAddingCar(false);
+    }
+  }
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white p-10 text-slate-600">
@@ -128,6 +202,37 @@ export function AdminCars() {
             Manage bookings
           </Link>
         </div>
+      </div>
+
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-slate-950 text-white"><Plus className="size-5" /></span>
+          <div>
+            <h2 className="text-xl font-black text-slate-950">Add a new Prius</h2>
+            <p className="text-sm text-slate-500">When you buy another car, add the plate and it appears on the public fleet page.</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Plate number
+            <input value={newCar.plateNumber} onChange={(event) => setNewCar((current) => ({ ...current, plateNumber: event.target.value.toUpperCase() }))} placeholder="MJO146" className="rounded-2xl border border-slate-200 px-4 py-3 uppercase outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Year
+            <input value={newCar.year} onChange={(event) => setNewCar((current) => ({ ...current, year: event.target.value }))} type="number" placeholder="2015" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Price per day
+            <input value={newCar.pricePerDay} onChange={(event) => setNewCar((current) => ({ ...current, pricePerDay: event.target.value }))} type="number" min={1} className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Image URL
+            <input value={newCar.imageUrl} onChange={(event) => setNewCar((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="/images/prius-fleet.jpg" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+        </div>
+        <button disabled={isAddingCar} onClick={addCar} className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+          {isAddingCar ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />} Add car
+        </button>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">

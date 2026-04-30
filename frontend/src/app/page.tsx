@@ -63,10 +63,10 @@ export default function Home() {
 
             <div className="fade-up fade-up-4 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
               <a
-                href="#booking"
+                href="#cars"
                 className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#ff3600] px-7 py-3.5 font-semibold text-white transition hover:bg-[#cc2b00] sm:px-8 sm:py-4"
               >
-                Book a car
+                Choose a car
                 <span className="flex size-6 items-center justify-center rounded-full bg-white/15 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                   <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
                     <path d="M1 8L8 1M8 1H2.5M8 1V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -212,10 +212,10 @@ export default function Home() {
                 ))}
               </ul>
               <a
-                href="#booking"
+                href="#cars"
                 className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[#ff3600] transition hover:gap-2.5"
               >
-                Book now →
+                Choose car →
               </a>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { CalendarX2, CheckCircle2, Fuel, Gauge, Users, XCircle } from "lucide-re
 export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?: CarBookingBlock[] }) {
   const availability = getCustomerCarAvailability(car.status);
   const isAvailable = availability.canRent;
+  const plateNumber = car.plateNumber ?? car.id.toUpperCase();
 
   function selectCarForRental() {
     window.dispatchEvent(new CustomEvent("priusgo:select-car", { detail: { carId: car.id } }));
@@ -28,14 +29,31 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
           </span>
         </div>
 
-        <div className="mt-6 rounded-[2rem] border border-white/80 bg-white/70 p-6 text-center shadow-xl backdrop-blur">
-          <div className="mx-auto mb-3 h-14 w-44 rounded-t-[4rem] bg-slate-700" />
-          <div className="mx-auto h-9 w-60 max-w-full rounded-b-3xl bg-white shadow-inner" />
-          <div className="mx-auto mt-[-13px] flex max-w-52 justify-between px-7">
-            <span className="size-8 rounded-full border-4 border-white bg-[#0b0b0b] shadow" />
-            <span className="size-8 rounded-full border-4 border-white bg-[#0b0b0b] shadow" />
-          </div>
+        <div className="mt-6 overflow-hidden rounded-[2rem] border border-white/80 bg-white/70 shadow-xl backdrop-blur">
+          {car.imageUrl ? (
+            // Use a normal img here because admin-added cars can use local or future storage URLs.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={car.imageUrl} alt={`${car.name} rental car`} className="h-56 w-full object-cover" />
+          ) : (
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-3 h-14 w-44 rounded-t-[4rem] bg-slate-700" />
+              <div className="mx-auto h-9 w-60 max-w-full rounded-b-3xl bg-white shadow-inner" />
+              <div className="mx-auto mt-[-13px] flex max-w-52 justify-between px-7">
+                <span className="size-8 rounded-full border-4 border-white bg-[#0b0b0b] shadow" />
+                <span className="size-8 rounded-full border-4 border-white bg-[#0b0b0b] shadow" />
+              </div>
+            </div>
+          )}
         </div>
+
+        <button
+          type="button"
+          onClick={selectCarForRental}
+          className="absolute bottom-5 left-5 rounded-full bg-[#0b0b0b] px-5 py-2.5 font-heading text-lg font-black tracking-[0.16em] text-white shadow-xl transition hover:bg-[#ff3600]"
+          aria-label={`Book car ${plateNumber}`}
+        >
+          {plateNumber}
+        </button>
       </div>
 
       {/* Card body */}

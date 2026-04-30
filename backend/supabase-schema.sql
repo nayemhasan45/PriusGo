@@ -64,14 +64,20 @@ begin
 end;
 $$;
 
-insert into public.cars (id, name, year, price_per_day, status)
+insert into public.cars (id, name, brand, model, year, fuel_type, transmission, seats, price_per_day, image_url, status)
 values
-  ('toyota-prius-white-2014', 'Toyota Prius White', 2014, 20, 'available'),
-  ('toyota-prius-silver-2015', 'Toyota Prius Silver', 2015, 20, 'available')
+  ('MJO146', 'Toyota Prius MJO146', 'Toyota', 'Prius', 2014, 'Hybrid petrol', 'Automatic', 5, 20, '/images/prius-fleet.jpg', 'available'),
+  ('MHP235', 'Toyota Prius MHP235', 'Toyota', 'Prius', 2015, 'Hybrid petrol', 'Automatic', 5, 20, '/images/prius-fleet.jpg', 'available')
 on conflict (id) do update set
   name = excluded.name,
+  brand = excluded.brand,
+  model = excluded.model,
   year = excluded.year,
+  fuel_type = excluded.fuel_type,
+  transmission = excluded.transmission,
+  seats = excluded.seats,
   price_per_day = excluded.price_per_day,
+  image_url = excluded.image_url,
   status = excluded.status;
 
 alter table public.profiles enable row level security;
@@ -135,6 +141,11 @@ drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"
   on public.cars for select
   using (status = 'available' or auth.role() = 'authenticated' or public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can insert cars" on public.cars;
+create policy "Admins can insert cars"
+  on public.cars for insert
+  with check (public.is_admin(auth.uid()));
 
 drop policy if exists "Admins can update cars" on public.cars;
 create policy "Admins can update cars"

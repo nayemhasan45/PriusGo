@@ -6,7 +6,7 @@ describe("admin booking helpers", () => {
     {
       id: "booking-1",
       user_id: "user-1",
-      car_id: "toyota-prius-white-2014",
+      car_id: "MJO146",
       full_name: "Al Amin",
       email: "al@example.com",
       phone: "+37060000000",
@@ -21,7 +21,7 @@ describe("admin booking helpers", () => {
     {
       id: "booking-2",
       user_id: "user-2",
-      car_id: "toyota-prius-silver-2015",
+      car_id: "MHP235",
       full_name: "Second Customer",
       email: "second@example.com",
       phone: "+37061111111",
@@ -40,7 +40,7 @@ describe("admin booking helpers", () => {
 
     expect(bookings[0]).toMatchObject({
       id: "booking-1",
-      carName: "Toyota Prius White",
+      carName: "Toyota Prius MJO146",
       fullName: "Al Amin",
       status: "pending",
       estimatedTotal: 105,

@@ -5,7 +5,7 @@ describe("Supabase booking helpers", () => {
   it("builds a Supabase booking insert with logged-in user id and customer contact metadata", () => {
     const insert = buildBookingInsert(
       {
-        carId: "toyota-prius-white-2014",
+        carId: "MJO146",
         fullName: "Al Amin",
         email: "al@example.com",
         phone: "+37060000000",
@@ -20,7 +20,7 @@ describe("Supabase booking helpers", () => {
 
     expect(insert).toEqual({
       user_id: "user-123",
-      car_id: "toyota-prius-white-2014",
+      car_id: "MJO146",
       full_name: "Al Amin",
       email: "al@example.com",
       phone: "+37060000000",
@@ -37,7 +37,7 @@ describe("Supabase booking helpers", () => {
     const booking = mapBookingRowToRequest({
       id: "booking-1",
       user_id: "user-123",
-      car_id: "toyota-prius-silver-2015",
+      car_id: "MHP235",
       full_name: "Al Amin",
       email: "al@example.com",
       phone: "+37060000000",
@@ -52,8 +52,8 @@ describe("Supabase booking helpers", () => {
 
     expect(booking).toMatchObject({
       id: "booking-1",
-      carId: "toyota-prius-silver-2015",
-      carName: "Toyota Prius Silver",
+      carId: "MHP235",
+      carName: "Toyota Prius MHP235",
       fullName: "Al Amin",
       email: "al@example.com",
       status: "approved",
