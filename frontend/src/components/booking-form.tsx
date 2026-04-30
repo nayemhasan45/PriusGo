@@ -140,7 +140,8 @@ export function BookingForm() {
         const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
         if (!userData.user) {
-          throw new Error("Please sign in before submitting a real booking request.");
+          window.location.href = `/login?redirectTo=${encodeURIComponent("/#booking")}`;
+          return;
         }
 
         const { data: isAvailable, error: availabilityError } = await supabase.rpc("car_is_available", {

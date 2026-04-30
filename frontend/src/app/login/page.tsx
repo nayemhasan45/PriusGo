@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { AuthForm } from "@/components/auth-form";
 import { Header } from "@/components/header";
 
@@ -25,7 +26,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <AuthForm />
+        <Suspense fallback={<div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl" />}>
+          <AuthForm />
+        </Suspense>
       </section>
     </main>
   );

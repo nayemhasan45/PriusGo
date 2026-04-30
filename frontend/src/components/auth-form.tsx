@@ -1,12 +1,14 @@
 "use client";
 
 import { Loader2, LogIn, UserPlus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? "/dashboard";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
@@ -28,7 +30,7 @@ export function AuthForm() {
       const { error: googleError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}${redirectTo}`,
         },
       });
 
@@ -74,7 +76,7 @@ export function AuthForm() {
         if (signInError) throw signInError;
       }
 
-      router.push("/dashboard");
+      router.push(redirectTo);
       router.refresh();
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Authentication failed. Please try again.");
