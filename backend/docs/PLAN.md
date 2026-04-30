@@ -10,6 +10,25 @@
 
 ---
 
+## Completed Work (as of 2026-04-30)
+
+- ✅ Phase 1: App verified, tests pass, build passes
+- ✅ Phase 2: Supabase connected (env vars, schema applied, storage bucket created)
+- ✅ Phase 3: Auth working — email/password + Google OAuth, profiles auto-created
+- ✅ Phase 4: Customer booking flow works end-to-end with Supabase
+- ✅ Phase 5: Admin role configured, admin pages protected by RLS
+- ✅ Phase 6: Novaride-inspired homepage redesign complete
+- ✅ Admin car image uploads via Supabase Storage (`car-images` bucket)
+- ✅ Admin can add/delete cars (delete gated by booking check)
+- ✅ Fleet is fully dynamic — no seed cars, admin-driven only
+- ✅ Interactive availability calendars on car cards and booking form
+- ✅ Live fleet count on homepage banner
+- ⬜ Phase 7: Business/legal safety (non-code — insurance, contracts, payment policy)
+- ⬜ Phase 8: Deploy to Vercel
+- ⬜ Phase 9: Portfolio case study
+
+---
+
 ## Current Project State
 
 Main frontend app:

@@ -40,11 +40,15 @@ npx vitest run src/lib/booking.test.ts
 
 The frontend talks directly to Supabase from the browser via `@supabase/ssr`. There is no custom API server. `src/lib/supabase/client.ts` returns `null` when env vars are missing — callers must guard against this.
 
-Car data has two sources that must stay in sync:
-- **`src/lib/cars.ts`** — static TypeScript array; used for display, pricing, and mapping `car_id` back to a name.
-- **`backend/supabase-schema.sql`** — seed `INSERT` for the same cars in the `cars` table; used for RLS and availability checks.
+Car data is fully dynamic — sourced only from the Supabase `cars` table:
+- **`src/lib/cars.ts`** — intentionally empty array (`[]`). No static car data. Do not add cars here.
+- Cars are added/removed exclusively through the admin UI at `/admin/cars`.
+- The schema has no seed cars. The fleet starts empty and grows as admin adds real cars.
+- `mapBookingRowToRequest` in `src/lib/supabase/bookings.ts` uses `car_id` as a fallback name since the static lookup is gone.
 
-When adding a new car, update both.
+### Car image uploads
+
+Car photos are stored in Supabase Storage bucket `car-images` (public, 5MB limit, JPEG/PNG/WebP/GIF). The RLS upload policy uses a subquery pattern `(select public.is_admin(auth.uid()))` — required for storage context. Admin-only upload/update/delete; public read.
 
 ### Type conventions
 
@@ -57,6 +61,19 @@ Supabase Auth is used for both email/password and Google OAuth. On first sign-in
 Admin access is granted by setting `profiles.role = 'admin'` directly in Supabase SQL Editor — there is no UI for this. The `public.is_admin(user_id)` SQL function is used in every admin RLS policy.
 
 Admin pages (`/admin/bookings`, `/admin/cars`) check the role client-side and redirect non-admins. The RLS policies on Supabase enforce the same rules server-side.
+
+### Admin car management
+
+- Admin can add cars with photo upload (Supabase Storage) or image URL fallback.
+- Admin can update car price and status (available/unavailable/maintenance).
+- Admin can delete cars **only if they have zero bookings** — the delete button is hidden otherwise (FK constraint). To force-remove a car with test bookings, delete its bookings first in Supabase SQL Editor.
+- `src/components/admin-cars.tsx` loads `carsWithBookings` (all car_ids that have any booking) to gate the delete button.
+
+### Availability calendars
+
+- `src/components/booking-calendar.tsx` — read-only month calendar on each car card. Green = available, red = booked, grey = past, orange = today. Month-navigable.
+- `src/components/booking-date-picker.tsx` — interactive dark-themed calendar in the booking form. Loads blocked dates for the selected car from `car_booking_blocks`. Click to select start/end date range; blocked dates are unclickable.
+- `src/components/fleet-count.tsx` — live fleet count on the homepage banner, reads from Supabase instead of being hardcoded.
 
 ### Availability logic
 
