@@ -1,4 +1,3 @@
-import { getCarById } from "@/lib/cars";
 import type { BookingRequest } from "@/lib/types";
 
 export type BookingStatus = BookingRequest["status"];
@@ -62,12 +61,10 @@ export function buildBookingInsert(values: BookingFormValues, userId: string): B
 }
 
 export function mapBookingRowToRequest(row: BookingRow): BookingRequest {
-  const car = getCarById(row.car_id);
-
   return {
     id: row.id,
     carId: row.car_id,
-    carName: car?.name ?? "Toyota Prius",
+    carName: `Toyota Prius ${row.car_id}`,
     fullName: row.full_name ?? "Customer",
     email: row.email ?? "",
     phone: row.phone,

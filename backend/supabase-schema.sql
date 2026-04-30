@@ -64,21 +64,6 @@ begin
 end;
 $$;
 
-insert into public.cars (id, name, brand, model, year, fuel_type, transmission, seats, price_per_day, image_url, status)
-values
-  ('MJO146', 'Toyota Prius MJO146', 'Toyota', 'Prius', 2014, 'Hybrid petrol', 'Automatic', 5, 20, '/images/prius-fleet.jpg', 'available'),
-  ('MHP235', 'Toyota Prius MHP235', 'Toyota', 'Prius', 2015, 'Hybrid petrol', 'Automatic', 5, 20, '/images/prius-fleet.jpg', 'available')
-on conflict (id) do update set
-  name = excluded.name,
-  brand = excluded.brand,
-  model = excluded.model,
-  year = excluded.year,
-  fuel_type = excluded.fuel_type,
-  transmission = excluded.transmission,
-  seats = excluded.seats,
-  price_per_day = excluded.price_per_day,
-  image_url = excluded.image_url,
-  status = excluded.status;
 
 alter table public.profiles enable row level security;
 alter table public.cars enable row level security;
@@ -136,7 +121,7 @@ where status in ('approved', 'completed');
 
 grant usage on schema public to anon, authenticated;
 grant select on public.cars to anon, authenticated;
-grant insert, update on public.cars to authenticated;
+grant insert, update, delete on public.cars to authenticated;
 grant select, insert, update on public.profiles to authenticated;
 grant select, insert, update on public.bookings to authenticated;
 grant select on public.car_booking_blocks to anon, authenticated;
@@ -157,19 +142,19 @@ create policy "Car images are publicly readable"
 
 drop policy if exists "Admins can upload car images" on storage.objects;
 create policy "Admins can upload car images"
-  on storage.objects for insert
-  with check (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'car-images' and (select public.is_admin(auth.uid())));
 
 drop policy if exists "Admins can update car images" on storage.objects;
 create policy "Admins can update car images"
-  on storage.objects for update
-  using (bucket_id = 'car-images' and public.is_admin(auth.uid()))
-  with check (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+  on storage.objects for update to authenticated
+  using (bucket_id = 'car-images' and (select public.is_admin(auth.uid())))
+  with check (bucket_id = 'car-images' and (select public.is_admin(auth.uid())));
 
 drop policy if exists "Admins can delete car images" on storage.objects;
 create policy "Admins can delete car images"
-  on storage.objects for delete
-  using (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'car-images' and (select public.is_admin(auth.uid())));
 
 drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"
@@ -186,6 +171,11 @@ create policy "Admins can update cars"
   on public.cars for update
   using (public.is_admin(auth.uid()))
   with check (public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can delete cars" on public.cars;
+create policy "Admins can delete cars"
+  on public.cars for delete
+  using (public.is_admin(auth.uid()));
 
 drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"

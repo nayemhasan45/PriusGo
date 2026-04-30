@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BookingForm } from "@/components/booking-form";
 import { CustomerCars } from "@/components/customer-cars";
+import { FleetCount } from "@/components/fleet-count";
 import { Header } from "@/components/header";
 
 const steps = [
@@ -91,7 +92,7 @@ export default function Home() {
                 <p className="mt-1 text-xs text-white/50 sm:text-sm">per week</p>
               </div>
               <div>
-                <p className="font-heading text-2xl font-black text-white sm:text-3xl">2</p>
+                <p className="font-heading text-2xl font-black text-white sm:text-3xl"><FleetCount /></p>
                 <p className="mt-1 text-xs text-white/50 sm:text-sm">cars in fleet</p>
               </div>
             </div>

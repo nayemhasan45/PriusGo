@@ -7,8 +7,9 @@ import { z } from "zod";
 import { estimateBookingPrice } from "@/lib/booking";
 import { cars as fallbackCars } from "@/lib/cars";
 import { buildBookingInsert } from "@/lib/supabase/bookings";
-import { mapCarRowToCar, type CarRow } from "@/lib/supabase/cars";
+import { mapCarRowToCar, type CarBookingBlock, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
 import { createClient } from "@/lib/supabase/client";
+import { BookingDatePicker } from "@/components/booking-date-picker";
 import type { BookingRequest, Car } from "@/lib/types";
 
 const bookingSchema = z.object({
@@ -28,6 +29,7 @@ const pricePerWeek = 100;
 export function BookingForm() {
   const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
   const [selectedCarId, setSelectedCarId] = useState("");
+  const [bookingBlocks, setBookingBlocks] = useState<CarBookingBlock[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [success, setSuccess] = useState(false);
@@ -67,6 +69,22 @@ export function BookingForm() {
     window.addEventListener("priusgo:select-car", handleCarSelection);
     return () => window.removeEventListener("priusgo:select-car", handleCarSelection);
   }, []);
+
+  useEffect(() => {
+    async function loadBlocks() {
+      setStartDate("");
+      setEndDate("");
+      if (!selectedCarId) { setBookingBlocks([]); return; }
+      const supabase = createClient();
+      if (!supabase) return;
+      const { data } = await supabase
+        .from("car_booking_blocks")
+        .select("car_id,start_date,end_date,status")
+        .eq("car_id", selectedCarId);
+      setBookingBlocks(data ? (data as CarBookingBlockRow[]).map((r) => ({ startDate: r.start_date, endDate: r.end_date, status: r.status })) : []);
+    }
+    void loadBlocks();
+  }, [selectedCarId]);
 
   const estimatedTotal = useMemo(() => {
     if (!selectedCar || !startDate || !endDate) return 0;
@@ -188,7 +206,7 @@ export function BookingForm() {
           </div>
           <h3 className="mt-5 font-heading text-2xl font-black text-white">Choose a car from the fleet first</h3>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/55">
-            Booking is car-specific. Pick MJO146, MHP235, or another available car from the fleet, then this form will lock to that exact car.
+            Booking is car-specific. Pick an available car from the fleet above, then this form will lock to that exact car.
           </p>
           <a href="#cars" className="mt-6 inline-flex rounded-full bg-[#ff3600] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#cc2b00]">
             View fleet
@@ -223,8 +241,18 @@ export function BookingForm() {
         <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" /></Field>
         <Field label="Phone"><input name="phone" required placeholder="+370 ..." /></Field>
         <Field label="Pickup location"><input name="pickupLocation" required defaultValue="Šiauliai" /></Field>
-        <Field label="Start date"><input name="startDate" required type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></Field>
-        <Field label="End date"><input name="endDate" required type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></Field>
+
+        <input type="hidden" name="startDate" value={startDate} />
+        <input type="hidden" name="endDate" value={endDate} />
+        <div className="md:col-span-2">
+          <BookingDatePicker
+            blocks={bookingBlocks}
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+          />
+        </div>
 
         <label className="grid gap-2 md:col-span-2">
           <span className="text-sm font-medium text-white/60">Message</span>

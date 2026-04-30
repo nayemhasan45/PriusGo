@@ -3,7 +3,8 @@
 import type { Car } from "@/lib/types";
 import type { CarBookingBlock } from "@/lib/supabase/cars";
 import { getCustomerCarAvailability } from "@/lib/supabase/cars";
-import { CalendarX2, CheckCircle2, Fuel, Gauge, Users, XCircle } from "lucide-react";
+import { BookingCalendar } from "@/components/booking-calendar";
+import { CheckCircle2, Fuel, Gauge, Users, XCircle } from "lucide-react";
 
 export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?: CarBookingBlock[] }) {
   const availability = getCustomerCarAvailability(car.status);
@@ -97,30 +98,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
           ))}
         </ul>
 
-        <div className="mt-5 rounded-2xl border border-[#e9e9e9] bg-[#fff7f4] p-4">
-          <div className="flex items-center justify-between gap-3">
-            <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#0b0b0b]">
-              <CalendarX2 className="size-4 text-[#ff3600]" /> Unavailable dates
-            </p>
-            <span className="text-xs text-[#616161]">per car</span>
-          </div>
-          {bookingBlocks.length === 0 ? (
-            <p className="mt-3 rounded-xl bg-white px-3 py-2 text-sm font-medium text-emerald-700 ring-1 ring-emerald-100">
-              No blocked dates — open for new bookings.
-            </p>
-          ) : (
-            <div className="mt-3 grid gap-2">
-              {bookingBlocks.slice(0, 4).map((block) => (
-                <div key={`${block.startDate}-${block.endDate}`} className="rounded-xl bg-white px-3 py-2 text-sm font-medium text-[#616161] ring-1 ring-[#e9e9e9]">
-                  {block.startDate} → {block.endDate}
-                </div>
-              ))}
-              {bookingBlocks.length > 4 && (
-                <p className="text-xs text-[#616161]">+{bookingBlocks.length - 4} more unavailable date ranges</p>
-              )}
-            </div>
-          )}
-        </div>
+        <BookingCalendar blocks={bookingBlocks} />
 
         {isAvailable ? (
           <button

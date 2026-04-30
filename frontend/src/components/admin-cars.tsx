@@ -1,6 +1,6 @@
 "use client";
 
-import { CarFront, Loader2, Plus, Save, ShieldCheck } from "lucide-react";
+import { CarFront, Loader2, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { buildAdminCarInsert, buildCarImageObjectPath, getCarStatusTone, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
@@ -40,9 +40,11 @@ const emptyNewCarForm: NewCarForm = {
 export function AdminCars() {
   const [cars, setCars] = useState<Car[]>([]);
   const [blocksByCar, setBlocksByCar] = useState<ReturnType<typeof groupBookingBlocksByCar>>({});
+  const [carsWithBookings, setCarsWithBookings] = useState<Set<string>>(new Set());
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingCarId, setUpdatingCarId] = useState<string | null>(null);
+  const [deletingCarId, setDeletingCarId] = useState<string | null>(null);
   const [newCar, setNewCar] = useState<NewCarForm>(emptyNewCarForm);
   const [newCarImageFile, setNewCarImageFile] = useState<File | null>(null);
   const [isAddingCar, setIsAddingCar] = useState(false);
@@ -88,6 +90,9 @@ export function AdminCars() {
 
       const { data: blockRows, error: blocksError } = await supabase.from("car_booking_blocks").select("car_id,start_date,end_date,status");
       if (!blocksError) setBlocksByCar(groupBookingBlocksByCar((blockRows ?? []) as CarBookingBlockRow[]));
+
+      const { data: bookingCarRows } = await supabase.from("bookings").select("car_id");
+      setCarsWithBookings(new Set((bookingCarRows ?? []).map((b: { car_id: string }) => b.car_id)));
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Could not load cars.");
     } finally {
@@ -120,6 +125,22 @@ export function AdminCars() {
       setError(getSupabaseErrorMessage(caughtError, "Could not update car."));
     } finally {
       setUpdatingCarId(null);
+    }
+  }
+
+  async function deleteCar(carId: string) {
+    setDeletingCarId(carId);
+    setError(null);
+    try {
+      const supabase = createClient();
+      if (!supabase) throw new Error("Supabase is not configured.");
+      const { error: deleteError } = await supabase.from("cars").delete().eq("id", carId);
+      if (deleteError) throw deleteError;
+      setCars((current) => current.filter((car) => car.id !== carId));
+    } catch (caughtError) {
+      setError(getSupabaseErrorMessage(caughtError, "Could not delete car."));
+    } finally {
+      setDeletingCarId(null);
     }
   }
 
@@ -314,16 +335,17 @@ export function AdminCars() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         {cars.map((car) => (
-          <CarAdminCard key={car.id} car={car} blocks={blocksByCar[car.id] ?? []} isUpdating={updatingCarId === car.id} onUpdate={updateCar} />
+          <CarAdminCard key={car.id} car={car} blocks={blocksByCar[car.id] ?? []} isUpdating={updatingCarId === car.id} isDeleting={deletingCarId === car.id} hasBookings={carsWithBookings.has(car.id)} onUpdate={updateCar} onDelete={deleteCar} />
         ))}
       </div>
     </div>
   );
 }
 
-function CarAdminCard({ car, blocks, isUpdating, onUpdate }: { car: Car; blocks: ReturnType<typeof groupBookingBlocksByCar>[string]; isUpdating: boolean; onUpdate: (carId: string, values: { pricePerDay?: number; status?: CarStatus }) => void }) {
+function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpdate, onDelete }: { car: Car; blocks: ReturnType<typeof groupBookingBlocksByCar>[string]; isUpdating: boolean; isDeleting: boolean; hasBookings: boolean; onUpdate: (carId: string, values: { pricePerDay?: number; status?: CarStatus }) => void; onDelete: (carId: string) => void }) {
   const [price, setPrice] = useState(String(car.pricePerDay));
   const [status, setStatus] = useState<CarStatus>(car.status);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const parsedPrice = Number(price);
   const canSave = Number.isFinite(parsedPrice) && parsedPrice > 0;
@@ -356,9 +378,29 @@ function CarAdminCard({ car, blocks, isUpdating, onUpdate }: { car: Car; blocks:
         </label>
       </div>
 
-      <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status })} className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
-        {isUpdating ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Save car
-      </button>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status })} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+          {isUpdating ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Save car
+        </button>
+
+        {!hasBookings && (
+          confirmDelete ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-red-700">Remove this car?</span>
+              <button onClick={() => { onDelete(car.id); setConfirmDelete(false); }} disabled={isDeleting} className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700 disabled:opacity-60">
+                {isDeleting ? <Loader2 className="size-4 animate-spin" /> : null} Yes, remove
+              </button>
+              <button onClick={() => setConfirmDelete(false)} className="rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-100">
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setConfirmDelete(true)} className="inline-flex items-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-black text-red-700 hover:bg-red-50">
+              <Trash2 className="size-4" /> Remove car
+            </button>
+          )
+        )}
+      </div>
 
       <div className="mt-6 rounded-3xl bg-slate-50 p-4">
         <p className="text-sm font-black text-slate-800">Rental calendar</p>
