@@ -94,9 +94,30 @@ http://localhost:3000/admin/bookings
 - Pricing supports €20/day and €100/week; extra days after full weeks are calculated daily.
 - Customer dashboard for own bookings
 - Admin booking dashboard
-- Admin car management for price/status updates
+- Admin car management for price/status updates and photo uploads
 - Admin quick actions for approve/reject/cancel/complete/reopen
 - Supabase Row Level Security for customer/admin access
+- Database trigger/exclusion constraint prevents overlapping approved/completed bookings for the same car
+
+## Version 2 plan
+
+PriusGo V2 is planned as a real small car-rental operating system, not just a demo.
+
+Main plan:
+
+```text
+backend/docs/VERSION_2_PLAN.md
+```
+
+V2 priorities:
+
+- responsive polish for phone, tablet, laptop, and desktop
+- production deployment and smoke testing
+- rental agreement/business safety workflow
+- admin operations dashboard
+- customer/admin communication helpers
+- deposit/payment tracking before online payment automation
+- SEO, trust sections, and portfolio case-study polish
 
 ## Verification
 

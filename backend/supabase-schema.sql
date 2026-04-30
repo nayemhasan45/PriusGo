@@ -2,6 +2,7 @@
 -- Safe to run more than once in Supabase SQL Editor.
 
 create extension if not exists pgcrypto;
+create extension if not exists btree_gist;
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -110,6 +111,53 @@ as $$
   );
 $$;
 
+create or replace function public.prevent_overlapping_confirmed_bookings()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status in ('approved', 'completed') and exists (
+    select 1
+    from public.bookings existing
+    where existing.car_id = new.car_id
+      and existing.id is distinct from new.id
+      and existing.status in ('approved', 'completed')
+      and daterange(existing.start_date, existing.end_date, '[]') && daterange(new.start_date, new.end_date, '[]')
+  ) then
+    raise exception 'Car % already has an approved/completed booking overlapping % to %', new.car_id, new.start_date, new.end_date
+      using errcode = '23P01';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists prevent_overlapping_confirmed_bookings on public.bookings;
+create trigger prevent_overlapping_confirmed_bookings
+  before insert or update of car_id, start_date, end_date, status on public.bookings
+  for each row execute function public.prevent_overlapping_confirmed_bookings();
+
+-- Race-safe database guard against double-booking confirmed rentals.
+-- The trigger above gives a friendly error in normal flows; this exclusion constraint
+-- is the final protection for concurrent admin approvals/inserts.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'bookings_no_overlapping_confirmed'
+  ) then
+    alter table public.bookings
+      add constraint bookings_no_overlapping_confirmed
+      exclude using gist (
+        car_id with =,
+        daterange(start_date, end_date, '[]') with &&
+      )
+      where (status in ('approved', 'completed'));
+  end if;
+end;
+$$;
+
 create or replace view public.car_booking_blocks as
 select
   car_id,
@@ -127,6 +175,7 @@ grant select, insert, update on public.bookings to authenticated;
 grant select on public.car_booking_blocks to anon, authenticated;
 grant execute on function public.car_is_available(text, date, date) to anon, authenticated;
 grant execute on function public.is_admin(uuid) to authenticated;
+grant execute on function public.prevent_overlapping_confirmed_bookings() to authenticated;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('car-images', 'car-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])

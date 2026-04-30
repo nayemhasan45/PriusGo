@@ -4,11 +4,12 @@ import { Loader2, LogIn, UserPlus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getSafeRedirectPath } from "@/lib/auth-redirect";
 
 export function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? "/dashboard";
+  const redirectTo = getSafeRedirectPath(searchParams.get("redirectTo"));
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);

@@ -4,7 +4,7 @@ import { CalendarDays, CarFront, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { estimateBookingPrice } from "@/lib/booking";
+import { dateRangeOverlapsBlocks, estimateBookingPrice } from "@/lib/booking";
 import { cars as fallbackCars } from "@/lib/cars";
 import { buildBookingInsert } from "@/lib/supabase/bookings";
 import { mapCarRowToCar, type CarBookingBlock, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
@@ -28,22 +28,33 @@ const pricePerWeek = 100;
 
 const DRAFT_KEY = "priusgo:booking-draft";
 
+type BookingDraft = {
+  carId?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  startDate?: string;
+  endDate?: string;
+  pickupLocation?: string;
+  message?: string;
+};
+
 export function BookingForm() {
-  const [draft] = useState<{ carId?: string; fullName?: string; email?: string; phone?: string } | null>(() => {
+  const [draft] = useState<BookingDraft | null>(() => {
     if (typeof window === "undefined") return null;
     try {
       const saved = sessionStorage.getItem(DRAFT_KEY);
       if (!saved) return null;
       sessionStorage.removeItem(DRAFT_KEY);
-      return JSON.parse(saved) as { carId?: string; fullName?: string; email?: string; phone?: string };
+      return JSON.parse(saved) as BookingDraft;
     } catch { return null; }
   });
 
   const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
   const [selectedCarId, setSelectedCarId] = useState(draft?.carId ?? "");
   const [bookingBlocks, setBookingBlocks] = useState<CarBookingBlock[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(draft?.startDate ?? "");
+  const [endDate, setEndDate] = useState(draft?.endDate ?? "");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +84,13 @@ export function BookingForm() {
       const customEvent = event as CustomEvent<{ carId?: string }>;
       const carId = customEvent.detail?.carId;
       if (!carId) return;
-      setSelectedCarId(carId);
+      setSelectedCarId((current) => {
+        if (current !== carId) {
+          setStartDate("");
+          setEndDate("");
+        }
+        return carId;
+      });
       setSuccess(false);
       setError(null);
     }
@@ -84,8 +101,6 @@ export function BookingForm() {
 
   useEffect(() => {
     async function loadBlocks() {
-      setStartDate("");
-      setEndDate("");
       if (!selectedCarId) { setBookingBlocks([]); return; }
       const supabase = createClient();
       if (!supabase) return;
@@ -93,10 +108,15 @@ export function BookingForm() {
         .from("car_booking_blocks")
         .select("car_id,start_date,end_date,status")
         .eq("car_id", selectedCarId);
-      setBookingBlocks(data ? (data as CarBookingBlockRow[]).map((r) => ({ startDate: r.start_date, endDate: r.end_date, status: r.status })) : []);
+      const blocks = data ? (data as CarBookingBlockRow[]).map((r) => ({ startDate: r.start_date, endDate: r.end_date, status: r.status })) : [];
+      setBookingBlocks(blocks);
+      if (startDate && endDate && dateRangeOverlapsBlocks(startDate, endDate, blocks)) {
+        setEndDate("");
+        setError("Those dates now overlap an existing booking. Please choose a different end date.");
+      }
     }
     void loadBlocks();
-  }, [selectedCarId]);
+  }, [selectedCarId, startDate, endDate]);
 
   const estimatedTotal = useMemo(() => {
     if (!selectedCar || !startDate || !endDate) return 0;
@@ -129,6 +149,9 @@ export function BookingForm() {
 
       const car = availableCars.find((item) => item.id === values.carId);
       if (!car) throw new Error("Selected car was not found");
+      if (dateRangeOverlapsBlocks(values.startDate, values.endDate, bookingBlocks)) {
+        throw new Error("This car is already rented for those dates. Choose another car or different dates.");
+      }
 
       const booking: BookingRequest = {
         id: crypto.randomUUID(),
@@ -155,6 +178,10 @@ export function BookingForm() {
             fullName: values.fullName,
             email: values.email,
             phone: values.phone,
+            startDate: values.startDate,
+            endDate: values.endDate,
+            pickupLocation: values.pickupLocation,
+            message: values.message,
           }));
           setIsRedirecting(true);
           window.location.href = `/login?redirectTo=${encodeURIComponent("/#booking")}`;
@@ -285,7 +312,7 @@ export function BookingForm() {
         <Field label="Full name"><input name="fullName" required placeholder="Al Amin" defaultValue={draft?.fullName ?? ""} /></Field>
         <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" defaultValue={draft?.email ?? ""} /></Field>
         <Field label="Phone"><input name="phone" required placeholder="+370 ..." defaultValue={draft?.phone ?? ""} /></Field>
-        <Field label="Pickup location"><input name="pickupLocation" required defaultValue="Šiauliai" /></Field>
+        <Field label="Pickup location"><input name="pickupLocation" required defaultValue={draft?.pickupLocation ?? "Šiauliai"} /></Field>
 
         <input type="hidden" name="startDate" value={startDate} />
         <input type="hidden" name="endDate" value={endDate} />
@@ -301,7 +328,7 @@ export function BookingForm() {
 
         <label className="grid gap-2 md:col-span-2">
           <span className="text-sm font-medium text-white/60">Message</span>
-          <textarea name="message" className="min-h-28 rounded-2xl border border-white/8 bg-white/8 px-4 py-3 text-white outline-none ring-[#ff3600] transition placeholder:text-white/25 focus:ring-2" placeholder="Pickup time, rental purpose, questions..." />
+          <textarea name="message" defaultValue={draft?.message ?? ""} className="min-h-28 rounded-2xl border border-white/8 bg-white/8 px-4 py-3 text-white outline-none ring-[#ff3600] transition placeholder:text-white/25 focus:ring-2" placeholder="Pickup time, rental purpose, questions..." />
         </label>
 
         <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/5 md:col-span-2">

@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { formatLocalDate } from "@/lib/booking";
 import type { CarBookingBlock } from "@/lib/supabase/cars";
 
 const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -10,10 +11,6 @@ const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
-
-function toDateStr(date: Date) {
-  return date.toISOString().split("T")[0];
-}
 
 function isBlocked(dateStr: string, blocks: CarBookingBlock[]) {
   return blocks.some((b) => dateStr >= b.startDate && dateStr <= b.endDate);
@@ -47,7 +44,7 @@ function getCalendarDays(year: number, month: number) {
 export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayStr = toDateStr(today);
+  const todayStr = formatLocalDate(today);
 
   const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -65,7 +62,7 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
   const isPrevDisabled = viewDate <= new Date(today.getFullYear(), today.getMonth(), 1);
 
   function getDayStyle(date: Date, current: boolean) {
-    const dateStr = toDateStr(date);
+    const dateStr = formatLocalDate(date);
     const isPast = date < today;
     const isToday = dateStr === todayStr;
 

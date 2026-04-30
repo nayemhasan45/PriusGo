@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { dateRangeOverlapsBlocks, formatLocalDate } from "@/lib/booking";
 import type { CarBookingBlock } from "@/lib/supabase/cars";
 
 const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -9,13 +10,6 @@ const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
-
-function toDateStr(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
 
 function isBlocked(dateStr: string, blocks: CarBookingBlock[]) {
   return blocks.some((b) => dateStr >= b.startDate && dateStr <= b.endDate);
@@ -56,7 +50,7 @@ interface BookingDatePickerProps {
 export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChange, onEndDateChange }: BookingDatePickerProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayStr = toDateStr(today);
+  const todayStr = formatLocalDate(today);
 
   const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [hoverDate, setHoverDate] = useState<string | null>(null);
@@ -72,6 +66,7 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
       onEndDateChange("");
     } else {
       if (dateStr >= startDate) {
+        if (dateRangeOverlapsBlocks(startDate, dateStr, blocks)) return;
         onEndDateChange(dateStr);
       } else {
         onStartDateChange(dateStr);
@@ -80,8 +75,12 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
     }
   }
 
+  function isInvalidRangeEnd(dateStr: string) {
+    return Boolean(startDate && !endDate && dateStr >= startDate && dateRangeOverlapsBlocks(startDate, dateStr, blocks));
+  }
+
   function getDayClasses(date: Date, current: boolean) {
-    const dateStr = toDateStr(date);
+    const dateStr = formatLocalDate(date);
     const isPast = date < today;
     const isToday = dateStr === todayStr;
     const blocked = isBlocked(dateStr, blocks);
@@ -94,6 +93,8 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
       : startDate && endDate
         ? dateStr > startDate && dateStr < endDate
         : false;
+
+    const invalidRangeEnd = isInvalidRangeEnd(dateStr);
 
     if (!current) return { cell: "opacity-0 cursor-default pointer-events-none", inner: "" };
 
@@ -115,7 +116,7 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
       };
     }
 
-    if (blocked) {
+    if (blocked || invalidRangeEnd) {
       return {
         cell: "cursor-not-allowed",
         inner: "bg-red-500/20 text-red-400 rounded-full text-xs font-semibold",
@@ -179,16 +180,17 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
       {/* Day cells */}
       <div className="grid grid-cols-7 gap-y-1 px-2 py-3">
         {days.map(({ date, current }, i) => {
-          const dateStr = toDateStr(date);
+          const dateStr = formatLocalDate(date);
           const isPast = date < today;
           const blocked = isBlocked(dateStr, blocks);
-          const clickable = current && !isPast && !blocked;
+          const invalidRangeEnd = isInvalidRangeEnd(dateStr);
+          const clickable = current && !isPast && !blocked && !invalidRangeEnd;
           const { cell, inner } = getDayClasses(date, current);
 
           return (
             <div key={i} className={`flex items-center justify-center py-0.5 ${cell}`}
               onClick={() => clickable && handleDayClick(dateStr)}
-              onMouseEnter={() => startDate && !endDate && current && !isPast && !blocked ? setHoverDate(dateStr) : undefined}
+              onMouseEnter={() => startDate && !endDate && current && !isPast && !blocked && !invalidRangeEnd ? setHoverDate(dateStr) : undefined}
               onMouseLeave={() => setHoverDate(null)}
             >
               <span className={`flex size-7 items-center justify-center transition ${inner}`}>

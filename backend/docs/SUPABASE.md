@@ -68,14 +68,17 @@ https://your-domain.com/**
 ## What the SQL creates
 
 - `profiles` table for customers/admin roles.
-- `cars` table seeded with the Prius cars used by the frontend.
+- `cars` table for admin-managed fleet vehicles.
 - `bookings` table for booking requests.
+- `car-images` public Storage bucket for admin-uploaded car photos.
+- `btree_gist` extension for the race-safe `bookings_no_overlapping_confirmed` exclusion constraint.
 - Row Level Security policies:
   - public visitors can read available cars
   - logged-in users can read all cars so they can see Available / Not available status
   - users can read/update their own profile
   - logged-in users can create their own pending booking requests
   - booking requests can only target available cars
+  - approved/completed bookings cannot overlap for the same car, enforced by a database trigger/exclusion constraint
   - logged-in users can read their own bookings
 - Auth trigger:
   - creates a `profiles` row automatically when a user registers
@@ -131,8 +134,19 @@ Availability behavior:
 - Customer rental requests are allowed only for cars with `status = 'available'`.
 - Availability rule: `approved` and `completed` rentals block overlapping requests for the same car.
 - After admin approves a booking request, that car/date range becomes unavailable for all users.
+- Supabase rejects overlapping `approved`/`completed` bookings for the same car at database level using a friendly trigger plus a race-safe exclusion constraint, so admin cannot accidentally double-book a car.
 - Pending requests do not block availability until admin approval.
 - `rejected` and `cancelled` bookings do not block availability.
 - The SQL function `public.car_is_available()` is used by RLS and the frontend before inserting a rental request.
 - The `public.car_booking_blocks` view should expose approved/completed blocked ranges for the customer UI.
 - Current MVP pricing is €20/day and €100/week; full weeks use the weekly rate and extra days use the daily rate.
+
+## Version 2 reference
+
+The V2 roadmap lives here:
+
+```text
+backend/docs/VERSION_2_PLAN.md
+```
+
+Backend-related V2 work will likely add rental agreement fields, admin-only notes, payment/deposit tracking, maintenance metadata, and reporting/export support. Any V2 database change must update `backend/supabase-schema.sql`, this file, and the relevant Supabase mapping tests.

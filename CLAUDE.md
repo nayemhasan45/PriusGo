@@ -12,8 +12,10 @@ PriusGo is a Toyota Prius rental MVP for Šiauliai, Lithuania. Customers browse 
 PriusGo/
   frontend/          Next.js 16 app — all customer and admin UI
   backend/
-    supabase-schema.sql   Single source of truth for all DB tables, RLS, and seed data
+    supabase-schema.sql   Single source of truth for all DB tables, RLS, storage policies, and constraints
     docs/SUPABASE.md      Supabase project notes and Vercel env setup guide
+    docs/PLAN.md          Current MVP/Phase 8 handoff plan
+    docs/VERSION_2_PLAN.md  Version 2 roadmap and implementation strategy
 ```
 
 All code lives under `frontend/`. Run every command from `frontend/`.
@@ -77,7 +79,7 @@ Admin pages (`/admin/bookings`, `/admin/cars`) check the role client-side and re
 
 ### Availability logic
 
-Car availability is enforced at the DB level via the `public.car_is_available()` function, which is called inside the `bookings` insert RLS policy. Only `approved` and `completed` bookings block date ranges. The `car_booking_blocks` view surfaces these blocked ranges to the frontend for display.
+Car availability is enforced at the DB level via the `public.car_is_available()` function, which is called inside the `bookings` insert RLS policy. Only `approved` and `completed` bookings block date ranges. The `prevent_overlapping_confirmed_bookings` trigger gives friendly errors for overlapping `approved`/`completed` bookings, and the `bookings_no_overlapping_confirmed` exclusion constraint is the final race-safe protection for concurrent admin approvals/inserts. The `car_booking_blocks` view surfaces these blocked ranges to the frontend for display.
 
 ### Pricing
 
@@ -94,6 +96,10 @@ Use the same visual language, not copied assets:
 - Layout: rounded 30-40px hero/sections, max width around 1320px, large spacing, premium car-rental landing page style.
 - Motion: CSS fade-up reveal, hover-lift cards, diagonal CTA arrow movement, smooth scroll. Avoid heavy animation libraries unless necessary.
 - Keep all existing Supabase booking/auth/admin behavior intact while changing visuals.
+
+## Current direction
+
+Phase 8 is deployment readiness. Version 2 is documented in `backend/docs/VERSION_2_PLAN.md` and should be treated as the next roadmap after deployment. V2 priorities are responsive polish for phone/tablet/laptop/desktop, real rental-business safety, admin operations, communication helpers, deposit/payment tracking, SEO/trust, and portfolio value.
 
 ## Next.js version note
 

@@ -1,5 +1,7 @@
 # PriusGo car rental availability UI plan
 
+> **Status 2026-05-01:** This plan has been implemented/superseded. PriusGo now has dynamic admin-managed fleet cards, per-car booking calendars, login-required booking flow, and database-level overlap protection. For current roadmap work, use `/Users/al-amin/PriusGo/backend/docs/PLAN.md` and `/Users/al-amin/PriusGo/backend/docs/VERSION_2_PLAN.md`.
+
 ## Goal
 
 Plan the improved customer-facing car rental UI before building it.
