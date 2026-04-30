@@ -71,7 +71,8 @@ https://your-domain.com/**
 - `cars` table seeded with the Prius cars used by the frontend.
 - `bookings` table for booking requests.
 - Row Level Security policies:
-  - everyone can read available cars only
+  - public visitors can read available cars
+  - logged-in users can read all cars so they can see Available / Not available status
   - users can read/update their own profile
   - logged-in users can create their own pending booking requests
   - booking requests can only target available cars
@@ -92,7 +93,13 @@ Admin booking management lives inside the same Next.js app:
 http://localhost:3000/admin/bookings
 ```
 
-The admin page is protected by Supabase Auth and `profiles.role = 'admin'`.
+Fleet/car management lives here:
+
+```text
+http://localhost:3000/admin/cars
+```
+
+The admin pages are protected by Supabase Auth and `profiles.role = 'admin'`.
 
 After running the latest schema SQL, make one trusted user an admin from Supabase SQL Editor:
 
@@ -113,3 +120,15 @@ Admin capabilities:
 - read all booking requests
 - update booking status to `pending`, `approved`, `rejected`, `cancelled`, or `completed`
 - see total requests, pending requests, approved requests, and estimated revenue
+- read all cars, including unavailable and maintenance cars
+- update car rental status and daily price
+- show each car's approved/completed rental calendar
+
+Availability behavior:
+
+- Customer car cards show blocked rental ranges per car.
+- Customer car cards show clear Available / Not available labels; logged-in users can see unavailable cars too.
+- Customer rental requests are allowed only for cars with `status = 'available'`.
+- Approved/completed rentals block overlapping requests for the same car.
+- The SQL function `public.car_is_available()` is used by RLS and the frontend before inserting a rental request.
+- Current MVP pricing is €20/day and €100/week; full weeks use the weekly rate and extra days use the daily rate.

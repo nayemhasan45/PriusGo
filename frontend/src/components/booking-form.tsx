@@ -2,13 +2,14 @@
 
 import { CalendarDays, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { estimateBookingPrice } from "@/lib/booking";
-import { cars } from "@/lib/cars";
+import { cars as fallbackCars } from "@/lib/cars";
 import { buildBookingInsert } from "@/lib/supabase/bookings";
+import { mapCarRowToCar, type CarRow } from "@/lib/supabase/cars";
 import { createClient } from "@/lib/supabase/client";
-import type { BookingRequest } from "@/lib/types";
+import type { BookingRequest, Car } from "@/lib/types";
 
 const bookingSchema = z.object({
   carId: z.string().min(1, "Choose a car"),
@@ -21,8 +22,12 @@ const bookingSchema = z.object({
   message: z.string().optional(),
 });
 
+const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
+const pricePerWeek = 100;
+
 export function BookingForm() {
-  const [selectedCarId, setSelectedCarId] = useState(cars[0]?.id ?? "");
+  const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
+  const [selectedCarId, setSelectedCarId] = useState(fallbackCars[0]?.id ?? "");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [success, setSuccess] = useState(false);
@@ -30,13 +35,43 @@ export function BookingForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedCar = cars.find((car) => car.id === selectedCarId);
+  const selectedCar = availableCars.find((car) => car.id === selectedCarId);
   const supabaseReady = Boolean(createClient());
+
+  useEffect(() => {
+    async function loadAvailableCars() {
+      const supabase = createClient();
+      if (!supabase) return;
+
+      const { data, error: carsError } = await supabase.from("cars").select(carColumns).eq("status", "available").order("name", { ascending: true });
+      if (carsError || !data) return;
+
+      const mappedCars = (data as CarRow[]).map(mapCarRowToCar);
+      setAvailableCars(mappedCars);
+      setSelectedCarId((current) => (mappedCars.some((car) => car.id === current) ? current : mappedCars[0]?.id ?? ""));
+    }
+
+    void loadAvailableCars();
+  }, []);
+
+  useEffect(() => {
+    function handleCarSelection(event: Event) {
+      const customEvent = event as CustomEvent<{ carId?: string }>;
+      const carId = customEvent.detail?.carId;
+      if (!carId) return;
+      setSelectedCarId(carId);
+      setSuccess(false);
+      setError(null);
+    }
+
+    window.addEventListener("priusgo:select-car", handleCarSelection);
+    return () => window.removeEventListener("priusgo:select-car", handleCarSelection);
+  }, []);
 
   const estimatedTotal = useMemo(() => {
     if (!selectedCar || !startDate || !endDate) return 0;
     try {
-      return estimateBookingPrice(selectedCar.pricePerDay, startDate, endDate);
+      return estimateBookingPrice(selectedCar.pricePerDay, startDate, endDate, { pricePerWeek });
     } catch {
       return 0;
     }
@@ -63,7 +98,7 @@ export function BookingForm() {
         message: String(formData.get("message") ?? ""),
       });
 
-      const car = cars.find((item) => item.id === values.carId);
+      const car = availableCars.find((item) => item.id === values.carId);
       if (!car) throw new Error("Selected car was not found");
 
       const booking: BookingRequest = {
@@ -77,7 +112,7 @@ export function BookingForm() {
         endDate: values.endDate,
         pickupLocation: values.pickupLocation,
         message: values.message,
-        estimatedTotal: estimateBookingPrice(car.pricePerDay, values.startDate, values.endDate),
+        estimatedTotal: estimateBookingPrice(car.pricePerDay, values.startDate, values.endDate, { pricePerWeek }),
         status: "pending",
         createdAt: new Date().toISOString(),
       };
@@ -88,6 +123,15 @@ export function BookingForm() {
         if (userError) throw userError;
         if (!userData.user) {
           throw new Error("Please sign in before submitting a real booking request.");
+        }
+
+        const { data: isAvailable, error: availabilityError } = await supabase.rpc("car_is_available", {
+          selected_car_id: values.carId,
+          requested_start_date: values.startDate,
+          requested_end_date: values.endDate,
+        });
+        if (!availabilityError && isAvailable === false) {
+          throw new Error("This car is already rented for those dates. Choose another car or different dates.");
         }
 
         const { error: insertError } = await supabase
@@ -102,7 +146,7 @@ export function BookingForm() {
 
       setSuccess(true);
       form.reset();
-      setSelectedCarId(cars[0]?.id ?? "");
+      setSelectedCarId(availableCars[0]?.id ?? "");
       setStartDate("");
       setEndDate("");
     } catch (caughtError) {
@@ -121,9 +165,9 @@ export function BookingForm() {
       <div className="mb-8 flex items-start gap-4">
         <div className="rounded-2xl bg-emerald-500 p-3 text-white"><CalendarDays className="size-6" /></div>
         <div>
-          <h2 className="text-3xl font-black">Request your booking</h2>
+          <h2 className="text-3xl font-black">Request your rental</h2>
           <p className="mt-2 text-slate-300">
-            {supabaseReady ? "Real Supabase storage is ready. Sign in first to submit a booking request." : "Demo mode saves locally. Add Supabase keys for real backend storage."}
+            {supabaseReady ? "Real Supabase storage is ready. Sign in first to request a rental." : "Demo mode saves locally. Add Supabase keys for real backend storage."}
           </p>
         </div>
       </div>
@@ -140,7 +184,7 @@ export function BookingForm() {
         <label className="grid gap-2 md:col-span-2">
           <span className="text-sm font-bold text-slate-200">Choose car</span>
           <select name="carId" value={selectedCarId} onChange={(event) => setSelectedCarId(event.target.value)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 outline-none ring-emerald-400 transition focus:ring-2">
-            {cars.map((car) => <option key={car.id} value={car.id} className="text-slate-950">{car.name} — €{car.pricePerDay}/day</option>)}
+            {availableCars.map((car) => <option key={car.id} value={car.id} className="text-slate-950">{car.name} — €{car.pricePerDay}/day · €{pricePerWeek}/week</option>)}
           </select>
         </label>
 
@@ -159,10 +203,11 @@ export function BookingForm() {
         <div className="rounded-2xl bg-white/10 p-4 md:col-span-2">
           <p className="text-sm text-slate-300">Estimated total</p>
           <p className="text-3xl font-black text-emerald-300">€{estimatedTotal}</p>
+          <p className="mt-1 text-xs font-bold text-slate-400">Weekly discount applied automatically: €{pricePerWeek}/week + daily rate for extra days.</p>
         </div>
 
         <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-4 font-black text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
-          {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit booking request
+          {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit rental request
         </button>
       </form>
     </div>

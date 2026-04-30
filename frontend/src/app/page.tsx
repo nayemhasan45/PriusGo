@@ -1,9 +1,8 @@
 import { ArrowRight, BadgeCheck, CarFront, Clock, Fuel, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { BookingForm } from "@/components/booking-form";
-import { CarCard } from "@/components/car-card";
+import { CustomerCars } from "@/components/customer-cars";
 import { Header } from "@/components/header";
-import { cars } from "@/lib/cars";
 
 const steps = [
   "Choose your Prius",
@@ -33,11 +32,11 @@ export default function Home() {
               Rent a Toyota Prius without stress.
             </h1>
             <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-slate-600">
-              PriusGo helps you book fuel-efficient Toyota Prius cars in Šiauliai for daily use, business trips, and city movement.
+              PriusGo helps you rent fuel-efficient Toyota Prius cars in Šiauliai for daily use, business trips, and city movement.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="#booking" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-7 py-4 font-black text-white shadow-xl shadow-emerald-600/20 transition hover:bg-emerald-700">
-                Book a Prius <ArrowRight className="size-5" />
+                Rent a Prius <ArrowRight className="size-5" />
               </a>
               <Link href="/login" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-7 py-4 font-black text-slate-800 transition hover:border-emerald-300 hover:text-emerald-700">
                 Login / Register
@@ -68,7 +67,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="rounded-2xl bg-white/10 p-4"><p className="text-2xl font-black">€35+</p><p className="text-xs text-slate-300">per day</p></div>
+                <div className="rounded-2xl bg-white/10 p-4"><p className="text-2xl font-black">€20</p><p className="text-xs text-slate-300">per day</p></div>
                 <div className="rounded-2xl bg-white/10 p-4"><p className="text-2xl font-black">5</p><p className="text-xs text-slate-300">seats</p></div>
                 <div className="rounded-2xl bg-white/10 p-4"><p className="text-2xl font-black">2</p><p className="text-xs text-slate-300">cars</p></div>
               </div>
@@ -83,11 +82,9 @@ export default function Home() {
             <p className="font-black uppercase tracking-[0.3em] text-emerald-600">Available cars</p>
             <h2 className="mt-3 text-4xl font-black text-slate-950">Choose your Prius</h2>
           </div>
-          <p className="max-w-xl text-slate-600">Start with a simple booking request. Admin approval and payments can be added in the next version.</p>
+          <p className="max-w-xl text-slate-600">Each physical car is shown separately with its own Available / Not available status and unavailable date ranges. Pick a car and rent it directly.</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          {cars.map((car) => <CarCard key={car.id} car={car} />)}
-        </div>
+        <CustomerCars />
       </section>
 
       <section id="pricing" className="bg-white py-20">

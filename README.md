@@ -89,9 +89,12 @@ http://localhost:3000/admin/bookings
 - Customer registration/login with Supabase Auth
 - Google sign-in/sign-out
 - Booking form connected to Supabase
-- Local demo fallback when Supabase keys are missing
+- Each physical car has its own customer-facing availability card with Available / Not available status.
+- Customer car cards show per-car unavailable date ranges and a direct `Rent this car` action.
+- Pricing supports €20/day and €100/week; extra days after full weeks are calculated daily.
 - Customer dashboard for own bookings
 - Admin booking dashboard
+- Admin car management for price/status updates
 - Admin quick actions for approve/reject/cancel/complete/reopen
 - Supabase Row Level Security for customer/admin access
 

@@ -18,6 +18,12 @@ export function estimateBookingPrice(
   pricePerDay: number,
   startDate: string,
   endDate: string,
+  options: { pricePerWeek?: number } = {},
 ): number {
-  return calculateRentalDays(startDate, endDate) * pricePerDay;
+  const rentalDays = calculateRentalDays(startDate, endDate);
+  if (!options.pricePerWeek) return rentalDays * pricePerDay;
+
+  const fullWeeks = Math.floor(rentalDays / 7);
+  const remainingDays = rentalDays % 7;
+  return fullWeeks * options.pricePerWeek + remainingDays * pricePerDay;
 }

@@ -66,8 +66,8 @@ $$;
 
 insert into public.cars (id, name, year, price_per_day, status)
 values
-  ('toyota-prius-white-2014', 'Toyota Prius White', 2014, 35, 'available'),
-  ('toyota-prius-silver-2015', 'Toyota Prius Silver', 2015, 38, 'available')
+  ('toyota-prius-white-2014', 'Toyota Prius White', 2014, 20, 'available'),
+  ('toyota-prius-silver-2015', 'Toyota Prius Silver', 2015, 20, 'available')
 on conflict (id) do update set
   name = excluded.name,
   year = excluded.year,
@@ -93,10 +93,54 @@ as $$
   );
 $$;
 
+create or replace function public.car_is_available(
+  selected_car_id text,
+  requested_start_date date,
+  requested_end_date date
+)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1
+    from public.cars
+    where cars.id = selected_car_id
+      and cars.status = 'available'
+  )
+  and not exists (
+    select 1
+    from public.bookings
+    where bookings.car_id = selected_car_id
+      and bookings.status in ('approved', 'completed')
+      and daterange(bookings.start_date, bookings.end_date, '[]') && daterange(requested_start_date, requested_end_date, '[]')
+  );
+$$;
+
+create or replace view public.car_booking_blocks as
+select
+  car_id,
+  start_date,
+  end_date,
+  status
+from public.bookings
+where status in ('approved', 'completed');
+
+grant select on public.car_booking_blocks to anon, authenticated;
+grant execute on function public.car_is_available(text, date, date) to anon, authenticated;
+
 drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"
   on public.cars for select
-  using (status = 'available');
+  using (status = 'available' or auth.role() = 'authenticated' or public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can update cars" on public.cars;
+create policy "Admins can update cars"
+  on public.cars for update
+  using (public.is_admin(auth.uid()))
+  with check (public.is_admin(auth.uid()));
 
 drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"
@@ -125,12 +169,7 @@ create policy "Users can create own booking requests"
   with check (
     auth.uid() = user_id
     and status = 'pending'
-    and exists (
-      select 1
-      from public.cars
-      where cars.id = bookings.car_id
-        and cars.status = 'available'
-    )
+    and public.car_is_available(bookings.car_id, bookings.start_date, bookings.end_date)
   );
 
 drop policy if exists "Users can read own bookings" on public.bookings;

@@ -16,4 +16,9 @@ describe("booking helpers", () => {
   it("estimates total booking price from day count", () => {
     expect(estimateBookingPrice(35, "2026-05-01", "2026-05-03")).toBe(105);
   });
+
+  it("uses weekly pricing when a weekly rate is provided", () => {
+    expect(estimateBookingPrice(20, "2026-05-01", "2026-05-07", { pricePerWeek: 100 })).toBe(100);
+    expect(estimateBookingPrice(20, "2026-05-01", "2026-05-10", { pricePerWeek: 100 })).toBe(160);
+  });
 });

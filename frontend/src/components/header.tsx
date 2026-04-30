@@ -78,9 +78,14 @@ export function Header() {
             </Link>
           ))}
           {showAuthState && isAdmin && (
-            <Link href="/admin/bookings" className="transition hover:text-emerald-700">
-              Admin
-            </Link>
+            <>
+              <Link href="/admin/bookings" className="transition hover:text-emerald-700">
+                Admin bookings
+              </Link>
+              <Link href="/admin/cars" className="transition hover:text-emerald-700">
+                Admin cars
+              </Link>
+            </>
           )}
         </nav>
 
