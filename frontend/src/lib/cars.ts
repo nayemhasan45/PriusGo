@@ -12,7 +12,7 @@ export const cars: Car[] = [
     seats: 5,
     pricePerDay: 20,
     status: "available",
-    imageGradient: "from-emerald-100 via-white to-sky-100",
+    imageGradient: "from-[#fff7f4] via-white to-sky-100",
     features: ["Low fuel cost", "Automatic", "City friendly", "5 seats"],
   },
   {
@@ -26,7 +26,7 @@ export const cars: Car[] = [
     seats: 5,
     pricePerDay: 20,
     status: "available",
-    imageGradient: "from-slate-100 via-white to-emerald-100",
+    imageGradient: "from-slate-100 via-white to-[#fff7f4]",
     features: ["Hybrid economy", "Comfortable", "Long trip ready", "5 seats"],
   },
 ];

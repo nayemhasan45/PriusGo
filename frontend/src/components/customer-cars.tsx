@@ -36,17 +36,17 @@ export function CustomerCars() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white p-10 text-slate-600">
-        <Loader2 className="mr-3 size-5 animate-spin" /> Loading available rental cars...
+      <div className="flex items-center justify-center rounded-[2rem] border border-[#e9e9e9] bg-white p-10 text-[#616161]">
+        <Loader2 className="mr-3 size-5 animate-spin text-[#ff3600]" /> Loading available rental cars...
       </div>
     );
   }
 
   if (cars.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
-        <h3 className="text-2xl font-black text-slate-950">No cars available right now</h3>
-        <p className="mt-3 text-slate-600">Please check again later or contact PriusGo directly.</p>
+      <div className="rounded-[2rem] border border-dashed border-[#e9e9e9] bg-white p-10 text-center">
+        <h3 className="font-heading text-2xl font-black text-[#0b0b0b]">No cars available right now</h3>
+        <p className="mt-3 text-[#616161]">Please check again later or contact PriusGo directly.</p>
       </div>
     );
   }

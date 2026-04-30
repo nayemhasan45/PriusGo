@@ -129,6 +129,10 @@ Availability behavior:
 - Customer car cards show blocked rental ranges per car.
 - Customer car cards show clear Available / Not available labels; logged-in users can see unavailable cars too.
 - Customer rental requests are allowed only for cars with `status = 'available'`.
-- Approved/completed rentals block overlapping requests for the same car.
+- Availability rule: `approved` and `completed` rentals block overlapping requests for the same car.
+- After admin approves a booking request, that car/date range becomes unavailable for all users.
+- Pending requests do not block availability until admin approval.
+- `rejected` and `cancelled` bookings do not block availability.
 - The SQL function `public.car_is_available()` is used by RLS and the frontend before inserting a rental request.
+- The `public.car_booking_blocks` view should expose approved/completed blocked ranges for the customer UI.
 - Current MVP pricing is €20/day and €100/week; full weeks use the weekly rate and extra days use the daily rate.

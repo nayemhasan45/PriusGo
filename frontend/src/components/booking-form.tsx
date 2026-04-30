@@ -161,30 +161,32 @@ export function BookingForm() {
   }
 
   return (
-    <div id="booking" className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20 sm:p-8">
+    <div id="booking" className="rounded-[2rem] bg-[#161616] p-6 text-white ring-1 ring-white/5 sm:p-8">
       <div className="mb-8 flex items-start gap-4">
-        <div className="rounded-2xl bg-emerald-500 p-3 text-white"><CalendarDays className="size-6" /></div>
+        <div className="rounded-2xl bg-[#ff3600] p-3 text-white"><CalendarDays className="size-6" /></div>
         <div>
-          <h2 className="text-3xl font-black">Request your rental</h2>
-          <p className="mt-2 text-slate-300">
-            {supabaseReady ? "Real Supabase storage is ready. Sign in first to request a rental." : "Demo mode saves locally. Add Supabase keys for real backend storage."}
+          <h2 className="font-heading text-2xl font-black">Request your rental</h2>
+          <p className="mt-1.5 text-sm text-white/50">
+            {supabaseReady ? "Sign in first, then submit your rental request." : "Demo mode — add Supabase keys for real backend storage."}
           </p>
         </div>
       </div>
 
       {success && (
-        <div className="mb-6 rounded-2xl bg-emerald-500/15 p-4 text-sm font-bold text-emerald-200">
+        <div className="mb-6 rounded-2xl bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-500/20">
           <div className="flex items-center gap-3"><CheckCircle2 className="size-5" /> Booking request saved {savedToSupabase ? "to Supabase" : "locally"}.</div>
-          <Link href="/dashboard" className="mt-2 inline-flex text-emerald-100 underline decoration-emerald-300 underline-offset-4">Check dashboard</Link>
+          <Link href="/dashboard" className="mt-2 inline-flex text-emerald-200 underline underline-offset-4">Check dashboard</Link>
         </div>
       )}
-      {error && <div className="mb-6 rounded-2xl bg-red-500/15 p-4 text-sm font-bold text-red-200">{error}</div>}
+      {error && (
+        <div className="mb-6 rounded-2xl bg-red-500/10 p-4 text-sm font-semibold text-red-300 ring-1 ring-red-500/20">{error}</div>
+      )}
 
       <form onSubmit={onSubmit} className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-2 md:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Choose car</span>
-          <select name="carId" value={selectedCarId} onChange={(event) => setSelectedCarId(event.target.value)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 outline-none ring-emerald-400 transition focus:ring-2">
-            {availableCars.map((car) => <option key={car.id} value={car.id} className="text-slate-950">{car.name} — €{car.pricePerDay}/day · €{pricePerWeek}/week</option>)}
+          <span className="text-sm font-medium text-white/60">Choose car</span>
+          <select name="carId" value={selectedCarId} onChange={(event) => setSelectedCarId(event.target.value)} className="rounded-2xl border border-white/8 bg-white/8 px-4 py-3 text-white outline-none ring-[#ff3600] transition focus:ring-2">
+            {availableCars.map((car) => <option key={car.id} value={car.id} className="text-[#0b0b0b]">{car.name} — €{car.pricePerDay}/day · €{pricePerWeek}/week</option>)}
           </select>
         </label>
 
@@ -196,17 +198,17 @@ export function BookingForm() {
         <Field label="End date"><input name="endDate" required type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></Field>
 
         <label className="grid gap-2 md:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Message</span>
-          <textarea name="message" className="min-h-28 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none ring-emerald-400 transition placeholder:text-slate-500 focus:ring-2" placeholder="Pickup time, rental purpose, questions..." />
+          <span className="text-sm font-medium text-white/60">Message</span>
+          <textarea name="message" className="min-h-28 rounded-2xl border border-white/8 bg-white/8 px-4 py-3 text-white outline-none ring-[#ff3600] transition placeholder:text-white/25 focus:ring-2" placeholder="Pickup time, rental purpose, questions..." />
         </label>
 
-        <div className="rounded-2xl bg-white/10 p-4 md:col-span-2">
-          <p className="text-sm text-slate-300">Estimated total</p>
-          <p className="text-3xl font-black text-emerald-300">€{estimatedTotal}</p>
-          <p className="mt-1 text-xs font-bold text-slate-400">Weekly discount applied automatically: €{pricePerWeek}/week + daily rate for extra days.</p>
+        <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/5 md:col-span-2">
+          <p className="text-sm text-white/50">Estimated total</p>
+          <p className="mt-1 font-heading text-4xl font-black text-[#ff3600]">€{estimatedTotal}</p>
+          <p className="mt-1.5 text-xs text-white/35">Weekly discount applied automatically: €{pricePerWeek}/week + daily rate for extra days.</p>
         </div>
 
-        <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-4 font-black text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
+        <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff3600] px-6 py-4 font-semibold text-white transition hover:bg-[#cc2b00] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2">
           {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit rental request
         </button>
       </form>
@@ -217,8 +219,8 @@ export function BookingForm() {
 function Field({ label, children }: { label: string; children: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> }) {
   return (
     <label className="grid gap-2">
-      <span className="text-sm font-bold text-slate-200">{label}</span>
-      <div className="[&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/10 [&_input]:bg-white/10 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-emerald-400 [&_input]:transition [&_input]:placeholder:text-slate-500 [&_input]:focus:ring-2">{children}</div>
+      <span className="text-sm font-medium text-white/60">{label}</span>
+      <div className="[&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/8 [&_input]:bg-white/8 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-[#ff3600] [&_input]:transition [&_input]:placeholder:text-white/25 [&_input]:focus:ring-2">{children}</div>
     </label>
   );
 }
