@@ -143,6 +143,34 @@ grant select on public.car_booking_blocks to anon, authenticated;
 grant execute on function public.car_is_available(text, date, date) to anon, authenticated;
 grant execute on function public.is_admin(uuid) to authenticated;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('car-images', 'car-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Car images are publicly readable" on storage.objects;
+create policy "Car images are publicly readable"
+  on storage.objects for select
+  using (bucket_id = 'car-images');
+
+drop policy if exists "Admins can upload car images" on storage.objects;
+create policy "Admins can upload car images"
+  on storage.objects for insert
+  with check (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can update car images" on storage.objects;
+create policy "Admins can update car images"
+  on storage.objects for update
+  using (bucket_id = 'car-images' and public.is_admin(auth.uid()))
+  with check (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+
+drop policy if exists "Admins can delete car images" on storage.objects;
+create policy "Admins can delete car images"
+  on storage.objects for delete
+  using (bucket_id = 'car-images' and public.is_admin(auth.uid()));
+
 drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"
   on public.cars for select

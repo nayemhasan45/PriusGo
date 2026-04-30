@@ -149,6 +149,16 @@ export function buildAdminCarInsert(input: AdminCarInsertInput): AdminCarInsertR
   };
 }
 
+export function buildCarImageObjectPath(plateNumber: string, fileName: string) {
+  const safePlateNumber = plateNumber.trim().toUpperCase().replace(/[^A-Z0-9-]/g, "") || "CAR";
+  const lastDotIndex = fileName.lastIndexOf(".");
+  const rawName = lastDotIndex >= 0 ? fileName.slice(0, lastDotIndex) : fileName;
+  const rawExtension = lastDotIndex >= 0 ? fileName.slice(lastDotIndex + 1) : "jpg";
+  const safeName = rawName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "photo";
+  const safeExtension = rawExtension.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  return `cars/${safePlateNumber}/${safeName}.${safeExtension}`;
+}
+
 export function getSupabaseErrorMessage(caughtError: unknown, fallback: string) {
   if (caughtError instanceof Error) return caughtError.message;
 

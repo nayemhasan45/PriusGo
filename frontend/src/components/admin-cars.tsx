@@ -3,7 +3,7 @@
 import { CarFront, Loader2, Plus, Save, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { buildAdminCarInsert, getCarStatusTone, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
+import { buildAdminCarInsert, buildCarImageObjectPath, getCarStatusTone, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
 import { createClient } from "@/lib/supabase/client";
 import type { Car, CarStatus } from "@/lib/types";
 
@@ -44,6 +44,7 @@ export function AdminCars() {
   const [isLoading, setIsLoading] = useState(true);
   const [updatingCarId, setUpdatingCarId] = useState<string | null>(null);
   const [newCar, setNewCar] = useState<NewCarForm>(emptyNewCarForm);
+  const [newCarImageFile, setNewCarImageFile] = useState<File | null>(null);
   const [isAddingCar, setIsAddingCar] = useState(false);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
@@ -160,6 +161,19 @@ export function AdminCars() {
       const supabase = createClient();
       if (!supabase) throw new Error("Supabase is not configured.");
 
+      let imageUrl = newCar.imageUrl;
+      if (newCarImageFile) {
+        const imagePath = buildCarImageObjectPath(plateNumber, newCarImageFile.name);
+        const { error: uploadError } = await supabase.storage.from("car-images").upload(imagePath, newCarImageFile, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+        if (uploadError) throw uploadError;
+
+        const { data: publicImage } = supabase.storage.from("car-images").getPublicUrl(imagePath);
+        imageUrl = publicImage.publicUrl;
+      }
+
       const { data, error: insertError } = await supabase
         .from("cars")
         .insert(buildAdminCarInsert({
@@ -172,7 +186,7 @@ export function AdminCars() {
           transmission: newCar.transmission,
           seats,
           pricePerDay,
-          imageUrl: newCar.imageUrl,
+          imageUrl,
           status: newCar.status,
         }))
         .select(carColumns)
@@ -183,6 +197,7 @@ export function AdminCars() {
       const addedCar = mapCarRowToCar(data as CarRow);
       setCars((current) => [...current, addedCar].sort((a, b) => a.name.localeCompare(b.name)));
       setNewCar(emptyNewCarForm);
+      setNewCarImageFile(null);
     } catch (caughtError) {
       setError(getSupabaseErrorMessage(caughtError, "Could not add car."));
     } finally {
@@ -281,6 +296,11 @@ export function AdminCars() {
               <option value="unavailable">unavailable</option>
               <option value="maintenance">maintenance</option>
             </select>
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">
+            Upload car photo
+            <input type="file" accept="image/*" onChange={(event) => setNewCarImageFile(event.target.files?.[0] ?? null)} className="rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:font-bold file:text-white hover:file:bg-emerald-700" />
+            <span className="text-xs font-medium text-slate-500">{newCarImageFile ? `Selected: ${newCarImageFile.name}` : "Upload from your computer. This will override the Image URL below."}</span>
           </label>
           <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">
             Image URL

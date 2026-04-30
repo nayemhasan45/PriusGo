@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAdminCarInsert, getCarStatusTone, getCustomerCarAvailability, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar } from "./cars";
+import { buildAdminCarInsert, buildCarImageObjectPath, getCarStatusTone, getCustomerCarAvailability, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar } from "./cars";
 
 describe("Supabase car helpers", () => {
   it("maps a Supabase car row into frontend car shape", () => {
@@ -55,6 +55,11 @@ describe("Supabase car helpers", () => {
       image_url: "/images/prius-fleet.jpg",
       status: "maintenance",
     });
+  });
+
+  it("builds a safe Supabase Storage object path for uploaded car images", () => {
+    expect(buildCarImageObjectPath(" mjo146 ", "My Prius Photo.JPG")).toBe("cars/MJO146/my-prius-photo.jpg");
+    expect(buildCarImageObjectPath("abc123", "front view.png")).toBe("cars/ABC123/front-view.png");
   });
 
   it("turns plain Supabase error objects into useful admin messages", () => {
