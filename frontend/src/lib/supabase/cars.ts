@@ -31,6 +31,36 @@ export type CarBookingBlock = {
 
 export type BookingBlocksByCar = Record<string, CarBookingBlock[]>;
 
+export type AdminCarInsertInput = {
+  plateNumber: string;
+  name: string;
+  brand: string;
+  model: string;
+  year: number;
+  fuelType: string;
+  transmission: string;
+  seats: number;
+  pricePerDay: number;
+  imageUrl?: string;
+  status: CarStatus;
+};
+
+export type AdminCarInsertRow = {
+  id: string;
+  name: string;
+  brand: string;
+  model: string;
+  year: number;
+  fuel_type: string;
+  transmission: string;
+  seats: number;
+  price_per_day: number;
+  image_url: string;
+  status: CarStatus;
+};
+
+const defaultPriusImageUrl = "/images/prius-fleet.jpg";
+
 const gradients = [
   "from-emerald-100 via-white to-sky-100",
   "from-slate-100 via-white to-emerald-100",
@@ -99,6 +129,56 @@ export function getCustomerCarAvailability(status: CarStatus) {
     canRent: false,
     tone: "not-available" as const,
   };
+}
+
+export function buildAdminCarInsert(input: AdminCarInsertInput): AdminCarInsertRow {
+  const plateNumber = input.plateNumber.trim().toUpperCase();
+
+  return {
+    id: plateNumber,
+    name: input.name.trim() || `Toyota Prius ${plateNumber}`,
+    brand: input.brand.trim() || "Toyota",
+    model: input.model.trim() || "Prius",
+    year: input.year,
+    fuel_type: input.fuelType.trim() || "Hybrid petrol",
+    transmission: input.transmission.trim() || "Automatic",
+    seats: input.seats,
+    price_per_day: input.pricePerDay,
+    image_url: input.imageUrl?.trim() || defaultPriusImageUrl,
+    status: input.status,
+  };
+}
+
+export function getSupabaseErrorMessage(caughtError: unknown, fallback: string) {
+  if (caughtError instanceof Error) return caughtError.message;
+
+  const message = getErrorText(caughtError);
+  if (!message) return fallback;
+
+  const lowerMessage = message.toLowerCase();
+  if (lowerMessage.includes("row-level security") || lowerMessage.includes("permission denied") || getErrorCode(caughtError) === "42501") {
+    return "Database blocked this action: admin insert/update policy is missing or your profile is not admin. Run backend/supabase-schema.sql in Supabase and make sure your profile role is admin.";
+  }
+
+  if (lowerMessage.includes("duplicate key") || lowerMessage.includes("already exists")) {
+    return "This plate number already exists in the fleet.";
+  }
+
+  return message;
+}
+
+function getErrorText(caughtError: unknown) {
+  if (typeof caughtError === "string") return caughtError;
+  if (!caughtError || typeof caughtError !== "object") return null;
+
+  const maybeError = caughtError as { message?: unknown; details?: unknown; hint?: unknown };
+  return [maybeError.message, maybeError.details, maybeError.hint].filter((value): value is string => typeof value === "string" && value.length > 0).join(" ") || null;
+}
+
+function getErrorCode(caughtError: unknown) {
+  if (!caughtError || typeof caughtError !== "object") return null;
+  const maybeError = caughtError as { code?: unknown };
+  return typeof maybeError.code === "string" ? maybeError.code : null;
 }
 
 function hashString(value: string) {

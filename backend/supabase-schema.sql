@@ -134,8 +134,14 @@ select
 from public.bookings
 where status in ('approved', 'completed');
 
+grant usage on schema public to anon, authenticated;
+grant select on public.cars to anon, authenticated;
+grant insert, update on public.cars to authenticated;
+grant select, insert, update on public.profiles to authenticated;
+grant select, insert, update on public.bookings to authenticated;
 grant select on public.car_booking_blocks to anon, authenticated;
 grant execute on function public.car_is_available(text, date, date) to anon, authenticated;
+grant execute on function public.is_admin(uuid) to authenticated;
 
 drop policy if exists "Cars are visible to everyone" on public.cars;
 create policy "Cars are visible to everyone"

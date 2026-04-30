@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getCarStatusTone, getCustomerCarAvailability, groupBookingBlocksByCar, mapCarRowToCar } from "./cars";
+import { buildAdminCarInsert, getCarStatusTone, getCustomerCarAvailability, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar } from "./cars";
 
 describe("Supabase car helpers", () => {
   it("maps a Supabase car row into frontend car shape", () => {
@@ -27,6 +27,41 @@ describe("Supabase car helpers", () => {
       status: "maintenance",
     });
     expect(car.features).toContain("Hybrid economy");
+  });
+
+  it("builds an admin car insert row from a new car form", () => {
+    expect(buildAdminCarInsert({
+      plateNumber: " abc123 ",
+      name: "City hybrid",
+      brand: "Toyota",
+      model: "Prius Plus",
+      year: 2020,
+      fuelType: "Hybrid petrol / LPG",
+      transmission: "Automatic CVT",
+      seats: 7,
+      pricePerDay: 35,
+      imageUrl: "",
+      status: "maintenance",
+    })).toEqual({
+      id: "ABC123",
+      name: "City hybrid",
+      brand: "Toyota",
+      model: "Prius Plus",
+      year: 2020,
+      fuel_type: "Hybrid petrol / LPG",
+      transmission: "Automatic CVT",
+      seats: 7,
+      price_per_day: 35,
+      image_url: "/images/prius-fleet.jpg",
+      status: "maintenance",
+    });
+  });
+
+  it("turns plain Supabase error objects into useful admin messages", () => {
+    expect(getSupabaseErrorMessage({ message: "new row violates row-level security policy", code: "42501" }, "Could not add car.")).toBe(
+      "Database blocked this action: admin insert/update policy is missing or your profile is not admin. Run backend/supabase-schema.sql in Supabase and make sure your profile role is admin.",
+    );
+    expect(getSupabaseErrorMessage({ message: "duplicate key value violates unique constraint" }, "Could not add car.")).toBe("This plate number already exists in the fleet.");
   });
 
   it("groups booking calendar blocks by car id", () => {

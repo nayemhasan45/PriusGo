@@ -3,7 +3,7 @@
 import { CarFront, Loader2, Plus, Save, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { getCarStatusTone, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
+import { buildAdminCarInsert, getCarStatusTone, getSupabaseErrorMessage, groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type CarRow } from "@/lib/supabase/cars";
 import { createClient } from "@/lib/supabase/client";
 import type { Car, CarStatus } from "@/lib/types";
 
@@ -11,16 +11,30 @@ const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_
 
 type NewCarForm = {
   plateNumber: string;
+  name: string;
+  brand: string;
+  model: string;
   year: string;
+  fuelType: string;
+  transmission: string;
+  seats: string;
   pricePerDay: string;
   imageUrl: string;
+  status: CarStatus;
 };
 
 const emptyNewCarForm: NewCarForm = {
   plateNumber: "",
+  name: "",
+  brand: "Toyota",
+  model: "Prius",
   year: "",
+  fuelType: "Hybrid petrol",
+  transmission: "Automatic",
+  seats: "5",
   pricePerDay: "20",
   imageUrl: "/images/prius-fleet.jpg",
+  status: "available",
 };
 
 export function AdminCars() {
@@ -102,7 +116,7 @@ export function AdminCars() {
       const updatedCar = mapCarRowToCar(data as CarRow);
       setCars((current) => current.map((car) => (car.id === carId ? updatedCar : car)));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Could not update car.");
+      setError(getSupabaseErrorMessage(caughtError, "Could not update car."));
     } finally {
       setUpdatingCarId(null);
     }
@@ -111,6 +125,7 @@ export function AdminCars() {
   async function addCar() {
     const plateNumber = newCar.plateNumber.trim().toUpperCase();
     const year = Number(newCar.year);
+    const seats = Number(newCar.seats);
     const pricePerDay = Number(newCar.pricePerDay);
 
     if (!/^[A-Z]{3}\d{3}$/.test(plateNumber)) {
@@ -120,6 +135,16 @@ export function AdminCars() {
 
     if (!Number.isInteger(year) || year < 1997 || year > new Date().getFullYear() + 1) {
       setError("Enter a valid car year.");
+      return;
+    }
+
+    if (!newCar.brand.trim() || !newCar.model.trim() || !newCar.fuelType.trim() || !newCar.transmission.trim()) {
+      setError("Fill brand, model, fuel type, and transmission.");
+      return;
+    }
+
+    if (!Number.isInteger(seats) || seats < 1 || seats > 9) {
+      setError("Enter a valid seat count.");
       return;
     }
 
@@ -137,19 +162,19 @@ export function AdminCars() {
 
       const { data, error: insertError } = await supabase
         .from("cars")
-        .insert({
-          id: plateNumber,
-          name: `Toyota Prius ${plateNumber}`,
-          brand: "Toyota",
-          model: "Prius",
+        .insert(buildAdminCarInsert({
+          plateNumber,
+          name: newCar.name,
+          brand: newCar.brand,
+          model: newCar.model,
           year,
-          fuel_type: "Hybrid petrol",
-          transmission: "Automatic",
-          seats: 5,
-          price_per_day: pricePerDay,
-          image_url: newCar.imageUrl.trim() || "/images/prius-fleet.jpg",
-          status: "available",
-        })
+          fuelType: newCar.fuelType,
+          transmission: newCar.transmission,
+          seats,
+          pricePerDay,
+          imageUrl: newCar.imageUrl,
+          status: newCar.status,
+        }))
         .select(carColumns)
         .single();
 
@@ -159,7 +184,7 @@ export function AdminCars() {
       setCars((current) => [...current, addedCar].sort((a, b) => a.name.localeCompare(b.name)));
       setNewCar(emptyNewCarForm);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Could not add car.");
+      setError(getSupabaseErrorMessage(caughtError, "Could not add car."));
     } finally {
       setIsAddingCar(false);
     }
@@ -212,20 +237,52 @@ export function AdminCars() {
             <p className="text-sm text-slate-500">When you buy another car, add the plate and it appears on the public fleet page.</p>
           </div>
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-4">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <label className="grid gap-2 text-sm font-bold text-slate-700">
             Plate number
             <input value={newCar.plateNumber} onChange={(event) => setNewCar((current) => ({ ...current, plateNumber: event.target.value.toUpperCase() }))} placeholder="MJO146" className="rounded-2xl border border-slate-200 px-4 py-3 uppercase outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Customer display name
+            <input value={newCar.name} onChange={(event) => setNewCar((current) => ({ ...current, name: event.target.value }))} placeholder="Toyota Prius MJO146" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Brand
+            <input value={newCar.brand} onChange={(event) => setNewCar((current) => ({ ...current, brand: event.target.value }))} placeholder="Toyota" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Model
+            <input value={newCar.model} onChange={(event) => setNewCar((current) => ({ ...current, model: event.target.value }))} placeholder="Prius" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
           </label>
           <label className="grid gap-2 text-sm font-bold text-slate-700">
             Year
             <input value={newCar.year} onChange={(event) => setNewCar((current) => ({ ...current, year: event.target.value }))} type="number" placeholder="2015" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
           </label>
           <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Fuel type
+            <input value={newCar.fuelType} onChange={(event) => setNewCar((current) => ({ ...current, fuelType: event.target.value }))} placeholder="Hybrid petrol" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Transmission
+            <input value={newCar.transmission} onChange={(event) => setNewCar((current) => ({ ...current, transmission: event.target.value }))} placeholder="Automatic" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Seats
+            <input value={newCar.seats} onChange={(event) => setNewCar((current) => ({ ...current, seats: event.target.value }))} type="number" min={1} max={9} className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
             Price per day
             <input value={newCar.pricePerDay} onChange={(event) => setNewCar((current) => ({ ...current, pricePerDay: event.target.value }))} type="number" min={1} className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
           </label>
           <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Status
+            <select value={newCar.status} onChange={(event) => setNewCar((current) => ({ ...current, status: event.target.value as CarStatus }))} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500">
+              <option value="available">available</option>
+              <option value="unavailable">unavailable</option>
+              <option value="maintenance">maintenance</option>
+            </select>
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">
             Image URL
             <input value={newCar.imageUrl} onChange={(event) => setNewCar((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="/images/prius-fleet.jpg" className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500" />
           </label>
