@@ -1,6 +1,10 @@
 # PriusGo
 
-PriusGo is a Toyota Prius rental MVP for Šiauliai, Lithuania. It is split into two clear parts:
+PriusGo is a Toyota Prius rental MVP for Šiauliai, Lithuania.
+
+Live site: https://prius-go.vercel.app/
+
+It is split into two clear parts:
 
 ```text
 PriusGo/
