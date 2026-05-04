@@ -11,10 +11,19 @@ import {
   normalizeAdminBookingRows,
   type AdminBooking,
 } from "@/lib/supabase/admin-bookings";
-import { type BookingRow, type BookingStatus } from "@/lib/supabase/bookings";
+import { type BookingLicenseCheckStatus, type BookingRow, type BookingStatus } from "@/lib/supabase/bookings";
 import { createClient } from "@/lib/supabase/client";
 
-const bookingColumns = "id,user_id,car_id,full_name,email,phone,start_date,end_date,pickup_location,message,status,total_estimated_price,created_at";
+const bookingColumns = "id,user_id,car_id,full_name,email,phone,start_date,end_date,pickup_location,message,driving_license_confirmed,rental_rules_accepted,booking_not_final_acknowledged,license_check_status,deposit_agreed,pickup_time,return_time,admin_notes,status,total_estimated_price,created_at";
+
+type BookingUpdate = {
+  status?: BookingStatus;
+  licenseCheckStatus?: BookingLicenseCheckStatus;
+  depositAgreed?: boolean;
+  pickupTime?: string | null;
+  returnTime?: string | null;
+  adminNotes?: string | null;
+};
 
 export function AdminBookings() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
@@ -74,7 +83,7 @@ export function AdminBookings() {
     void Promise.resolve().then(loadAdminBookings);
   }, []);
 
-  async function updateBookingStatus(bookingId: string, status: BookingStatus) {
+  async function updateBooking(bookingId: string, updates: BookingUpdate) {
     setIsUpdatingId(bookingId);
     setError(null);
 
@@ -82,9 +91,17 @@ export function AdminBookings() {
       const supabase = createClient();
       if (!supabase) throw new Error("Supabase is not configured.");
 
+      const updatePayload: Record<string, unknown> = {};
+      if (updates.status !== undefined) updatePayload.status = updates.status;
+      if (updates.licenseCheckStatus !== undefined) updatePayload.license_check_status = updates.licenseCheckStatus;
+      if (updates.depositAgreed !== undefined) updatePayload.deposit_agreed = updates.depositAgreed;
+      if (updates.pickupTime !== undefined) updatePayload.pickup_time = updates.pickupTime;
+      if (updates.returnTime !== undefined) updatePayload.return_time = updates.returnTime;
+      if (updates.adminNotes !== undefined) updatePayload.admin_notes = updates.adminNotes;
+
       const { data, error: updateError } = await supabase
         .from("bookings")
-        .update({ status })
+        .update(updatePayload)
         .eq("id", bookingId)
         .select(bookingColumns)
         .single();
@@ -94,7 +111,7 @@ export function AdminBookings() {
       const [updatedBooking] = normalizeAdminBookingRows([data as BookingRow]);
       setBookings((current) => current.map((booking) => (booking.id === bookingId ? updatedBooking : booking)));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Could not update booking status.");
+      setError(caughtError instanceof Error ? caughtError.message : "Could not update booking.");
     } finally {
       setIsUpdatingId(null);
     }
@@ -183,7 +200,7 @@ export function AdminBookings() {
                           key={action.status}
                           type="button"
                           disabled={isUpdatingId === booking.id}
-                          onClick={() => void updateBookingStatus(booking.id, action.status)}
+                          onClick={() => void updateBooking(booking.id, { status: action.status })}
                           className="rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {isUpdatingId === booking.id ? "Updating..." : action.label}
@@ -191,20 +208,112 @@ export function AdminBookings() {
                       ))}
                     </div>
                   </div>
-                  <label className="grid gap-2 text-sm font-bold text-slate-700">
-                    Manual status
-                    <select
-                      value={booking.status}
+                  <form
+                    className="grid gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      const formData = new FormData(event.currentTarget);
+                      void updateBooking(booking.id, {
+                        status: String(formData.get("status") ?? booking.status) as BookingStatus,
+                        licenseCheckStatus: String(formData.get("licenseCheckStatus") ?? booking.licenseCheckStatus) as BookingLicenseCheckStatus,
+                        depositAgreed: formData.get("depositAgreed") === "on",
+                        pickupTime: normalizeOptionalString(formData.get("pickupTime")),
+                        returnTime: normalizeOptionalString(formData.get("returnTime")),
+                        adminNotes: normalizeOptionalString(formData.get("adminNotes")),
+                      });
+                    }}
+                  >
+                    <label className="grid gap-2 text-sm font-bold text-slate-700">
+                      Manual status
+                      <select
+                        name="status"
+                        value={booking.status}
+                        disabled={isUpdatingId === booking.id}
+                        onChange={(event) => void updateBooking(booking.id, { status: event.target.value as BookingStatus })}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {adminBookingStatuses.map((status) => (
+                          <option key={status} value={status}>{status}</option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="grid gap-2 text-sm font-bold text-slate-700">
+                      License check status
+                      <select
+                        name="licenseCheckStatus"
+                        defaultValue={booking.licenseCheckStatus}
+                        disabled={isUpdatingId === booking.id}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <option value="pending">pending</option>
+                        <option value="verified">verified</option>
+                        <option value="rejected">rejected</option>
+                      </select>
+                    </label>
+
+                    <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700">
+                      <input
+                        name="depositAgreed"
+                        type="checkbox"
+                        defaultChecked={booking.depositAgreed}
+                        disabled={isUpdatingId === booking.id}
+                        className="size-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      Deposit agreed
+                    </label>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="grid gap-2 text-sm font-bold text-slate-700">
+                        Pickup time
+                        <input
+                          name="pickupTime"
+                          type="time"
+                          defaultValue={booking.pickupTime ?? ""}
+                          disabled={isUpdatingId === booking.id}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        />
+                      </label>
+                      <label className="grid gap-2 text-sm font-bold text-slate-700">
+                        Return time
+                        <input
+                          name="returnTime"
+                          type="time"
+                          defaultValue={booking.returnTime ?? ""}
+                          disabled={isUpdatingId === booking.id}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        />
+                      </label>
+                    </div>
+
+                    <label className="grid gap-2 text-sm font-bold text-slate-700">
+                      Admin notes
+                      <textarea
+                        name="adminNotes"
+                        defaultValue={booking.adminNotes ?? ""}
+                        rows={4}
+                        disabled={isUpdatingId === booking.id}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        placeholder="Internal notes only"
+                      />
+                    </label>
+
+                    <button
+                      type="submit"
                       disabled={isUpdatingId === booking.id}
-                      onChange={(event) => void updateBookingStatus(booking.id, event.target.value as BookingStatus)}
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {adminBookingStatuses.map((status) => (
-                        <option key={status} value={status}>{status}</option>
-                      ))}
-                    </select>
-                  </label>
+                      {isUpdatingId === booking.id ? "Saving..." : "Save workflow"}
+                    </button>
+                  </form>
                 </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 rounded-3xl bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2 lg:grid-cols-4">
+                <Detail label="License confirmed" value={booking.drivingLicenseConfirmed ? "Yes" : "No"} />
+                <Detail label="Rules accepted" value={booking.rentalRulesAccepted ? "Yes" : "No"} />
+                <Detail label="Booking acknowledged" value={booking.bookingNotFinalAcknowledged ? "Yes" : "No"} />
+                <Detail label="Deposit agreed" value={booking.depositAgreed ? "Yes" : "No"} />
               </div>
             </article>
           ))}
@@ -221,4 +330,18 @@ function MetricCard({ label, value }: { label: string; value: number | string })
       <p className="mt-2 text-3xl font-black text-slate-950">{value}</p>
     </div>
   );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+      <p className="mt-1 font-semibold text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function normalizeOptionalString(value: FormDataEntryValue | null) {
+  const text = typeof value === "string" ? value.trim() : "";
+  return text ? text : null;
 }

@@ -38,11 +38,58 @@ create table if not exists public.bookings (
   end_date date not null,
   pickup_location text not null,
   message text,
+  driving_license_confirmed boolean not null default false,
+  rental_rules_accepted boolean not null default false,
+  booking_not_final_acknowledged boolean not null default false,
+  license_check_status text not null default 'pending' check (license_check_status in ('pending', 'verified', 'rejected')),
+  deposit_agreed boolean not null default false,
+  pickup_time text,
+  return_time text,
+  admin_notes text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'cancelled', 'completed')),
   total_estimated_price numeric(10,2),
   created_at timestamptz not null default now(),
   constraint bookings_date_order check (end_date >= start_date)
 );
+
+alter table public.bookings add column if not exists driving_license_confirmed boolean not null default false;
+alter table public.bookings add column if not exists rental_rules_accepted boolean not null default false;
+alter table public.bookings add column if not exists booking_not_final_acknowledged boolean not null default false;
+alter table public.bookings add column if not exists license_check_status text not null default 'pending';
+alter table public.bookings add column if not exists deposit_agreed boolean not null default false;
+alter table public.bookings add column if not exists pickup_time text;
+alter table public.bookings add column if not exists return_time text;
+alter table public.bookings add column if not exists admin_notes text;
+
+do $$
+begin
+  alter table public.bookings
+    add constraint bookings_license_check_status_check
+    check (license_check_status in ('pending', 'verified', 'rejected'));
+exception
+  when duplicate_object then null;
+end;
+$$;
+
+do $$
+begin
+  alter table public.bookings
+    add constraint bookings_pickup_time_format_check
+    check (pickup_time is null or pickup_time ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$');
+exception
+  when duplicate_object then null;
+end;
+$$;
+
+do $$
+begin
+  alter table public.bookings
+    add constraint bookings_return_time_format_check
+    check (return_time is null or return_time ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$');
+exception
+  when duplicate_object then null;
+end;
+$$;
 
 -- Keep reruns safe if an earlier draft schema already exists.
 delete from public.bookings where user_id is null;
@@ -167,6 +214,56 @@ select
 from public.bookings
 where status in ('approved', 'completed');
 
+create or replace function public.get_customer_bookings()
+returns table (
+  id uuid,
+  user_id uuid,
+  car_id text,
+  full_name text,
+  email text,
+  phone text,
+  start_date date,
+  end_date date,
+  pickup_location text,
+  message text,
+  driving_license_confirmed boolean,
+  rental_rules_accepted boolean,
+  booking_not_final_acknowledged boolean,
+  pickup_time text,
+  return_time text,
+  status text,
+  total_estimated_price numeric,
+  created_at timestamptz
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    bookings.id,
+    bookings.user_id,
+    bookings.car_id,
+    bookings.full_name,
+    bookings.email,
+    bookings.phone,
+    bookings.start_date,
+    bookings.end_date,
+    bookings.pickup_location,
+    bookings.message,
+    bookings.driving_license_confirmed,
+    bookings.rental_rules_accepted,
+    bookings.booking_not_final_acknowledged,
+    bookings.pickup_time,
+    bookings.return_time,
+    bookings.status,
+    bookings.total_estimated_price,
+    bookings.created_at
+  from public.bookings
+  where bookings.user_id = auth.uid()
+  order by bookings.created_at desc;
+$$;
+
 grant usage on schema public to anon, authenticated;
 grant select on public.cars to anon, authenticated;
 grant insert, update, delete on public.cars to authenticated;
@@ -174,6 +271,7 @@ grant select, insert, update on public.profiles to authenticated;
 grant select, insert, update on public.bookings to authenticated;
 grant select on public.car_booking_blocks to anon, authenticated;
 grant execute on function public.car_is_available(text, date, date) to anon, authenticated;
+grant execute on function public.get_customer_bookings() to authenticated;
 grant execute on function public.is_admin(uuid) to authenticated;
 grant execute on function public.prevent_overlapping_confirmed_bookings() to authenticated;
 
@@ -252,14 +350,19 @@ create policy "Users can create own booking requests"
   on public.bookings for insert
   with check (
     auth.uid() = user_id
+    and driving_license_confirmed = true
+    and rental_rules_accepted = true
+    and booking_not_final_acknowledged = true
+    and license_check_status = 'pending'
+    and deposit_agreed = false
+    and pickup_time is not null
+    and return_time is not null
+    and admin_notes is null
     and status = 'pending'
     and public.car_is_available(bookings.car_id, bookings.start_date, bookings.end_date)
   );
 
 drop policy if exists "Users can read own bookings" on public.bookings;
-create policy "Users can read own bookings"
-  on public.bookings for select
-  using (auth.uid() = user_id);
 
 drop policy if exists "Admins can read all bookings" on public.bookings;
 create policy "Admins can read all bookings"

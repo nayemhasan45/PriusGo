@@ -3,7 +3,7 @@
 import { Loader2, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { mapBookingRowToRequest, type BookingRow } from "@/lib/supabase/bookings";
+import { mapBookingRowToRequest, type BookingReadableRow } from "@/lib/supabase/bookings";
 import { createClient } from "@/lib/supabase/client";
 import type { BookingRequest } from "@/lib/types";
 
@@ -42,12 +42,10 @@ export function DashboardBookings() {
 
         setUserEmail(userData.user.email ?? null);
         const { data, error: bookingsError } = await supabase
-          .from("bookings")
-          .select("id,user_id,car_id,full_name,email,phone,start_date,end_date,pickup_location,message,status,total_estimated_price,created_at")
-          .order("created_at", { ascending: false });
+          .rpc("get_customer_bookings");
 
         if (bookingsError) throw bookingsError;
-        setBookings(((data ?? []) as BookingRow[]).map(mapBookingRowToRequest));
+        setBookings(((data ?? []) as BookingReadableRow[]).map(mapBookingRowToRequest));
       } catch (caughtError) {
         setError(caughtError instanceof Error ? caughtError.message : "Could not load bookings.");
       } finally {
@@ -126,6 +124,11 @@ export function DashboardBookings() {
             <div>
               <h2 className="text-xl font-black text-slate-950">{booking.carName}</h2>
               <p className="mt-1 text-sm text-slate-500">{booking.startDate} → {booking.endDate} • Pickup: {booking.pickupLocation}</p>
+              {(booking.pickupTime || booking.returnTime) && (
+                <p className="mt-1 text-sm text-slate-500">
+                  Times: {booking.pickupTime ?? "not set"} → {booking.returnTime ?? "not set"}
+                </p>
+              )}
               <p className="mt-3 text-sm text-slate-600">{booking.fullName} • {booking.phone}</p>
             </div>
             <div className="text-left sm:text-right">

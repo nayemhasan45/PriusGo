@@ -28,6 +28,11 @@ export type BookingRequest = {
   endDate: string;
   pickupLocation: string;
   message?: string;
+  pickupTime?: string | null;
+  returnTime?: string | null;
+  drivingLicenseConfirmed?: boolean;
+  rentalRulesAccepted?: boolean;
+  bookingNotFinalAcknowledged?: boolean;
   estimatedTotal: number;
   status: "pending" | "approved" | "rejected" | "cancelled" | "completed";
   createdAt: string;

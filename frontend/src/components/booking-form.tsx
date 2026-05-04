@@ -20,6 +20,11 @@ const bookingSchema = z.object({
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
   pickupLocation: z.string().min(2, "Pickup location is required"),
+  pickupTime: z.string().min(1, "Pickup time is required"),
+  returnTime: z.string().min(1, "Return time is required"),
+  drivingLicenseConfirmed: z.boolean().refine(Boolean, "Confirm your valid driving license"),
+  rentalRulesAccepted: z.boolean().refine(Boolean, "Accept the rental rules"),
+  bookingNotFinalAcknowledged: z.boolean().refine(Boolean, "Confirm the booking is not final until admin confirms"),
   message: z.string().optional(),
 });
 
@@ -36,6 +41,11 @@ type BookingDraft = {
   startDate?: string;
   endDate?: string;
   pickupLocation?: string;
+  pickupTime?: string;
+  returnTime?: string;
+  drivingLicenseConfirmed?: boolean;
+  rentalRulesAccepted?: boolean;
+  bookingNotFinalAcknowledged?: boolean;
   message?: string;
 };
 
@@ -144,6 +154,11 @@ export function BookingForm() {
         startDate: String(formData.get("startDate") ?? ""),
         endDate: String(formData.get("endDate") ?? ""),
         pickupLocation: String(formData.get("pickupLocation") ?? ""),
+        pickupTime: String(formData.get("pickupTime") ?? ""),
+        returnTime: String(formData.get("returnTime") ?? ""),
+        drivingLicenseConfirmed: formData.get("drivingLicenseConfirmed") === "on",
+        rentalRulesAccepted: formData.get("rentalRulesAccepted") === "on",
+        bookingNotFinalAcknowledged: formData.get("bookingNotFinalAcknowledged") === "on",
         message: String(formData.get("message") ?? ""),
       });
 
@@ -163,6 +178,11 @@ export function BookingForm() {
         startDate: values.startDate,
         endDate: values.endDate,
         pickupLocation: values.pickupLocation,
+        pickupTime: values.pickupTime,
+        returnTime: values.returnTime,
+        drivingLicenseConfirmed: values.drivingLicenseConfirmed,
+        rentalRulesAccepted: values.rentalRulesAccepted,
+        bookingNotFinalAcknowledged: values.bookingNotFinalAcknowledged,
         message: values.message,
         estimatedTotal: estimateBookingPrice(car.pricePerDay, values.startDate, values.endDate, { pricePerWeek }),
         status: "pending",
@@ -181,6 +201,11 @@ export function BookingForm() {
             startDate: values.startDate,
             endDate: values.endDate,
             pickupLocation: values.pickupLocation,
+            pickupTime: values.pickupTime,
+            returnTime: values.returnTime,
+            drivingLicenseConfirmed: values.drivingLicenseConfirmed,
+            rentalRulesAccepted: values.rentalRulesAccepted,
+            bookingNotFinalAcknowledged: values.bookingNotFinalAcknowledged,
             message: values.message,
           }));
           setIsRedirecting(true);
@@ -313,6 +338,8 @@ export function BookingForm() {
         <Field label="Email"><input name="email" required type="email" placeholder="you@email.com" defaultValue={draft?.email ?? ""} /></Field>
         <Field label="Phone"><input name="phone" required placeholder="+370 ..." defaultValue={draft?.phone ?? ""} /></Field>
         <Field label="Pickup location"><input name="pickupLocation" required defaultValue={draft?.pickupLocation ?? "Šiauliai"} /></Field>
+        <Field label="Pickup time"><input name="pickupTime" required type="time" defaultValue={draft?.pickupTime ?? ""} /></Field>
+        <Field label="Return time"><input name="returnTime" required type="time" defaultValue={draft?.returnTime ?? ""} /></Field>
 
         <input type="hidden" name="startDate" value={startDate} />
         <input type="hidden" name="endDate" value={endDate} />
@@ -324,6 +351,27 @@ export function BookingForm() {
             onStartDateChange={setStartDate}
             onEndDateChange={setEndDate}
           />
+        </div>
+
+        <div className="md:col-span-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+          <p className="text-sm font-semibold text-white/70">Before submitting, confirm:</p>
+          <div className="mt-4 grid gap-3">
+            <CheckItem
+              name="drivingLicenseConfirmed"
+              label="I have a valid driving license and can present it when needed."
+              defaultChecked={draft?.drivingLicenseConfirmed ?? false}
+            />
+            <CheckItem
+              name="rentalRulesAccepted"
+              label="I accept PriusGo rental rules, pickup/return terms, and deposit conditions."
+              defaultChecked={draft?.rentalRulesAccepted ?? false}
+            />
+            <CheckItem
+              name="bookingNotFinalAcknowledged"
+              label="I understand this booking is not final until the admin confirms it."
+              defaultChecked={draft?.bookingNotFinalAcknowledged ?? false}
+            />
+          </div>
         </div>
 
         <label className="grid gap-2 md:col-span-2">
@@ -351,6 +399,20 @@ function Field({ label, children }: { label: string; children: React.ReactElemen
     <label className="grid gap-2">
       <span className="text-sm font-medium text-white/60">{label}</span>
       <div className="[&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/8 [&_input]:bg-white/8 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-[#ff3600] [&_input]:transition [&_input]:placeholder:text-white/25 [&_input]:focus:ring-2">{children}</div>
+    </label>
+  );
+}
+
+function CheckItem({ name, label, defaultChecked }: { name: string; label: string; defaultChecked: boolean }) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-sm text-white/75 transition hover:border-white/20">
+      <input
+        name={name}
+        type="checkbox"
+        defaultChecked={defaultChecked}
+        className="mt-1 size-4 rounded border-white/20 bg-transparent text-[#ff3600] focus:ring-[#ff3600]"
+      />
+      <span className="leading-relaxed">{label}</span>
     </label>
   );
 }

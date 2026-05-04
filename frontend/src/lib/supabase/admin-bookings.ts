@@ -1,7 +1,11 @@
 import type { BookingRequest } from "@/lib/types";
-import { mapBookingRowToRequest, type BookingRow, type BookingStatus } from "./bookings";
+import { mapBookingRowToRequest, type BookingLicenseCheckStatus, type BookingRow, type BookingStatus } from "./bookings";
 
-export type AdminBooking = BookingRequest;
+export type AdminBooking = BookingRequest & {
+  licenseCheckStatus: BookingLicenseCheckStatus;
+  depositAgreed: boolean;
+  adminNotes: string | null;
+};
 
 export type AdminBookingMetrics = {
   total: number;
@@ -46,7 +50,12 @@ export function getQuickStatusActions(status: BookingStatus): QuickStatusAction[
 }
 
 export function normalizeAdminBookingRows(rows: BookingRow[]): AdminBooking[] {
-  return rows.map(mapBookingRowToRequest);
+  return rows.map((row) => ({
+    ...mapBookingRowToRequest(row),
+    licenseCheckStatus: row.license_check_status,
+    depositAgreed: row.deposit_agreed,
+    adminNotes: row.admin_notes,
+  }));
 }
 
 export function getAdminBookingMetrics(bookings: AdminBooking[]): AdminBookingMetrics {

@@ -1,6 +1,7 @@
 import type { BookingRequest } from "@/lib/types";
 
 export type BookingStatus = BookingRequest["status"];
+export type BookingLicenseCheckStatus = "pending" | "verified" | "rejected";
 
 export type BookingFormValues = {
   carId: string;
@@ -10,6 +11,11 @@ export type BookingFormValues = {
   startDate: string;
   endDate: string;
   pickupLocation: string;
+  pickupTime: string;
+  returnTime: string;
+  drivingLicenseConfirmed: boolean;
+  rentalRulesAccepted: boolean;
+  bookingNotFinalAcknowledged: boolean;
   message?: string;
   estimatedTotal: number;
 };
@@ -24,11 +30,19 @@ export type BookingInsert = {
   end_date: string;
   pickup_location: string;
   message: string | null;
+  driving_license_confirmed: boolean;
+  rental_rules_accepted: boolean;
+  booking_not_final_acknowledged: boolean;
+  license_check_status: BookingLicenseCheckStatus;
+  deposit_agreed: boolean;
+  pickup_time: string | null;
+  return_time: string | null;
+  admin_notes: string | null;
   status: "pending";
   total_estimated_price: number;
 };
 
-export type BookingRow = {
+export type BookingReadableRow = {
   id: string;
   user_id: string;
   car_id: string;
@@ -39,9 +53,20 @@ export type BookingRow = {
   end_date: string;
   pickup_location: string;
   message: string | null;
+  driving_license_confirmed: boolean;
+  rental_rules_accepted: boolean;
+  booking_not_final_acknowledged: boolean;
+  pickup_time: string | null;
+  return_time: string | null;
   status: BookingStatus;
   total_estimated_price: number | null;
   created_at: string;
+};
+
+export type BookingRow = BookingReadableRow & {
+  license_check_status: BookingLicenseCheckStatus;
+  deposit_agreed: boolean;
+  admin_notes: string | null;
 };
 
 export function buildBookingInsert(values: BookingFormValues, userId: string): BookingInsert {
@@ -55,12 +80,20 @@ export function buildBookingInsert(values: BookingFormValues, userId: string): B
     end_date: values.endDate,
     pickup_location: values.pickupLocation,
     message: values.message?.trim() ? values.message.trim() : null,
+    driving_license_confirmed: values.drivingLicenseConfirmed,
+    rental_rules_accepted: values.rentalRulesAccepted,
+    booking_not_final_acknowledged: values.bookingNotFinalAcknowledged,
+    license_check_status: "pending",
+    deposit_agreed: false,
+    pickup_time: values.pickupTime.trim() ? values.pickupTime.trim() : null,
+    return_time: values.returnTime.trim() ? values.returnTime.trim() : null,
+    admin_notes: null,
     status: "pending",
     total_estimated_price: values.estimatedTotal,
   };
 }
 
-export function mapBookingRowToRequest(row: BookingRow): BookingRequest {
+export function mapBookingRowToRequest(row: BookingReadableRow): BookingRequest {
   return {
     id: row.id,
     carId: row.car_id,
@@ -72,6 +105,11 @@ export function mapBookingRowToRequest(row: BookingRow): BookingRequest {
     endDate: row.end_date,
     pickupLocation: row.pickup_location,
     message: row.message ?? undefined,
+    pickupTime: row.pickup_time,
+    returnTime: row.return_time,
+    drivingLicenseConfirmed: row.driving_license_confirmed,
+    rentalRulesAccepted: row.rental_rules_accepted,
+    bookingNotFinalAcknowledged: row.booking_not_final_acknowledged,
     estimatedTotal: Number(row.total_estimated_price ?? 0),
     status: row.status,
     createdAt: row.created_at,
