@@ -1,14 +1,17 @@
 "use client";
 
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Copy, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   adminBookingStatuses,
+  defaultAdminBookingFilters,
+  filterAdminBookings,
   getAdminBookingMetrics,
   getQuickStatusActions,
   getStatusTone,
   normalizeAdminBookingRows,
+  type AdminBookingFilters,
   type AdminBooking,
 } from "@/lib/supabase/admin-bookings";
 import { type BookingLicenseCheckStatus, type BookingRow, type BookingStatus } from "@/lib/supabase/bookings";
@@ -25,15 +28,50 @@ type BookingUpdate = {
   adminNotes?: string | null;
 };
 
+function buildContactSubject(booking: AdminBooking) {
+  return `PriusGo booking: ${booking.carName}`;
+}
+
+function buildContactBody(booking: AdminBooking) {
+  return [
+    `Hi ${booking.fullName},`,
+    "",
+    `PriusGo booking: ${booking.carName}`,
+    `Dates: ${booking.startDate} to ${booking.endDate}`,
+    `Pickup: ${booking.pickupLocation}`,
+    `Phone: ${booking.phone}`,
+  ].join("\n");
+}
+
+function formatTelPhone(phone: string) {
+  return phone.replace(/[^\d+]/g, "");
+}
+
+function formatWhatsAppPhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
 export function AdminBookings() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
+  const [filters, setFilters] = useState<AdminBookingFilters>(defaultAdminBookingFilters);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const metrics = useMemo(() => getAdminBookingMetrics(bookings), [bookings]);
+  const visibleBookings = useMemo(() => filterAdminBookings(bookings, filters), [bookings, filters]);
+  const bookingCarOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    bookings.forEach((booking) => {
+      if (!seen.has(booking.carId)) seen.set(booking.carId, booking.carName);
+    });
+    return Array.from(seen.entries())
+      .sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([carId, carName]) => ({ carId, carName }));
+  }, [bookings]);
 
   async function loadAdminBookings() {
     setIsLoading(true);
@@ -117,6 +155,20 @@ export function AdminBookings() {
     }
   }
 
+  async function copyPhoneNumber(bookingId: string, phone: string) {
+    try {
+      await navigator.clipboard.writeText(phone);
+      setCopiedPhoneId(bookingId);
+      window.setTimeout(() => setCopiedPhoneId((current) => (current === bookingId ? null : current)), 1500);
+    } catch {
+      setError("Could not copy phone number.");
+    }
+  }
+
+  function resetFilters() {
+    setFilters(defaultAdminBookingFilters);
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white p-10 text-slate-600">
@@ -153,8 +205,88 @@ export function AdminBookings() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard label="Total requests" value={metrics.total} />
         <MetricCard label="Pending" value={metrics.pending} />
-        <MetricCard label="Approved" value={metrics.approved} />
+        <MetricCard label="Active rentals" value={metrics.active} />
         <MetricCard label="Estimated revenue" value={`€${metrics.revenueEstimate}`} />
+      </div>
+
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-4 lg:grid-cols-5">
+          <label className="grid gap-2 text-sm font-bold text-slate-700 lg:col-span-2">
+            Search
+            <input
+              type="search"
+              value={filters.query}
+              onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
+              placeholder="Name, phone, email, car, pickup, notes"
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-500"
+            />
+          </label>
+
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Status
+            <select
+              value={filters.status}
+              onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value as AdminBookingFilters["status"] }))}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-500"
+            >
+              <option value="all">All statuses</option>
+              {adminBookingStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Car
+            <select
+              value={filters.carId}
+              onChange={(event) => setFilters((current) => ({ ...current, carId: event.target.value }))}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-500"
+            >
+              <option value="all">All cars</option>
+              {bookingCarOptions.map((car) => (
+                <option key={car.carId} value={car.carId}>
+                  {car.carName}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            From
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={(event) => setFilters((current) => ({ ...current, startDate: event.target.value }))}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-500"
+            />
+          </label>
+
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            To
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(event) => setFilters((current) => ({ ...current, endDate: event.target.value }))}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-500"
+            />
+          </label>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-500">
+            Showing <span className="font-bold text-slate-900">{visibleBookings.length}</span> of <span className="font-bold text-slate-900">{bookings.length}</span> bookings.
+          </p>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="self-start rounded-full border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+          >
+            Clear filters
+          </button>
+        </div>
       </div>
 
       <div className="rounded-3xl border border-emerald-100 bg-emerald-50 p-5">
@@ -169,9 +301,17 @@ export function AdminBookings() {
           <h2 className="text-2xl font-black text-slate-950">No booking requests yet</h2>
           <p className="mt-3 text-slate-600">Customer bookings will appear here when they submit requests.</p>
         </div>
+      ) : visibleBookings.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
+          <h2 className="text-2xl font-black text-slate-950">No bookings match those filters</h2>
+          <p className="mt-3 text-slate-600">Try clearing the search, date range, or status filter.</p>
+          <button type="button" onClick={resetFilters} className="mt-6 inline-flex rounded-full bg-slate-950 px-6 py-3 font-black text-white hover:bg-emerald-700">
+            Clear filters
+          </button>
+        </div>
       ) : (
         <div className="grid gap-4">
-          {bookings.map((booking) => (
+          {visibleBookings.map((booking) => (
             <article key={booking.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
                 <div className="min-w-0 flex-1">
@@ -187,6 +327,36 @@ export function AdminBookings() {
                     <p><span className="font-black">Email:</span> {booking.email || "Not provided"}</p>
                     <p><span className="font-black">Phone:</span> {booking.phone}</p>
                     {booking.message && <p><span className="font-black">Message:</span> {booking.message}</p>}
+                  </div>
+
+                  <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    <a
+                      href={`tel:${formatTelPhone(booking.phone)}`}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                    >
+                      <Phone className="size-4" /> Call
+                    </a>
+                    <a
+                      href={`https://wa.me/${formatWhatsAppPhone(booking.phone)}?text=${encodeURIComponent(buildContactBody(booking))}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                    >
+                      <span className="text-base font-black">WA</span> WhatsApp
+                    </a>
+                    <a
+                      href={`mailto:${booking.email}?subject=${encodeURIComponent(buildContactSubject(booking))}&body=${encodeURIComponent(buildContactBody(booking))}`}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                    >
+                      <Mail className="size-4" /> Email
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => void copyPhoneNumber(booking.id, booking.phone)}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                    >
+                      <Copy className="size-4" /> {copiedPhoneId === booking.id ? "Copied" : "Copy number"}
+                    </button>
                   </div>
                 </div>
 

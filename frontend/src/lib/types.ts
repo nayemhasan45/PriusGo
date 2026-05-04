@@ -34,6 +34,6 @@ export type BookingRequest = {
   rentalRulesAccepted?: boolean;
   bookingNotFinalAcknowledged?: boolean;
   estimatedTotal: number;
-  status: "pending" | "approved" | "rejected" | "cancelled" | "completed";
+  status: "pending" | "approved" | "picked_up" | "returned" | "completed" | "rejected" | "cancelled";
   createdAt: string;
 };

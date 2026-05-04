@@ -20,7 +20,7 @@ export type CarBookingBlockRow = {
   car_id: string;
   start_date: string;
   end_date: string;
-  status: Extract<BookingStatus, "approved" | "completed">;
+  status: Extract<BookingStatus, "approved" | "picked_up" | "returned" | "completed">;
 };
 
 export type CarBookingBlock = {

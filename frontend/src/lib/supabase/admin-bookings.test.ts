@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAdminBookingMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
+import { filterAdminBookings, getAdminBookingMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
 
 describe("admin booking helpers", () => {
   const rows = [
@@ -45,7 +45,7 @@ describe("admin booking helpers", () => {
       pickup_time: "11:00",
       return_time: "17:30",
       admin_notes: "Call before pickup.",
-      status: "approved" as const,
+      status: "picked_up" as const,
       total_estimated_price: 76,
       created_at: "2026-04-30T12:00:00.000Z",
     },
@@ -77,7 +77,7 @@ describe("admin booking helpers", () => {
     expect(metrics).toEqual({
       total: 2,
       pending: 1,
-      approved: 1,
+      active: 1,
       revenueEstimate: 181,
     });
   });
@@ -85,6 +85,7 @@ describe("admin booking helpers", () => {
   it("returns a clear style tone for each status", () => {
     expect(getStatusTone("pending")).toContain("amber");
     expect(getStatusTone("approved")).toContain("emerald");
+    expect(getStatusTone("picked_up")).toContain("sky");
     expect(getStatusTone("rejected")).toContain("red");
   });
 
@@ -96,9 +97,24 @@ describe("admin booking helpers", () => {
     ]);
 
     expect(getQuickStatusActions("approved")).toEqual([
-      { status: "completed", label: "Complete" },
+      { status: "picked_up", label: "Mark picked up" },
       { status: "cancelled", label: "Cancel" },
       { status: "rejected", label: "Reject" },
     ]);
+
+    expect(getQuickStatusActions("picked_up")).toEqual([
+      { status: "returned", label: "Mark returned" },
+      { status: "completed", label: "Complete" },
+      { status: "cancelled", label: "Cancel" },
+    ]);
+  });
+
+  it("filters bookings by search, status, car, and date range", () => {
+    const bookings = normalizeAdminBookingRows(rows);
+
+    expect(filterAdminBookings(bookings, { query: "morning", status: "all", carId: "all", startDate: "", endDate: "" })).toHaveLength(1);
+    expect(filterAdminBookings(bookings, { query: "", status: "picked_up", carId: "all", startDate: "", endDate: "" })).toHaveLength(1);
+    expect(filterAdminBookings(bookings, { query: "", status: "all", carId: "MJO146", startDate: "2026-05-01", endDate: "2026-05-04" })).toHaveLength(1);
+    expect(filterAdminBookings(bookings, { query: "", status: "all", carId: "all", startDate: "2026-05-06", endDate: "2026-05-08" })).toHaveLength(1);
   });
 });

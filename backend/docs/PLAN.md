@@ -12,7 +12,7 @@
 
 ## 1) Current verified status
 
-Checked on **2026-05-04 13:34 EEST**.
+Checked/updated on **2026-05-04 15:23 EEST**.
 
 ### ✅ Done / working now
 - Live site is up: `https://prius-go.vercel.app/`
@@ -39,6 +39,20 @@ Checked on **2026-05-04 13:34 EEST**.
   - RLS on cars/bookings/profiles
   - DB-level car availability check
   - overlap trigger + exclusion constraint for approved/completed bookings
+- Sprint 1 rental safety workflow is now implemented and pushed:
+  - booking confirmation checkboxes are enforced
+  - pickup time and return time are stored
+  - admin can track license check status
+  - admin can track deposit agreed
+  - admin-only notes exist and stay hidden from customers
+  - customer dashboard now uses safe customer RPC instead of direct table read
+- Supabase SQL for Sprint 1 has been applied after code push.
+- Sprint 2 work is now implemented in the workspace:
+  - admin booking filters/search UI added
+  - quick contact actions added
+  - richer booking lifecycle statuses added
+  - tests/lint/build pass with these Sprint 2 changes
+- Important: the updated overlap-protection SQL fix is in `backend/supabase-schema.sql` and should be re-run in Supabase after final review because the exclusion constraint migration was corrected for existing databases.
 - Code quality baseline is healthy:
   - `npm test` ✅ 21/21 tests passed
   - `npm run lint` ✅
@@ -54,24 +68,22 @@ Checked on **2026-05-04 13:34 EEST**.
 
 These are the **highest-value practical changes now**, in order.
 
-### Priority A — Finish the real rental loop, not just the UI
-**Why now:** The app looks good, but real business value comes from handling a booking from request → approval → pickup → return → payment tracking.
+### Priority A — Ship Sprint 2 cleanly
+**Why now:** The best next step is to keep the good admin workflow changes and make sure the DB status logic is shipped safely.
 
 **Main gaps right now:**
-- booking form does not collect license/contract-confirmation details
-- admin cannot track pickup/return progress
-- admin cannot store internal notes per booking
-- payment/deposit status is missing
-- no printable booking summary / rental sheet
+- corrected overlap-protection SQL should be re-applied in Supabase after final review
+- printable booking summary / rental sheet is still missing
+- CSV export for admin/accounting is still missing
 
-### Priority B — Make admin faster for real daily use
-**Why now:** With only 2 cars, speed and clarity matter more than fancy features.
+### Priority B — Add money tracking without risky payment automation
+**Why now:** After Sprint 2 is shipped, the next practical need is knowing who paid, how much deposit was collected, and what still needs follow-up.
 
 **Main gaps right now:**
-- no filters/search on admin bookings
-- no quick WhatsApp / call / copy actions
-- no maintenance note / next available date tracking
-- no export for bookings/accounting
+- no payment status
+- no deposit amount field
+- no payment method / payment notes
+- no discount / extra charge / manual adjustment flow
 
 ### Priority C — Improve trust and conversion on the public side
 **Why now:** People rent cars when the site feels real, clear, and safe.
@@ -89,16 +101,17 @@ These are the **highest-value practical changes now**, in order.
 These are the best additions to make PriusGo more useful in the real world.
 
 ### Must-add practical features
-1. **Rental rules acceptance checkbox** before booking submit
-2. **Driver license check status** on each booking
-3. **Deposit amount + payment status** tracking
-4. **Admin-only notes** for each booking
-5. **Pickup time / return time** fields
-6. **Pickup status flow**: `pending → approved → picked_up → returned → completed`
-7. **Quick contact buttons**: call / WhatsApp / email / copy number
+1. **Rental rules acceptance checkbox** before booking submit ✅ done
+2. **Driver license check status** on each booking ✅ done
+3. **Admin-only notes** for each booking ✅ done
+4. **Pickup time / return time** fields ✅ done
+5. **Deposit agreed flag** on each booking ✅ done
+6. **Pickup status flow**: `pending → approved → picked_up → returned → completed` ✅ done
+7. **Quick contact buttons**: call / WhatsApp / email / copy number ✅ done
 8. **Printable booking summary / contract draft**
-9. **Booking filters** by status, car, date, customer
+9. **Booking filters** by status, car, date, customer ✅ done
 10. **CSV export** for admin records
+11. **Payment status + deposit amount** tracking
 
 ### Strong second-wave features
 11. **Maintenance note + next available date** per car
@@ -119,19 +132,21 @@ These are the best additions to make PriusGo more useful in the real world.
 
 ## 4) Recommended implementation order
 
-## Sprint 1 — Make bookings legally/operationally safer
-**Outcome:** A booking request contains the minimum info needed for a real rental decision.
+## Sprint 1 — Make bookings legally/operationally safer ✅ DONE
+**Outcome:** A booking request now contains the minimum info needed for a real rental decision.
 
-**Do:**
-- add booking form acceptance checkboxes
-- add booking fields for:
+**Done:**
+- booking form acceptance checkboxes added and enforced
+- booking fields added for:
   - license confirmed
   - deposit agreed
   - pickup time
   - return time
   - admin notes
-- show those fields in admin bookings
-- keep admin notes hidden from customer view
+- admin bookings updated to manage those fields
+- customer dashboard kept safe from admin-only data
+- RLS/customer-read path hardened with customer RPC and stricter insert policy
+- frontend checks passed and SQL was applied in Supabase
 
 **Files likely to change:**
 - `backend/supabase-schema.sql`
@@ -145,15 +160,36 @@ These are the best additions to make PriusGo more useful in the real world.
 - `frontend/src/lib/types.ts`
 
 **Acceptance check:**
-- customer can submit booking with the new required confirmations
-- admin sees internal workflow fields
-- customer does **not** see admin-only notes
-- tests/lint/build pass
+- customer can submit booking with the new required confirmations ✅
+- admin sees internal workflow fields ✅
+- customer does **not** see admin-only notes ✅
+- tests/lint/build pass ✅
 
 ---
 
-## Sprint 2 — Make admin usable as a real operations panel
+## Sprint 2 — Make admin usable as a real operations panel ✅ DONE
 **Outcome:** Al-Amin can manage bookings quickly without digging through every card.
+
+**Done:**
+- filters/search UI exists:
+  - status
+  - car
+  - date range
+  - customer search
+- quick actions exist:
+  - call
+  - WhatsApp
+  - email
+  - copy phone
+- richer booking lifecycle statuses exist:
+  - `pending`
+  - `approved`
+  - `picked_up`
+  - `returned`
+  - `completed`
+  - `rejected`
+  - `cancelled`
+- tests/lint/build pass with the current Sprint 2 changes
 
 **Do:**
 - add filters/search on admin bookings:
@@ -188,6 +224,7 @@ These are the best additions to make PriusGo more useful in the real world.
 - admin can find a booking in seconds
 - one booking card gives direct contact actions
 - new statuses do not break overlap logic
+- corrected overlap-protection SQL has been re-applied in Supabase
 - tests/lint/build pass
 
 ---
@@ -292,39 +329,41 @@ These are the best additions to make PriusGo more useful in the real world.
 - admin cars management
 - photo upload
 - booking overlap protection
+- rental rules acceptance enforcement
+- pickup time / return time workflow fields
+- license check status tracking
+- deposit agreed tracking
+- admin-only notes with safe customer read path
+- stricter booking insert policy for customer-safe workflow fields
+- Supabase SQL applied for Sprint 1
 - test/lint/build green
 
 ### NOT DONE YET
-- contract/rules acceptance enforcement inside booking submit
-- driver screening workflow
-- admin-only notes
-- pickup/return workflow status
 - deposit/payment tracking
-- quick communication actions
-- booking filters/search
+- re-apply corrected overlap-protection SQL after final review
 - CSV export
+- printable booking summary / contract draft
 - maintenance notes / next available date
-- printable rental sheet
 - stronger trust/SEO conversion polish
 
 ---
 
 ## 6) Best next action for you
 
-If you want the **most practical next coding step**, do this first:
+If you want the **most practical next coding step**, do this next:
 
 ### Next task to work on now
-**Implement Sprint 1 only:**
-- rental rules acceptance checkbox
-- license confirmation field
-- deposit agreed field
-- pickup time / return time
-- admin-only notes
+**Prepare Sprint 2 for review/commit:**
+- keep the current admin filters/search work
+- keep the current call / WhatsApp / email / copy actions
+- keep the richer booking lifecycle statuses
+- make sure overlap-protection SQL fix is included in final schema
+- verify admin bookings flow in browser
 
 Why this first:
-- biggest jump from demo → real rental workflow
-- low feature count, high business value
-- creates the data foundation for later admin/payment improvements
+- most of the value is already built locally
+- fastest path to a real business improvement with minimal extra work
+- prepares clean ground for payment tracking in Sprint 3
 
 ---
 

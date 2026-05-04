@@ -46,7 +46,7 @@ create table if not exists public.bookings (
   pickup_time text,
   return_time text,
   admin_notes text,
-  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'cancelled', 'completed')),
+  status text not null default 'pending' check (status in ('pending', 'approved', 'picked_up', 'returned', 'completed', 'rejected', 'cancelled')),
   total_estimated_price numeric(10,2),
   created_at timestamptz not null default now(),
   constraint bookings_date_order check (end_date >= start_date)
@@ -60,6 +60,17 @@ alter table public.bookings add column if not exists deposit_agreed boolean not 
 alter table public.bookings add column if not exists pickup_time text;
 alter table public.bookings add column if not exists return_time text;
 alter table public.bookings add column if not exists admin_notes text;
+
+do $$
+begin
+  alter table public.bookings drop constraint if exists bookings_status_check;
+  alter table public.bookings
+    add constraint bookings_status_check
+    check (status in ('pending', 'approved', 'picked_up', 'returned', 'completed', 'rejected', 'cancelled'));
+exception
+  when duplicate_object then null;
+end;
+$$;
 
 do $$
 begin
@@ -153,7 +164,7 @@ as $$
     select 1
     from public.bookings
     where bookings.car_id = selected_car_id
-      and bookings.status in ('approved', 'completed')
+      and bookings.status in ('approved', 'picked_up', 'returned', 'completed')
       and daterange(bookings.start_date, bookings.end_date, '[]') && daterange(requested_start_date, requested_end_date, '[]')
   );
 $$;
@@ -165,15 +176,15 @@ security definer
 set search_path = public
 as $$
 begin
-  if new.status in ('approved', 'completed') and exists (
+  if new.status in ('approved', 'picked_up', 'returned', 'completed') and exists (
     select 1
     from public.bookings existing
     where existing.car_id = new.car_id
       and existing.id is distinct from new.id
-      and existing.status in ('approved', 'completed')
+      and existing.status in ('approved', 'picked_up', 'returned', 'completed')
       and daterange(existing.start_date, existing.end_date, '[]') && daterange(new.start_date, new.end_date, '[]')
   ) then
-    raise exception 'Car % already has an approved/completed booking overlapping % to %', new.car_id, new.start_date, new.end_date
+    raise exception 'Car % already has an active booking (approved/picked_up/returned/completed) overlapping % to %', new.car_id, new.start_date, new.end_date
       using errcode = '23P01';
   end if;
 
@@ -191,17 +202,16 @@ create trigger prevent_overlapping_confirmed_bookings
 -- is the final protection for concurrent admin approvals/inserts.
 do $$
 begin
-  if not exists (
-    select 1 from pg_constraint where conname = 'bookings_no_overlapping_confirmed'
-  ) then
-    alter table public.bookings
-      add constraint bookings_no_overlapping_confirmed
-      exclude using gist (
-        car_id with =,
-        daterange(start_date, end_date, '[]') with &&
-      )
-      where (status in ('approved', 'completed'));
-  end if;
+  alter table public.bookings drop constraint if exists bookings_no_overlapping_confirmed;
+  alter table public.bookings
+    add constraint bookings_no_overlapping_confirmed
+    exclude using gist (
+      car_id with =,
+      daterange(start_date, end_date, '[]') with &&
+    )
+      where (status in ('approved', 'picked_up', 'returned', 'completed'));
+exception
+  when duplicate_object then null;
 end;
 $$;
 
@@ -212,7 +222,7 @@ select
   end_date,
   status
 from public.bookings
-where status in ('approved', 'completed');
+where status in ('approved', 'picked_up', 'returned', 'completed');
 
 create or replace function public.get_customer_bookings()
 returns table (
