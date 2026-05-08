@@ -30,6 +30,34 @@ const faqs = [
   { q: "Can I drive outside Lithuania?", a: "Please discuss your travel plans when booking. Cross-border arrangements depend on your destination and insurance coverage." },
 ];
 
+const trustItems = [
+  { title: "Transparent pricing", desc: "€20/day or €100/week, shown before booking." },
+  { title: "Manual approval", desc: "Every request is reviewed before the rental becomes final." },
+  { title: "Šiauliai pickup", desc: "Pickup and return are arranged locally in Šiauliai." },
+  { title: "License + ID check", desc: "Valid driving license and ID or passport required at pickup." },
+  { title: "Deposit agreed first", desc: "Deposit and payment details are confirmed before handoff." },
+  { title: "No online payment risk", desc: "No card capture or hidden checkout flow in this version." },
+];
+
+const contactMethods = [
+  { title: "Booking request form", desc: "Fastest way to contact PriusGo and reserve a car." },
+  { title: "Approval follow-up", desc: "After approval, you receive the pickup details and direct contact for the rental." },
+  { title: "Customer dashboard", desc: "Signed-in customers can track requests and rental status in one place." },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.a,
+    },
+  })),
+};
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
@@ -223,6 +251,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── TRUST ── */}
+      <section id="trust" className="bg-white py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
+          <div className="mb-10 max-w-xl sm:mb-14">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Trust first</p>
+            <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-[#0b0b0b] sm:text-4xl lg:text-5xl">
+              Why renters trust PriusGo
+            </h2>
+            <p className="mt-4 text-[#616161]">
+              Clear pricing, manual approval, and local handoff keep the process simple and safe for both sides.
+            </p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {trustItems.map((item, index) => (
+              <div key={item.title} className="rounded-[2rem] border border-[#e9e9e9] bg-[#fff7f4] p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5 sm:p-8">
+                <p className="font-heading text-5xl font-black text-[#ff3600] opacity-20">0{index + 1}</p>
+                <h3 className="mt-4 font-heading text-xl font-black text-[#0b0b0b]">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#616161]">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── BOOKING ── */}
       <section className="bg-[#0b0b0b] py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
@@ -305,22 +358,22 @@ export default function Home() {
           <div className="grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-center lg:gap-24">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Get in touch</p>
-              <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">Contact us</h2>
+              <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">How to reach PriusGo</h2>
               <p className="mt-5 leading-relaxed text-white/55">
-                Questions about availability, terms, or your booking? Reach out directly and we&apos;ll get back to you quickly.
+                Use the booking form to contact us fastest. After approval, you receive the exact pickup details and direct follow-up for the rental.
               </p>
             </div>
             <div className="grid gap-4">
-              {[
-                { label: "Phone / WhatsApp", value: "+370 — confirmed on booking" },
-                { label: "Email", value: "Sent via booking form above" },
-                { label: "Location", value: "Šiauliai, Lithuania" },
-              ].map(({ label, value }) => (
-                <div key={label} className="rounded-2xl border border-white/8 bg-white/5 p-5">
-                  <p className="text-xs font-medium uppercase tracking-wider text-white/35">{label}</p>
-                  <p className="mt-1.5 font-medium text-white">{value}</p>
+              {contactMethods.map(({ title, desc }) => (
+                <div key={title} className="rounded-2xl border border-white/8 bg-white/5 p-5">
+                  <p className="text-xs font-medium uppercase tracking-wider text-white/35">{title}</p>
+                  <p className="mt-1.5 font-medium text-white">{desc}</p>
                 </div>
               ))}
+              <div className="rounded-2xl border border-white/8 bg-white/5 p-5">
+                <p className="text-xs font-medium uppercase tracking-wider text-white/35">Location</p>
+                <p className="mt-1.5 font-medium text-white">Šiauliai, Lithuania</p>
+              </div>
               <a
                 href="#booking"
                 className="mt-1 inline-flex items-center justify-center gap-3 rounded-full bg-[#ff3600] px-8 py-4 font-semibold text-white transition hover:bg-[#cc2b00]"
@@ -343,6 +396,12 @@ export default function Home() {
           <Link href="/login" className="transition hover:text-white/55">Login / Register</Link>
         </div>
       </footer>
+
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </main>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
+import { Copy, Loader2, Mail, Phone, Printer, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -61,6 +61,113 @@ function formatTelPhone(phone: string) {
 
 function formatWhatsAppPhone(phone: string) {
   return phone.replace(/\D/g, "");
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatSummaryMoney(value: number | null | undefined, fallback = 0) {
+  const amount = typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  return Number.isInteger(amount) ? `€${amount}` : `€${amount.toFixed(2)}`;
+}
+
+function buildPrintableBookingSummaryHtml(booking: AdminBooking) {
+  const rentalTotal = booking.rentalTotal ?? booking.estimatedTotal;
+  const amountDue = rentalTotal - (booking.discountAmount ?? 0) + (booking.extraCharge ?? 0);
+
+  return `<!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>PriusGo booking summary</title>
+      <style>
+        :root { color-scheme: light; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 32px; color: #111827; background: #fff; }
+        .sheet { max-width: 860px; margin: 0 auto; }
+        h1 { margin: 0 0 8px; font-size: 28px; }
+        .sub { color: #6b7280; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px 16px; }
+        .label { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: #6b7280; margin-bottom: 6px; }
+        .value { font-size: 14px; font-weight: 700; white-space: pre-wrap; }
+        .full { grid-column: 1 / -1; }
+        .section { margin-top: 18px; }
+        .section h2 { font-size: 16px; margin: 0 0 10px; }
+        ul { margin: 0; padding-left: 18px; }
+        li { margin: 5px 0; }
+        .totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .footer { margin-top: 24px; color: #6b7280; font-size: 12px; }
+        @media print { body { padding: 0; } .sheet { max-width: none; } }
+      </style>
+    </head>
+    <body>
+      <div class="sheet">
+        <h1>PriusGo booking summary</h1>
+        <div class="sub">Printable rental sheet / contract draft for pickup handoff</div>
+
+        <div class="grid">
+          <div class="card"><div class="label">Customer</div><div class="value">${escapeHtml(booking.fullName)}</div></div>
+          <div class="card"><div class="label">Phone</div><div class="value">${escapeHtml(booking.phone)}</div></div>
+          <div class="card"><div class="label">Email</div><div class="value">${escapeHtml(booking.email || "Not provided")}</div></div>
+          <div class="card"><div class="label">Car</div><div class="value">${escapeHtml(booking.carName)}</div></div>
+          <div class="card"><div class="label">Dates</div><div class="value">${escapeHtml(`${booking.startDate} → ${booking.endDate}`)}</div></div>
+          <div class="card"><div class="label">Pickup location</div><div class="value">${escapeHtml(booking.pickupLocation)}</div></div>
+          <div class="card"><div class="label">Pickup / return time</div><div class="value">${escapeHtml(`${booking.pickupTime ?? "not set"} → ${booking.returnTime ?? "not set"}`)}</div></div>
+          <div class="card"><div class="label">Status</div><div class="value">${escapeHtml(booking.status)}</div></div>
+          <div class="card"><div class="label">Payment status</div><div class="value">${escapeHtml(booking.paymentStatus.replaceAll("_", " "))}</div></div>
+          <div class="card"><div class="label">Payment method</div><div class="value">${escapeHtml(booking.paymentMethod ?? "not set")}</div></div>
+        </div>
+
+        <div class="section">
+          <h2>Money summary</h2>
+          <div class="totals">
+            <div class="card"><div class="label">Rental total</div><div class="value">${escapeHtml(formatSummaryMoney(rentalTotal, booking.estimatedTotal))}</div></div>
+            <div class="card"><div class="label">Deposit</div><div class="value">${escapeHtml(formatSummaryMoney(booking.depositAmount))}</div></div>
+            <div class="card"><div class="label">Discount</div><div class="value">${escapeHtml(formatSummaryMoney(booking.discountAmount))}</div></div>
+            <div class="card"><div class="label">Extra charge</div><div class="value">${escapeHtml(formatSummaryMoney(booking.extraCharge))}</div></div>
+          </div>
+          <div class="card section full"><div class="label">Amount due</div><div class="value">${escapeHtml(formatSummaryMoney(amountDue))}</div></div>
+        </div>
+
+        <div class="section">
+          <h2>Rental confirmation checklist</h2>
+          <ul>
+            <li>Valid driving license checked</li>
+            <li>ID or passport checked</li>
+            <li>Rental rules accepted</li>
+            <li>Booking confirmed by admin before handoff</li>
+            <li>Deposit and payment details agreed before handoff</li>
+          </ul>
+        </div>
+
+        <div class="section grid">
+          <div class="card full"><div class="label">Payment notes</div><div class="value">${escapeHtml(booking.paymentNotes ?? "None")}</div></div>
+          <div class="card full"><div class="label">Admin notes</div><div class="value">${escapeHtml(booking.adminNotes ?? "None")}</div></div>
+        </div>
+
+        <div class="footer">PriusGo · Šiauliai, Lithuania · Generated ${escapeHtml(new Date().toLocaleString())}</div>
+      </div>
+      <script>window.print();</script>
+    </body>
+  </html>`;
+}
+
+function printBookingSummary(booking: AdminBooking) {
+  const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+  if (!printWindow) return false;
+
+  printWindow.document.open();
+  printWindow.document.write(buildPrintableBookingSummaryHtml(booking));
+  printWindow.document.close();
+  printWindow.focus();
+  return true;
 }
 
 function formatMoney(value: number | null | undefined) {
@@ -425,6 +532,16 @@ export function AdminBookings() {
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
                     >
                       <Copy className="size-4" /> {copiedPhoneId === booking.id ? "Copied" : "Copy number"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const opened = printBookingSummary(booking);
+                        if (!opened) setError("Could not open the printable booking summary.");
+                      }}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                    >
+                      <Printer className="size-4" /> Print summary
                     </button>
                   </div>
                 </div>
