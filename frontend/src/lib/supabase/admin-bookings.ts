@@ -28,6 +28,14 @@ export type AdminPaymentMetrics = {
   refunded: number;
 };
 
+export type AdminAccountingMetrics = {
+  rentalTotal: number;
+  depositAmount: number;
+  discountAmount: number;
+  extraCharge: number;
+  amountDue: number;
+};
+
 export type AdminBookingFilters = {
   query: string;
   status: BookingStatus | "all";
@@ -116,6 +124,26 @@ export function getAdminPaymentMetrics(bookings: AdminBooking[]): AdminPaymentMe
       refunded: metrics.refunded + (booking.paymentStatus === "refunded" ? 1 : 0),
     }),
     { unpaid: 0, depositPaid: 0, paid: 0, refunded: 0 },
+  );
+}
+
+export function getAdminAccountingMetrics(bookings: AdminBooking[]): AdminAccountingMetrics {
+  return bookings.reduce(
+    (metrics, booking) => {
+      const rentalTotal = getBookingMoneyValue(booking.rentalTotal, booking.estimatedTotal);
+      const depositAmount = getBookingMoneyValue(booking.depositAmount, 0);
+      const discountAmount = getBookingMoneyValue(booking.discountAmount, 0);
+      const extraCharge = getBookingMoneyValue(booking.extraCharge, 0);
+
+      return {
+        rentalTotal: metrics.rentalTotal + rentalTotal,
+        depositAmount: metrics.depositAmount + depositAmount,
+        discountAmount: metrics.discountAmount + discountAmount,
+        extraCharge: metrics.extraCharge + extraCharge,
+        amountDue: metrics.amountDue + rentalTotal - discountAmount + extraCharge,
+      };
+    },
+    { rentalTotal: 0, depositAmount: 0, discountAmount: 0, extraCharge: 0, amountDue: 0 },
   );
 }
 

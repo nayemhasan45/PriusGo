@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAdminBookingsCsv, filterAdminBookings, getAdminBookingMetrics, getAdminPaymentMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
+import { buildAdminBookingsCsv, filterAdminBookings, getAdminAccountingMetrics, getAdminBookingMetrics, getAdminPaymentMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
 
 describe("admin booking helpers", () => {
   const rows = [
@@ -111,6 +111,18 @@ describe("admin booking helpers", () => {
       depositPaid: 1,
       paid: 0,
       refunded: 0,
+    });
+  });
+
+  it("calculates accounting metrics", () => {
+    const metrics = getAdminAccountingMetrics(normalizeAdminBookingRows(rows));
+
+    expect(metrics).toEqual({
+      rentalTotal: 181,
+      depositAmount: 50,
+      discountAmount: 10,
+      extraCharge: 5,
+      amountDue: 176,
     });
   });
 

@@ -1,6 +1,6 @@
 # PriusGo
 
-PriusGo is a Toyota Prius rental MVP for Šiauliai, Lithuania.
+PriusGo is a Toyota Prius rental app for Šiauliai, Lithuania.
 
 Live site: https://prius-go.vercel.app/
 
@@ -12,10 +12,25 @@ PriusGo/
   backend/    Supabase SQL schema, RLS policies, backend notes
 ```
 
-## Frontend
+## Current status
+
+- V1 is complete.
+- V2 is in progress.
+- Responsive phone/tablet polish is done.
+- Admin overview dashboard is live at `/admin`.
+
+## Prerequisites
+
+- Node.js 20+
+- npm
+- A Supabase project
+- A Google Cloud OAuth client if you want Google sign-in
+
+## Quick start
 
 ```bash
-cd frontend
+git clone https://github.com/nayemhasan45/PriusGo.git
+cd PriusGo/frontend
 npm install
 npm run dev
 ```
@@ -32,6 +47,7 @@ Useful local pages:
 http://localhost:3000
 http://localhost:3000/login
 http://localhost:3000/dashboard
+http://localhost:3000/admin
 http://localhost:3000/admin/bookings
 ```
 
@@ -44,7 +60,7 @@ http://localhost:3000/admin/bookings
 backend/supabase-schema.sql
 ```
 
-3. Create this file:
+3. Create `frontend/.env.local`:
 
 ```text
 frontend/.env.local
@@ -57,8 +73,15 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-5. Enable Google login in Supabase Auth Providers and add the Google OAuth client ID/secret.
-6. Restart the frontend dev server.
+5. Add these variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+6. Enable Google login in Supabase Auth Providers and add the Google OAuth client ID/secret.
+7. Restart the frontend dev server.
 
 More details are in:
 
@@ -88,6 +111,49 @@ Then open:
 http://localhost:3000/admin/bookings
 ```
 
+## Google sign-in
+
+Set these in Supabase Auth URL configuration:
+
+```text
+http://localhost:3000
+http://localhost:3000/**
+http://localhost:3000/dashboard
+```
+
+In Google Cloud Console, use this redirect URI:
+
+```text
+https://tiaoqvqshkwrvukvywzh.supabase.co/auth/v1/callback
+```
+
+For production, add your deployed domain to the Supabase redirect URLs.
+
+## Deployment
+
+For Vercel, set:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+```
+
+Do not add service role keys to the frontend.
+
+### Production checklist
+
+1. Deploy `frontend/` to Vercel.
+2. Run `backend/supabase-schema.sql` in the production Supabase SQL Editor.
+3. Confirm the `car-images` bucket exists and admin can upload photos.
+4. Add your production domain to Supabase Auth redirect URLs.
+5. Make sure one trusted login is marked `profiles.role = 'admin'`.
+6. Smoke test:
+   - homepage loads
+   - login works
+   - booking request submits
+   - admin can approve a booking
+   - admin can open `/admin`
+
 ## Current MVP features
 
 - Customer registration/login with Supabase Auth
@@ -97,15 +163,27 @@ http://localhost:3000/admin/bookings
 - Customer car cards show per-car unavailable date ranges and a direct `Rent this car` action.
 - Pricing supports €20/day and €100/week; extra days after full weeks are calculated daily.
 - Customer dashboard for own bookings
+- Admin overview dashboard
 - Admin booking dashboard
 - Admin car management for price/status updates and photo uploads
 - Admin quick actions for approve/reject/cancel/complete/reopen
+- Mobile-friendly layouts for public and admin screens
 - Supabase Row Level Security for customer/admin access
 - Database trigger/exclusion constraint prevents overlapping approved/completed bookings for the same car
 
-## Version 2 plan
+## Verification
 
-PriusGo V2 is planned as a real small car-rental operating system, not just a demo.
+Run from `frontend/`:
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+## Version 2 roadmap
+
+PriusGo V2 is building out the app into a real small car-rental operating system, not just a demo.
 
 Main plan:
 
@@ -123,14 +201,12 @@ V2 priorities:
 - deposit/payment tracking before online payment automation
 - SEO, trust sections, and portfolio case-study polish
 
-## Verification
+## Portfolio case study
 
-Run from `frontend/`:
+Short project write-up:
 
-```bash
-npm test
-npm run lint
-npm run build
+```text
+backend/docs/CASE_STUDY.md
 ```
 
 ## Security notes

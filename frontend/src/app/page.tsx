@@ -276,6 +276,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── LOCAL SEO ── */}
+      <section id="siauliai" className="bg-[#fff7f4] py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-12">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Šiauliai car rental</p>
+              <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-[#0b0b0b] sm:text-4xl lg:text-5xl">
+                Local Prius rental for Šiauliai, Lithuania
+              </h2>
+              <p className="mt-5 max-w-2xl text-[#616161]">
+                PriusGo is built for drivers in Šiauliai who want a reliable Toyota Prius for daily movement, business travel, airport runs, or weekend plans.
+                Pickup is arranged locally in Šiauliai, and every request is reviewed before the rental is confirmed.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              <div className="rounded-[1.5rem] border border-[#e9e9e9] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Pickup area</p>
+                <p className="mt-2 font-heading text-xl font-black text-[#0b0b0b]">Šiauliai, Lithuania</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-[#e9e9e9] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Rental type</p>
+                <p className="mt-2 font-heading text-xl font-black text-[#0b0b0b]">Toyota Prius hybrid</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-[#e9e9e9] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Best for</p>
+                <p className="mt-2 font-heading text-xl font-black text-[#0b0b0b]">City and business trips</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── BOOKING ── */}
       <section className="bg-[#0b0b0b] py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
@@ -302,10 +334,10 @@ export default function Home() {
                 Please read these before submitting a booking. Clear rules protect both you and the car owner.
               </p>
               <a
-                href="#booking"
+                href="/rental-rules"
                 className="mt-8 inline-flex items-center gap-3 rounded-full bg-[#ff3600] px-8 py-4 font-semibold text-white transition hover:bg-[#cc2b00]"
               >
-                I agree — Book now
+                Read rental rules
                 <span className="flex size-6 items-center justify-center rounded-full bg-white/20">
                   <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
                     <path d="M1 8L8 1M8 1H2.5M8 1V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

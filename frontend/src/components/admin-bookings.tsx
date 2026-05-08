@@ -11,6 +11,7 @@ import {
   defaultAdminBookingFilters,
   filterAdminBookings,
   getAdminPaymentMetrics,
+  getAdminAccountingMetrics,
   getAdminBookingMetrics,
   getQuickStatusActions,
   getPaymentStatusTone,
@@ -53,6 +54,36 @@ function buildContactBody(booking: AdminBooking) {
     `Pickup: ${booking.pickupLocation}`,
     `Phone: ${booking.phone}`,
   ].join("\n");
+}
+
+function buildMessageTemplates(booking: AdminBooking) {
+  return [
+    {
+      key: "received",
+      label: "Booking received",
+      text: `Hi ${booking.fullName}, your PriusGo booking request for ${booking.carName} has been received. We will review it and confirm the next step soon.`,
+    },
+    {
+      key: "approved",
+      label: "Booking approved",
+      text: `Hi ${booking.fullName}, your PriusGo booking for ${booking.carName} is approved. Pickup: ${booking.pickupLocation}. Dates: ${booking.startDate} to ${booking.endDate}.`,
+    },
+    {
+      key: "rejected",
+      label: "Booking rejected",
+      text: `Hi ${booking.fullName}, your PriusGo booking for ${booking.carName} cannot be confirmed for the requested dates. Please reply if you want to check a different period.`,
+    },
+    {
+      key: "pickup",
+      label: "Pickup reminder",
+      text: `Hi ${booking.fullName}, friendly reminder that your PriusGo pickup for ${booking.carName} is coming up. Pickup: ${booking.pickupLocation}. Time: ${booking.pickupTime ?? "to be confirmed"}.`,
+    },
+    {
+      key: "return",
+      label: "Return reminder",
+      text: `Hi ${booking.fullName}, friendly reminder to return ${booking.carName} today. Return time: ${booking.returnTime ?? "to be confirmed"}. Please message us if anything changes.`,
+    },
+  ];
 }
 
 function formatTelPhone(phone: string) {
@@ -201,12 +232,14 @@ export function AdminBookings() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [copiedTemplateKey, setCopiedTemplateKey] = useState<string | null>(null);
   const [isExportingCsv, setIsExportingCsv] = useState(false);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const metrics = useMemo(() => getAdminBookingMetrics(bookings), [bookings]);
   const paymentMetrics = useMemo(() => getAdminPaymentMetrics(bookings), [bookings]);
+  const accountingMetrics = useMemo(() => getAdminAccountingMetrics(bookings), [bookings]);
   const visibleBookings = useMemo(() => filterAdminBookings(bookings, filters), [bookings, filters]);
   const bookingCarOptions = useMemo(() => {
     const seen = new Map<string, string>();
@@ -310,6 +343,19 @@ export function AdminBookings() {
     }
   }
 
+  async function copyMessageTemplate(bookingId: string, templateKey: string, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedTemplateKey(`${bookingId}:${templateKey}`);
+      window.setTimeout(
+        () => setCopiedTemplateKey((current) => (current === `${bookingId}:${templateKey}` ? null : current)),
+        1500,
+      );
+    } catch {
+      setError("Could not copy message template.");
+    }
+  }
+
   function resetFilters() {
     setFilters(defaultAdminBookingFilters);
   }
@@ -372,6 +418,14 @@ export function AdminBookings() {
         <MetricCard label="Deposit paid" value={paymentMetrics.depositPaid} />
         <MetricCard label="Paid" value={paymentMetrics.paid} />
         <MetricCard label="Refunded" value={paymentMetrics.refunded} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <MetricCard label="Rental total" value={`€${accountingMetrics.rentalTotal}`} />
+        <MetricCard label="Deposits" value={`€${accountingMetrics.depositAmount}`} />
+        <MetricCard label="Discounts" value={`€${accountingMetrics.discountAmount}`} />
+        <MetricCard label="Extra charges" value={`€${accountingMetrics.extraCharge}`} />
+        <MetricCard label="Amount due" value={`€${accountingMetrics.amountDue}`} />
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -458,7 +512,7 @@ export function AdminBookings() {
               disabled={visibleBookings.length === 0 || isExportingCsv}
               className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isExportingCsv ? "Exporting..." : "Export CSV"}
+              {isExportingCsv ? "Exporting..." : "Export accounting CSV"}
             </button>
           </div>
         </div>
@@ -539,10 +593,34 @@ export function AdminBookings() {
                         const opened = printBookingSummary(booking);
                         if (!opened) setError("Could not open the printable booking summary.");
                       }}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 sm:w-auto"
                     >
                       <Printer className="size-4" /> Print summary
                     </button>
+                  </div>
+
+                  <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Message templates</p>
+                      <p className="mt-1 text-sm text-slate-600">Copy a ready-made message for WhatsApp, SMS, or email.</p>
+                    </div>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {buildMessageTemplates(booking).map((template) => {
+                        const templateId = `${booking.id}:${template.key}`;
+                        return (
+                          <button
+                            key={template.key}
+                            type="button"
+                            onClick={() => void copyMessageTemplate(booking.id, template.key, template.text)}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                          >
+                            <span className="block text-xs font-black uppercase tracking-[0.2em] text-slate-500">{template.label}</span>
+                            <span className="mt-2 block leading-relaxed">{template.text}</span>
+                            <span className="mt-3 block text-xs font-bold text-emerald-700">{copiedTemplateKey === templateId ? "Copied" : "Copy template"}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 

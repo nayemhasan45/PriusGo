@@ -25,6 +25,24 @@ NEXT_PUBLIC_SUPABASE_URL=https://tiaoqvqshkwrvukvywzh.supabase.co
 
 Do not commit `.env.local` to GitHub.
 
+## Production rollout
+
+Before calling PriusGo deployed, confirm:
+
+1. `backend/supabase-schema.sql` has been run in the production Supabase project.
+2. The `car-images` Storage bucket exists and public read/admin write policies work.
+3. `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set in Vercel.
+4. No service-role key is exposed in `NEXT_PUBLIC_*` variables.
+5. The production domain is listed in Supabase Auth redirect URLs.
+6. One trusted login is marked `profiles.role = 'admin'`.
+7. Smoke test:
+   - homepage loads
+   - login works
+   - booking request submits
+   - `/admin` loads for admin
+   - booking approval works
+   - photo upload works from admin cars
+
 ## Google sign-in setup
 
 PriusGo uses Supabase Auth for Google OAuth. The frontend button redirects users to Google and returns successful logins to `/dashboard`.
