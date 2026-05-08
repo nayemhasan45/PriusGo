@@ -10,6 +10,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
   const availability = getCustomerCarAvailability(car.status);
   const isAvailable = availability.canRent;
   const plateNumber = car.plateNumber ?? car.id.toUpperCase();
+  const hasMaintenanceInfo = Boolean(car.maintenanceNote || car.nextAvailableDate);
 
   function selectCarForRental() {
     window.dispatchEvent(new CustomEvent("priusgo:select-car", { detail: { carId: car.id } }));
@@ -76,6 +77,12 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
         <div className={`mt-5 rounded-2xl p-4 ${isAvailable ? "bg-emerald-50 text-emerald-900 ring-1 ring-emerald-100" : "bg-slate-100 text-slate-700 ring-1 ring-slate-200"}`}>
           <p className="text-sm font-semibold">{availability.label}</p>
           <p className="mt-0.5 text-sm opacity-75">{availability.description}</p>
+          {!isAvailable && hasMaintenanceInfo && (
+            <div className="mt-3 space-y-2 border-t border-current/10 pt-3 text-sm">
+              {car.maintenanceNote && <p><span className="font-bold">Maintenance:</span> {car.maintenanceNote}</p>}
+              {car.nextAvailableDate && <p><span className="font-bold">Next available:</span> {car.nextAvailableDate}</p>}
+            </div>
+          )}
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-3 text-sm font-medium text-[#616161]">

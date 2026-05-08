@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterAdminBookings, getAdminBookingMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
+import { buildAdminBookingsCsv, filterAdminBookings, getAdminBookingMetrics, getAdminPaymentMetrics, getQuickStatusActions, getStatusTone, normalizeAdminBookingRows } from "./admin-bookings";
 
 describe("admin booking helpers", () => {
   const rows = [
@@ -19,6 +19,13 @@ describe("admin booking helpers", () => {
       booking_not_final_acknowledged: true,
       license_check_status: "pending" as const,
       deposit_agreed: false,
+      payment_status: "unpaid" as const,
+      deposit_amount: null,
+      payment_method: null,
+      payment_notes: null,
+      rental_total: 105,
+      discount_amount: 0,
+      extra_charge: 0,
       pickup_time: "10:30",
       return_time: "18:00",
       admin_notes: null,
@@ -42,6 +49,13 @@ describe("admin booking helpers", () => {
       booking_not_final_acknowledged: true,
       license_check_status: "verified" as const,
       deposit_agreed: true,
+      payment_status: "deposit_paid" as const,
+      deposit_amount: 50,
+      payment_method: "cash" as const,
+      payment_notes: 'Paid cash, "receipt" signed.',
+      rental_total: 76,
+      discount_amount: 10,
+      extra_charge: 5,
       pickup_time: "11:00",
       return_time: "17:30",
       admin_notes: "Call before pickup.",
@@ -67,6 +81,13 @@ describe("admin booking helpers", () => {
       bookingNotFinalAcknowledged: true,
       licenseCheckStatus: "pending",
       depositAgreed: false,
+      paymentStatus: "unpaid",
+      depositAmount: null,
+      paymentMethod: null,
+      paymentNotes: null,
+      rentalTotal: 105,
+      discountAmount: 0,
+      extraCharge: 0,
     });
     expect(bookings[0]).toHaveProperty("adminNotes", null);
   });
@@ -79,6 +100,17 @@ describe("admin booking helpers", () => {
       pending: 1,
       active: 1,
       revenueEstimate: 181,
+    });
+  });
+
+  it("calculates payment metrics", () => {
+    const metrics = getAdminPaymentMetrics(normalizeAdminBookingRows(rows));
+
+    expect(metrics).toEqual({
+      unpaid: 1,
+      depositPaid: 1,
+      paid: 0,
+      refunded: 0,
     });
   });
 
@@ -116,5 +148,13 @@ describe("admin booking helpers", () => {
     expect(filterAdminBookings(bookings, { query: "", status: "picked_up", carId: "all", startDate: "", endDate: "" })).toHaveLength(1);
     expect(filterAdminBookings(bookings, { query: "", status: "all", carId: "MJO146", startDate: "2026-05-01", endDate: "2026-05-04" })).toHaveLength(1);
     expect(filterAdminBookings(bookings, { query: "", status: "all", carId: "all", startDate: "2026-05-06", endDate: "2026-05-08" })).toHaveLength(1);
+  });
+
+  it("builds a CSV export with payment fields", () => {
+    const csv = buildAdminBookingsCsv(normalizeAdminBookingRows(rows));
+
+    expect(csv).toContain("Payment status");
+    expect(csv).toContain("deposit_paid");
+    expect(csv).toContain('"Paid cash, ""receipt"" signed."');
   });
 });

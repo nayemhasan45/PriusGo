@@ -4,20 +4,25 @@ import { Copy, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
+  bookingPaymentMethods,
+  bookingPaymentStatuses,
+  buildAdminBookingsCsv,
   adminBookingStatuses,
   defaultAdminBookingFilters,
   filterAdminBookings,
+  getAdminPaymentMetrics,
   getAdminBookingMetrics,
   getQuickStatusActions,
+  getPaymentStatusTone,
   getStatusTone,
   normalizeAdminBookingRows,
   type AdminBookingFilters,
   type AdminBooking,
 } from "@/lib/supabase/admin-bookings";
-import { type BookingLicenseCheckStatus, type BookingRow, type BookingStatus } from "@/lib/supabase/bookings";
+import { type BookingLicenseCheckStatus, type BookingPaymentMethod, type BookingPaymentStatus, type BookingRow, type BookingStatus } from "@/lib/supabase/bookings";
 import { createClient } from "@/lib/supabase/client";
 
-const bookingColumns = "id,user_id,car_id,full_name,email,phone,start_date,end_date,pickup_location,message,driving_license_confirmed,rental_rules_accepted,booking_not_final_acknowledged,license_check_status,deposit_agreed,pickup_time,return_time,admin_notes,status,total_estimated_price,created_at";
+const bookingColumns = "id,user_id,car_id,full_name,email,phone,start_date,end_date,pickup_location,message,driving_license_confirmed,rental_rules_accepted,booking_not_final_acknowledged,license_check_status,deposit_agreed,pickup_time,return_time,admin_notes,status,payment_status,deposit_amount,payment_method,payment_notes,rental_total,discount_amount,extra_charge,total_estimated_price,created_at";
 
 type BookingUpdate = {
   status?: BookingStatus;
@@ -26,6 +31,13 @@ type BookingUpdate = {
   pickupTime?: string | null;
   returnTime?: string | null;
   adminNotes?: string | null;
+  paymentStatus?: BookingPaymentStatus;
+  depositAmount?: number | null;
+  paymentMethod?: BookingPaymentMethod | null;
+  paymentNotes?: string | null;
+  rentalTotal?: number | null;
+  discountAmount?: number | null;
+  extraCharge?: number | null;
 };
 
 function buildContactSubject(booking: AdminBooking) {
@@ -51,6 +63,30 @@ function formatWhatsAppPhone(phone: string) {
   return phone.replace(/\D/g, "");
 }
 
+function formatMoney(value: number | null | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "-";
+  return Number.isInteger(value) ? `€${value}` : `€${value.toFixed(2)}`;
+}
+
+function parseOptionalMoney(value: FormDataEntryValue | null) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return null;
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function downloadCsvFile(fileName: string, csv: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 export function AdminBookings() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [filters, setFilters] = useState<AdminBookingFilters>(defaultAdminBookingFilters);
@@ -58,10 +94,12 @@ export function AdminBookings() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const metrics = useMemo(() => getAdminBookingMetrics(bookings), [bookings]);
+  const paymentMetrics = useMemo(() => getAdminPaymentMetrics(bookings), [bookings]);
   const visibleBookings = useMemo(() => filterAdminBookings(bookings, filters), [bookings, filters]);
   const bookingCarOptions = useMemo(() => {
     const seen = new Map<string, string>();
@@ -169,6 +207,19 @@ export function AdminBookings() {
     setFilters(defaultAdminBookingFilters);
   }
 
+  async function exportVisibleBookings() {
+    setIsExportingCsv(true);
+    try {
+      const csv = buildAdminBookingsCsv(visibleBookings);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadCsvFile(`priusgo-bookings-${stamp}.csv`, csv);
+    } catch {
+      setError("Could not export CSV.");
+    } finally {
+      setIsExportingCsv(false);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center rounded-3xl border border-slate-200 bg-white p-10 text-slate-600">
@@ -207,6 +258,13 @@ export function AdminBookings() {
         <MetricCard label="Pending" value={metrics.pending} />
         <MetricCard label="Active rentals" value={metrics.active} />
         <MetricCard label="Estimated revenue" value={`€${metrics.revenueEstimate}`} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Unpaid" value={paymentMetrics.unpaid} />
+        <MetricCard label="Deposit paid" value={paymentMetrics.depositPaid} />
+        <MetricCard label="Paid" value={paymentMetrics.paid} />
+        <MetricCard label="Refunded" value={paymentMetrics.refunded} />
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -279,13 +337,23 @@ export function AdminBookings() {
           <p className="text-sm text-slate-500">
             Showing <span className="font-bold text-slate-900">{visibleBookings.length}</span> of <span className="font-bold text-slate-900">{bookings.length}</span> bookings.
           </p>
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="self-start rounded-full border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
-          >
-            Clear filters
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+            >
+              Clear filters
+            </button>
+            <button
+              type="button"
+              onClick={() => void exportVisibleBookings()}
+              disabled={visibleBookings.length === 0 || isExportingCsv}
+              className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isExportingCsv ? "Exporting..." : "Export CSV"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -318,6 +386,7 @@ export function AdminBookings() {
                   <div className="flex flex-wrap items-center gap-3">
                     <h2 className="text-xl font-black text-slate-950">{booking.carName}</h2>
                     <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${getStatusTone(booking.status)}`}>{booking.status}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${getPaymentStatusTone(booking.paymentStatus)}`}>{booking.paymentStatus.replaceAll("_", " ")}</span>
                   </div>
                   <p className="mt-2 text-sm text-slate-500">
                     {booking.startDate} → {booking.endDate} • Pickup: {booking.pickupLocation}
@@ -390,6 +459,13 @@ export function AdminBookings() {
                         pickupTime: normalizeOptionalString(formData.get("pickupTime")),
                         returnTime: normalizeOptionalString(formData.get("returnTime")),
                         adminNotes: normalizeOptionalString(formData.get("adminNotes")),
+                        paymentStatus: String(formData.get("paymentStatus") ?? booking.paymentStatus) as BookingPaymentStatus,
+                        depositAmount: parseOptionalMoney(formData.get("depositAmount")),
+                        paymentMethod: normalizeOptionalPaymentMethod(formData.get("paymentMethod")),
+                        paymentNotes: normalizeOptionalString(formData.get("paymentNotes")),
+                        rentalTotal: parseOptionalMoney(formData.get("rentalTotal")),
+                        discountAmount: parseOptionalMoney(formData.get("discountAmount")),
+                        extraCharge: parseOptionalMoney(formData.get("extraCharge")),
                       });
                     }}
                   >
@@ -421,6 +497,105 @@ export function AdminBookings() {
                         <option value="rejected">rejected</option>
                       </select>
                     </label>
+
+                    <div className="grid gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-4">
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Money tracking</p>
+
+                      <label className="grid gap-2 text-sm font-bold text-slate-700">
+                        Payment status
+                        <select
+                          name="paymentStatus"
+                          defaultValue={booking.paymentStatus}
+                          disabled={isUpdatingId === booking.id}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {bookingPaymentStatuses.map((status) => (
+                            <option key={status} value={status}>{status}</option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="grid gap-2 text-sm font-bold text-slate-700">
+                          Deposit amount
+                          <input
+                            name="depositAmount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            defaultValue={booking.depositAmount ?? ""}
+                            disabled={isUpdatingId === booking.id}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                        </label>
+                        <label className="grid gap-2 text-sm font-bold text-slate-700">
+                          Payment method
+                          <select
+                            name="paymentMethod"
+                            defaultValue={booking.paymentMethod ?? ""}
+                            disabled={isUpdatingId === booking.id}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <option value="">not set</option>
+                            {bookingPaymentMethods.map((method) => (
+                              <option key={method} value={method}>{method}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="grid gap-2 text-sm font-bold text-slate-700">
+                          Rental total
+                          <input
+                            name="rentalTotal"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            defaultValue={booking.rentalTotal ?? booking.estimatedTotal ?? ""}
+                            disabled={isUpdatingId === booking.id}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                        </label>
+                        <label className="grid gap-2 text-sm font-bold text-slate-700">
+                          Discount
+                          <input
+                            name="discountAmount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            defaultValue={booking.discountAmount ?? ""}
+                            disabled={isUpdatingId === booking.id}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                        </label>
+                      </div>
+
+                      <label className="grid gap-2 text-sm font-bold text-slate-700">
+                        Extra charge
+                        <input
+                          name="extraCharge"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={booking.extraCharge ?? ""}
+                          disabled={isUpdatingId === booking.id}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        />
+                      </label>
+
+                      <label className="grid gap-2 text-sm font-bold text-slate-700">
+                        Payment notes
+                        <textarea
+                          name="paymentNotes"
+                          defaultValue={booking.paymentNotes ?? ""}
+                          rows={3}
+                          disabled={isUpdatingId === booking.id}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                          placeholder="Cash / bank transfer details, reminders, follow-up"
+                        />
+                      </label>
+                    </div>
 
                     <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700">
                       <input
@@ -485,6 +660,26 @@ export function AdminBookings() {
                 <Detail label="Booking acknowledged" value={booking.bookingNotFinalAcknowledged ? "Yes" : "No"} />
                 <Detail label="Deposit agreed" value={booking.depositAgreed ? "Yes" : "No"} />
               </div>
+
+              <div className="mt-4 grid gap-3 rounded-3xl border border-amber-100 bg-amber-50 p-4 text-sm text-slate-700 sm:grid-cols-2 lg:grid-cols-4">
+                <Detail label="Payment status" value={booking.paymentStatus.replaceAll("_", " ")} />
+                <Detail label="Deposit amount" value={formatMoney(booking.depositAmount)} />
+                <Detail label="Rental total" value={formatMoney(booking.rentalTotal ?? booking.estimatedTotal)} />
+                <Detail label="Amount due" value={formatMoney((booking.rentalTotal ?? booking.estimatedTotal) - (booking.discountAmount ?? 0) + (booking.extraCharge ?? 0))} />
+              </div>
+
+              <div className="mt-4 grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 text-sm text-slate-700 sm:grid-cols-3">
+                <Detail label="Payment method" value={booking.paymentMethod ?? "not set"} />
+                <Detail label="Discount" value={formatMoney(booking.discountAmount)} />
+                <Detail label="Extra charge" value={formatMoney(booking.extraCharge)} />
+              </div>
+
+              {booking.paymentNotes && (
+                <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Payment notes</p>
+                  <p className="mt-2 leading-relaxed">{booking.paymentNotes}</p>
+                </div>
+              )}
             </article>
           ))}
         </div>
@@ -514,4 +709,11 @@ function Detail({ label, value }: { label: string; value: string }) {
 function normalizeOptionalString(value: FormDataEntryValue | null) {
   const text = typeof value === "string" ? value.trim() : "";
   return text ? text : null;
+}
+
+function normalizeOptionalPaymentMethod(value: FormDataEntryValue | null) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return null;
+  if (bookingPaymentMethods.includes(text as BookingPaymentMethod)) return text as BookingPaymentMethod;
+  return null;
 }

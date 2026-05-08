@@ -24,6 +24,8 @@ create table if not exists public.cars (
   price_per_day numeric(10,2) not null,
   image_url text,
   status text not null default 'available' check (status in ('available', 'unavailable', 'maintenance')),
+  maintenance_note text,
+  next_available_date date,
   created_at timestamptz not null default now()
 );
 
@@ -47,6 +49,13 @@ create table if not exists public.bookings (
   return_time text,
   admin_notes text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'picked_up', 'returned', 'completed', 'rejected', 'cancelled')),
+  payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'deposit_paid', 'paid', 'refunded')),
+  deposit_amount numeric(10,2),
+  payment_method text check (payment_method in ('cash', 'bank', 'card', 'other')),
+  payment_notes text,
+  rental_total numeric(10,2),
+  discount_amount numeric(10,2),
+  extra_charge numeric(10,2),
   total_estimated_price numeric(10,2),
   created_at timestamptz not null default now(),
   constraint bookings_date_order check (end_date >= start_date)
@@ -60,6 +69,13 @@ alter table public.bookings add column if not exists deposit_agreed boolean not 
 alter table public.bookings add column if not exists pickup_time text;
 alter table public.bookings add column if not exists return_time text;
 alter table public.bookings add column if not exists admin_notes text;
+alter table public.bookings add column if not exists payment_status text not null default 'unpaid';
+alter table public.bookings add column if not exists deposit_amount numeric(10,2);
+alter table public.bookings add column if not exists payment_method text;
+alter table public.bookings add column if not exists payment_notes text;
+alter table public.bookings add column if not exists rental_total numeric(10,2);
+alter table public.bookings add column if not exists discount_amount numeric(10,2);
+alter table public.bookings add column if not exists extra_charge numeric(10,2);
 
 do $$
 begin
@@ -67,6 +83,28 @@ begin
   alter table public.bookings
     add constraint bookings_status_check
     check (status in ('pending', 'approved', 'picked_up', 'returned', 'completed', 'rejected', 'cancelled'));
+exception
+  when duplicate_object then null;
+end;
+$$;
+
+do $$
+begin
+  alter table public.bookings drop constraint if exists bookings_payment_status_check;
+  alter table public.bookings
+    add constraint bookings_payment_status_check
+    check (payment_status in ('unpaid', 'deposit_paid', 'paid', 'refunded'));
+exception
+  when duplicate_object then null;
+end;
+$$;
+
+do $$
+begin
+  alter table public.bookings drop constraint if exists bookings_payment_method_check;
+  alter table public.bookings
+    add constraint bookings_payment_method_check
+    check (payment_method is null or payment_method in ('cash', 'bank', 'card', 'other'));
 exception
   when duplicate_object then null;
 end;
@@ -127,6 +165,9 @@ $$;
 alter table public.profiles enable row level security;
 alter table public.cars enable row level security;
 alter table public.bookings enable row level security;
+
+alter table public.cars add column if not exists maintenance_note text;
+alter table public.cars add column if not exists next_available_date date;
 
 create or replace function public.is_admin(user_id uuid)
 returns boolean
@@ -209,7 +250,7 @@ begin
       car_id with =,
       daterange(start_date, end_date, '[]') with &&
     )
-      where (status in ('approved', 'picked_up', 'returned', 'completed'));
+        where (status in ('approved', 'picked_up', 'returned', 'completed'));
 exception
   when duplicate_object then null;
 end;

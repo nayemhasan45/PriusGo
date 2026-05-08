@@ -7,7 +7,7 @@ import { buildAdminCarInsert, buildCarImageObjectPath, getCarStatusTone, getSupa
 import { createClient } from "@/lib/supabase/client";
 import type { Car, CarStatus } from "@/lib/types";
 
-const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
+const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,maintenance_note,next_available_date,created_at";
 
 type NewCarForm = {
   plateNumber: string;
@@ -21,6 +21,8 @@ type NewCarForm = {
   pricePerDay: string;
   imageUrl: string;
   status: CarStatus;
+  maintenanceNote: string;
+  nextAvailableDate: string;
 };
 
 const emptyNewCarForm: NewCarForm = {
@@ -35,6 +37,8 @@ const emptyNewCarForm: NewCarForm = {
   pricePerDay: "20",
   imageUrl: "/images/prius-fleet.jpg",
   status: "available",
+  maintenanceNote: "",
+  nextAvailableDate: "",
 };
 
 export function AdminCars() {
@@ -104,7 +108,7 @@ export function AdminCars() {
     void Promise.resolve().then(loadAdminCars);
   }, []);
 
-  async function updateCar(carId: string, values: { pricePerDay?: number; status?: CarStatus }) {
+  async function updateCar(carId: string, values: { pricePerDay?: number; status?: CarStatus; maintenanceNote?: string; nextAvailableDate?: string }) {
     setUpdatingCarId(carId);
     setError(null);
 
@@ -112,9 +116,11 @@ export function AdminCars() {
       const supabase = createClient();
       if (!supabase) throw new Error("Supabase is not configured.");
 
-      const updateValues: Record<string, number | string> = {};
+      const updateValues: Record<string, number | string | null> = {};
       if (values.pricePerDay !== undefined) updateValues.price_per_day = values.pricePerDay;
       if (values.status !== undefined) updateValues.status = values.status;
+      if (values.maintenanceNote !== undefined) updateValues.maintenance_note = values.maintenanceNote.trim() ? values.maintenanceNote.trim() : null;
+      if (values.nextAvailableDate !== undefined) updateValues.next_available_date = values.nextAvailableDate.trim() ? values.nextAvailableDate.trim() : null;
 
       const { data, error: updateError } = await supabase.from("cars").update(updateValues).eq("id", carId).select(carColumns).single();
       if (updateError) throw updateError;
@@ -209,6 +215,8 @@ export function AdminCars() {
           pricePerDay,
           imageUrl,
           status: newCar.status,
+          maintenanceNote: newCar.maintenanceNote,
+          nextAvailableDate: newCar.nextAvailableDate,
         }))
         .select(carColumns)
         .single();
@@ -319,6 +327,25 @@ export function AdminCars() {
             </select>
           </label>
           <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">
+            Maintenance note
+            <textarea
+              value={newCar.maintenanceNote}
+              onChange={(event) => setNewCar((current) => ({ ...current, maintenanceNote: event.target.value }))}
+              rows={3}
+              placeholder="Brake service, tire change, cleaning, etc."
+              className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            Next available date
+            <input
+              value={newCar.nextAvailableDate}
+              onChange={(event) => setNewCar((current) => ({ ...current, nextAvailableDate: event.target.value }))}
+              type="date"
+              className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">
             Upload car photo
             <input type="file" accept="image/*" onChange={(event) => setNewCarImageFile(event.target.files?.[0] ?? null)} className="rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:font-bold file:text-white hover:file:bg-emerald-700" />
             <span className="text-xs font-medium text-slate-500">{newCarImageFile ? `Selected: ${newCarImageFile.name}` : "Upload from your computer. This will override the Image URL below."}</span>
@@ -335,16 +362,27 @@ export function AdminCars() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         {cars.map((car) => (
-          <CarAdminCard key={car.id} car={car} blocks={blocksByCar[car.id] ?? []} isUpdating={updatingCarId === car.id} isDeleting={deletingCarId === car.id} hasBookings={carsWithBookings.has(car.id)} onUpdate={updateCar} onDelete={deleteCar} />
+          <CarAdminCard
+            key={`${car.id}-${car.pricePerDay}-${car.status}-${car.maintenanceNote ?? ""}-${car.nextAvailableDate ?? ""}`}
+            car={car}
+            blocks={blocksByCar[car.id] ?? []}
+            isUpdating={updatingCarId === car.id}
+            isDeleting={deletingCarId === car.id}
+            hasBookings={carsWithBookings.has(car.id)}
+            onUpdate={updateCar}
+            onDelete={deleteCar}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpdate, onDelete }: { car: Car; blocks: ReturnType<typeof groupBookingBlocksByCar>[string]; isUpdating: boolean; isDeleting: boolean; hasBookings: boolean; onUpdate: (carId: string, values: { pricePerDay?: number; status?: CarStatus }) => void; onDelete: (carId: string) => void }) {
+function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpdate, onDelete }: { car: Car; blocks: ReturnType<typeof groupBookingBlocksByCar>[string]; isUpdating: boolean; isDeleting: boolean; hasBookings: boolean; onUpdate: (carId: string, values: { pricePerDay?: number; status?: CarStatus; maintenanceNote?: string; nextAvailableDate?: string }) => void; onDelete: (carId: string) => void }) {
   const [price, setPrice] = useState(String(car.pricePerDay));
   const [status, setStatus] = useState<CarStatus>(car.status);
+  const [maintenanceNote, setMaintenanceNote] = useState(car.maintenanceNote ?? "");
+  const [nextAvailableDate, setNextAvailableDate] = useState(car.nextAvailableDate ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const parsedPrice = Number(price);
@@ -376,10 +414,29 @@ function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpda
             <option value="maintenance">maintenance</option>
           </select>
         </label>
+        <label className="grid gap-2 text-sm font-bold text-slate-700 sm:col-span-2">
+          Maintenance note
+          <textarea
+            value={maintenanceNote}
+            onChange={(event) => setMaintenanceNote(event.target.value)}
+            rows={3}
+            placeholder="Brake service, cleaning, tire change, etc."
+            className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+          />
+        </label>
+        <label className="grid gap-2 text-sm font-bold text-slate-700">
+          Next available date
+          <input
+            value={nextAvailableDate}
+            onChange={(event) => setNextAvailableDate(event.target.value)}
+            type="date"
+            className="rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
+          />
+        </label>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status })} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+        <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status, maintenanceNote, nextAvailableDate })} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
           {isUpdating ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Save car
         </button>
 
@@ -416,6 +473,21 @@ function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpda
           </div>
         )}
       </div>
+
+      {(maintenanceNote || nextAvailableDate) && (
+        <div className="mt-4 rounded-3xl border border-amber-100 bg-amber-50 p-4 text-sm text-slate-700">
+          {maintenanceNote && (
+            <p>
+              <span className="font-black text-amber-900">Maintenance note:</span> {maintenanceNote}
+            </p>
+          )}
+          {nextAvailableDate && (
+            <p className={maintenanceNote ? "mt-2" : ""}>
+              <span className="font-black text-amber-900">Next available:</span> {nextAvailableDate}
+            </p>
+          )}
+        </div>
+      )}
     </article>
   );
 }

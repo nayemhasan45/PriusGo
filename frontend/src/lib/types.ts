@@ -15,6 +15,8 @@ export type Car = {
   imageUrl?: string | null;
   plateNumber?: string;
   features: string[];
+  maintenanceNote?: string | null;
+  nextAvailableDate?: string | null;
 };
 
 export type BookingRequest = {

@@ -13,6 +13,8 @@ export type CarRow = {
   price_per_day: number | string;
   image_url: string | null;
   status: CarStatus;
+  maintenance_note: string | null;
+  next_available_date: string | null;
   created_at: string;
 };
 
@@ -43,6 +45,8 @@ export type AdminCarInsertInput = {
   pricePerDay: number;
   imageUrl?: string;
   status: CarStatus;
+  maintenanceNote?: string | null;
+  nextAvailableDate?: string | null;
 };
 
 export type AdminCarInsertRow = {
@@ -57,6 +61,8 @@ export type AdminCarInsertRow = {
   price_per_day: number;
   image_url: string;
   status: CarStatus;
+  maintenance_note: string | null;
+  next_available_date: string | null;
 };
 
 const defaultPriusImageUrl = "/images/prius-fleet.jpg";
@@ -84,6 +90,8 @@ export function mapCarRowToCar(row: CarRow): Car {
     seats: row.seats,
     pricePerDay: Number(row.price_per_day),
     status: row.status,
+    maintenanceNote: row.maintenance_note,
+    nextAvailableDate: row.next_available_date,
     imageGradient: gradients[gradientIndex],
     imageUrl: row.image_url ?? "/images/prius-fleet.jpg",
     plateNumber,
@@ -146,6 +154,8 @@ export function buildAdminCarInsert(input: AdminCarInsertInput): AdminCarInsertR
     price_per_day: input.pricePerDay,
     image_url: input.imageUrl?.trim() || defaultPriusImageUrl,
     status: input.status,
+    maintenance_note: input.maintenanceNote?.trim() ? input.maintenanceNote.trim() : null,
+    next_available_date: input.nextAvailableDate?.trim() ? input.nextAvailableDate.trim() : null,
   };
 }
 

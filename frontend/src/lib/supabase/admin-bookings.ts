@@ -1,10 +1,17 @@
 import type { BookingRequest } from "@/lib/types";
-import { mapBookingRowToRequest, type BookingLicenseCheckStatus, type BookingRow, type BookingStatus } from "./bookings";
+import { mapBookingRowToRequest, type BookingLicenseCheckStatus, type BookingPaymentMethod, type BookingPaymentStatus, type BookingRow, type BookingStatus } from "./bookings";
 
 export type AdminBooking = BookingRequest & {
   licenseCheckStatus: BookingLicenseCheckStatus;
   depositAgreed: boolean;
   adminNotes: string | null;
+  paymentStatus: BookingPaymentStatus;
+  depositAmount: number | null;
+  paymentMethod: BookingPaymentMethod | null;
+  paymentNotes: string | null;
+  rentalTotal: number | null;
+  discountAmount: number | null;
+  extraCharge: number | null;
 };
 
 export type AdminBookingMetrics = {
@@ -12,6 +19,13 @@ export type AdminBookingMetrics = {
   pending: number;
   active: number;
   revenueEstimate: number;
+};
+
+export type AdminPaymentMetrics = {
+  unpaid: number;
+  depositPaid: number;
+  paid: number;
+  refunded: number;
 };
 
 export type AdminBookingFilters = {
@@ -36,6 +50,9 @@ export type QuickStatusAction = {
   status: BookingStatus;
   label: string;
 };
+
+export const bookingPaymentStatuses: BookingPaymentStatus[] = ["unpaid", "deposit_paid", "paid", "refunded"];
+export const bookingPaymentMethods: BookingPaymentMethod[] = ["cash", "bank", "card", "other"];
 
 const quickStatusActionsByStatus: Record<BookingStatus, QuickStatusAction[]> = {
   pending: [
@@ -80,7 +97,26 @@ export function normalizeAdminBookingRows(rows: BookingRow[]): AdminBooking[] {
     licenseCheckStatus: row.license_check_status,
     depositAgreed: row.deposit_agreed,
     adminNotes: row.admin_notes,
+    paymentStatus: row.payment_status,
+    depositAmount: toNullableNumber(row.deposit_amount),
+    paymentMethod: row.payment_method,
+    paymentNotes: row.payment_notes,
+    rentalTotal: toNullableNumber(row.rental_total),
+    discountAmount: toNullableNumber(row.discount_amount),
+    extraCharge: toNullableNumber(row.extra_charge),
   }));
+}
+
+export function getAdminPaymentMetrics(bookings: AdminBooking[]): AdminPaymentMetrics {
+  return bookings.reduce(
+    (metrics, booking) => ({
+      unpaid: metrics.unpaid + (booking.paymentStatus === "unpaid" ? 1 : 0),
+      depositPaid: metrics.depositPaid + (booking.paymentStatus === "deposit_paid" ? 1 : 0),
+      paid: metrics.paid + (booking.paymentStatus === "paid" ? 1 : 0),
+      refunded: metrics.refunded + (booking.paymentStatus === "refunded" ? 1 : 0),
+    }),
+    { unpaid: 0, depositPaid: 0, paid: 0, refunded: 0 },
+  );
 }
 
 export function filterAdminBookings(bookings: AdminBooking[], filters: AdminBookingFilters) {
@@ -115,7 +151,7 @@ export function getAdminBookingMetrics(bookings: AdminBooking[]): AdminBookingMe
       total: metrics.total + 1,
       pending: metrics.pending + (booking.status === "pending" ? 1 : 0),
       active: metrics.active + (booking.status === "approved" || booking.status === "picked_up" || booking.status === "returned" ? 1 : 0),
-      revenueEstimate: metrics.revenueEstimate + booking.estimatedTotal,
+      revenueEstimate: metrics.revenueEstimate + getBookingMoneyValue(booking.rentalTotal, booking.estimatedTotal),
     }),
     { total: 0, pending: 0, active: 0, revenueEstimate: 0 },
   );
@@ -133,4 +169,89 @@ export function getStatusTone(status: BookingStatus) {
   };
 
   return tones[status];
+}
+
+export function getPaymentStatusTone(status: BookingPaymentStatus) {
+  const tones: Record<BookingPaymentStatus, string> = {
+    unpaid: "bg-amber-100 text-amber-800",
+    deposit_paid: "bg-sky-100 text-sky-800",
+    paid: "bg-emerald-100 text-emerald-800",
+    refunded: "bg-violet-100 text-violet-800",
+  };
+
+  return tones[status];
+}
+
+export function buildAdminBookingsCsv(bookings: AdminBooking[]) {
+  const headers = [
+    "Booking ID",
+    "Customer",
+    "Phone",
+    "Email",
+    "Car",
+    "Start date",
+    "End date",
+    "Status",
+    "Payment status",
+    "Payment method",
+    "Rental total",
+    "Deposit amount",
+    "Discount amount",
+    "Extra charge",
+    "Amount due",
+    "Payment notes",
+    "Admin notes",
+  ];
+
+  const rows = bookings.map((booking) => {
+    const rentalTotal = getBookingMoneyValue(booking.rentalTotal, booking.estimatedTotal);
+    const depositAmount = getBookingMoneyValue(booking.depositAmount, 0);
+    const discountAmount = getBookingMoneyValue(booking.discountAmount, 0);
+    const extraCharge = getBookingMoneyValue(booking.extraCharge, 0);
+    const amountDue = rentalTotal - discountAmount + extraCharge;
+
+    return [
+      booking.id,
+      booking.fullName,
+      booking.phone,
+      booking.email,
+      booking.carName,
+      booking.startDate,
+      booking.endDate,
+      booking.status,
+      booking.paymentStatus,
+      booking.paymentMethod ?? "",
+      formatCsvMoney(rentalTotal),
+      formatCsvMoney(depositAmount),
+      formatCsvMoney(discountAmount),
+      formatCsvMoney(extraCharge),
+      formatCsvMoney(amountDue),
+      booking.paymentNotes ?? "",
+      booking.adminNotes ?? "",
+    ];
+  });
+
+  return [headers, ...rows].map((row) => row.map(escapeCsvCell).join(",")).join("\n");
+}
+
+function toNullableNumber(value: number | string | null | undefined) {
+  if (value === null || value === undefined || value === "") return null;
+  const normalized = Number(value);
+  return Number.isFinite(normalized) ? normalized : null;
+}
+
+function getBookingMoneyValue(value: number | null | undefined, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function formatCsvMoney(value: number) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function escapeCsvCell(value: string) {
+  if (/[",\n\r]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+
+  return value;
 }

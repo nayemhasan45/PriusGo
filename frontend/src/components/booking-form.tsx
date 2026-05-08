@@ -28,7 +28,7 @@ const bookingSchema = z.object({
   message: z.string().optional(),
 });
 
-const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
+const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,maintenance_note,next_available_date,created_at";
 const pricePerWeek = 100;
 
 const DRAFT_KEY = "priusgo:booking-draft";

@@ -2,6 +2,8 @@ import type { BookingRequest } from "@/lib/types";
 
 export type BookingStatus = BookingRequest["status"];
 export type BookingLicenseCheckStatus = "pending" | "verified" | "rejected";
+export type BookingPaymentStatus = "unpaid" | "deposit_paid" | "paid" | "refunded";
+export type BookingPaymentMethod = "cash" | "bank" | "card" | "other";
 
 export type BookingFormValues = {
   carId: string;
@@ -59,7 +61,7 @@ export type BookingReadableRow = {
   pickup_time: string | null;
   return_time: string | null;
   status: BookingStatus;
-  total_estimated_price: number | null;
+  total_estimated_price: number | string | null;
   created_at: string;
 };
 
@@ -67,6 +69,13 @@ export type BookingRow = BookingReadableRow & {
   license_check_status: BookingLicenseCheckStatus;
   deposit_agreed: boolean;
   admin_notes: string | null;
+  payment_status: BookingPaymentStatus;
+  deposit_amount: number | string | null;
+  payment_method: BookingPaymentMethod | null;
+  payment_notes: string | null;
+  rental_total: number | string | null;
+  discount_amount: number | string | null;
+  extra_charge: number | string | null;
 };
 
 export function buildBookingInsert(values: BookingFormValues, userId: string): BookingInsert {

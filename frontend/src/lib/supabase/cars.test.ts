@@ -15,6 +15,8 @@ describe("Supabase car helpers", () => {
       price_per_day: 42,
       image_url: null,
       status: "maintenance",
+      maintenance_note: "Brake pads replacement",
+      next_available_date: "2026-05-20",
       created_at: "2026-04-29T12:00:00.000Z",
     });
 
@@ -25,6 +27,8 @@ describe("Supabase car helpers", () => {
       fuelType: "Hybrid petrol",
       pricePerDay: 42,
       status: "maintenance",
+      maintenanceNote: "Brake pads replacement",
+      nextAvailableDate: "2026-05-20",
     });
     expect(car.features).toContain("Hybrid economy");
   });
@@ -42,6 +46,8 @@ describe("Supabase car helpers", () => {
       pricePerDay: 35,
       imageUrl: "",
       status: "maintenance",
+      maintenanceNote: "Wheel alignment",
+      nextAvailableDate: "2026-05-20",
     })).toEqual({
       id: "ABC123",
       name: "City hybrid",
@@ -54,6 +60,8 @@ describe("Supabase car helpers", () => {
       price_per_day: 35,
       image_url: "/images/prius-fleet.jpg",
       status: "maintenance",
+      maintenance_note: "Wheel alignment",
+      next_available_date: "2026-05-20",
     });
   });
 

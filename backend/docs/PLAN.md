@@ -52,9 +52,20 @@ Checked/updated on **2026-05-04 15:23 EEST**.
   - quick contact actions added
   - richer booking lifecycle statuses added
   - tests/lint/build pass with these Sprint 2 changes
+- Sprint 3 money-tracking work is now implemented in the workspace:
+  - payment status tracking added
+  - deposit amount / payment method / notes added
+  - rental total / discount / extra charge fields added
+  - CSV export added for bookings/accounting
+  - tests/lint/build pass with these Sprint 3 changes
+- Sprint 4 work is now implemented in the workspace:
+  - maintenance note per car added
+  - next available date per car added
+  - admin/public fleet views show maintenance details
+  - tests/lint/build pass with these Sprint 4 changes
 - Important: the updated overlap-protection SQL fix is in `backend/supabase-schema.sql` and should be re-run in Supabase after final review because the exclusion constraint migration was corrected for existing databases.
 - Code quality baseline is healthy:
-  - `npm test` ✅ 21/21 tests passed
+  - `npm test` ✅ 24/24 tests passed
   - `npm run lint` ✅
   - `npm run build` ✅
 
@@ -68,22 +79,19 @@ Checked/updated on **2026-05-04 15:23 EEST**.
 
 These are the **highest-value practical changes now**, in order.
 
-### Priority A — Ship Sprint 2 cleanly
-**Why now:** The best next step is to keep the good admin workflow changes and make sure the DB status logic is shipped safely.
+### Priority A — Ship Sprint 5 cleanly
+**Why now:** The fleet maintenance workflow is now done, so the next useful business improvement is public trust and conversion polish.
 
 **Main gaps right now:**
 - corrected overlap-protection SQL should be re-applied in Supabase after final review
 - printable booking summary / rental sheet is still missing
-- CSV export for admin/accounting is still missing
 
-### Priority B — Add money tracking without risky payment automation
-**Why now:** After Sprint 2 is shipped, the next practical need is knowing who paid, how much deposit was collected, and what still needs follow-up.
+### Priority B — Add printable booking summary
+**Why now:** The fleet workflow is done, and a printable rental sheet/contract draft is the next operational gap.
 
 **Main gaps right now:**
-- no payment status
-- no deposit amount field
-- no payment method / payment notes
-- no discount / extra charge / manual adjustment flow
+- no printable booking summary / rental sheet
+- no contract draft for pickup handoff
 
 ### Priority C — Improve trust and conversion on the public side
 **Why now:** People rent cars when the site feels real, clear, and safe.
@@ -110,11 +118,11 @@ These are the best additions to make PriusGo more useful in the real world.
 7. **Quick contact buttons**: call / WhatsApp / email / copy number ✅ done
 8. **Printable booking summary / contract draft**
 9. **Booking filters** by status, car, date, customer ✅ done
-10. **CSV export** for admin records
-11. **Payment status + deposit amount** tracking
+10. **CSV export** for admin records ✅ done
+11. **Payment status + deposit amount** tracking ✅ done
 
 ### Strong second-wave features
-11. **Maintenance note + next available date** per car
+11. **Maintenance note + next available date** per car ✅ done
 12. **Damage / fuel / mileage checklist fields**
 13. **Reminder message templates** for approve / pickup / return
 14. **Public trust section**: valid documents required, transparent price, pickup area, process
@@ -333,17 +341,19 @@ These are the best additions to make PriusGo more useful in the real world.
 - pickup time / return time workflow fields
 - license check status tracking
 - deposit agreed tracking
+- payment status tracking
+- deposit amount / payment method / notes
+- rental total / discount / extra charge fields
+- CSV export for bookings/accounting
+- maintenance note + next available date per car
 - admin-only notes with safe customer read path
 - stricter booking insert policy for customer-safe workflow fields
 - Supabase SQL applied for Sprint 1
 - test/lint/build green
 
 ### NOT DONE YET
-- deposit/payment tracking
 - re-apply corrected overlap-protection SQL after final review
-- CSV export
 - printable booking summary / contract draft
-- maintenance notes / next available date
 - stronger trust/SEO conversion polish
 
 ---
@@ -353,17 +363,17 @@ These are the best additions to make PriusGo more useful in the real world.
 If you want the **most practical next coding step**, do this next:
 
 ### Next task to work on now
-**Prepare Sprint 2 for review/commit:**
-- keep the current admin filters/search work
-- keep the current call / WhatsApp / email / copy actions
-- keep the richer booking lifecycle statuses
+**Prepare Sprint 5 for review/commit:**
+- improve trust/conversion copy and contact details
+- add clearer rental rules and legal/trust sections
+- update SEO metadata and page copy
 - make sure overlap-protection SQL fix is included in final schema
 - verify admin bookings flow in browser
 
 Why this first:
 - most of the value is already built locally
 - fastest path to a real business improvement with minimal extra work
-- prepares clean ground for payment tracking in Sprint 3
+- prepares clean ground for Sprint 5 trust/SEO work
 
 ---
 

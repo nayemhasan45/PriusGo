@@ -8,7 +8,7 @@ import { groupBookingBlocksByCar, mapCarRowToCar, type CarBookingBlockRow, type 
 import { createClient } from "@/lib/supabase/client";
 import type { Car } from "@/lib/types";
 
-const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,created_at";
+const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_per_day,image_url,status,maintenance_note,next_available_date,created_at";
 
 export function CustomerCars() {
   const [cars, setCars] = useState<Car[]>(fallbackCars);
