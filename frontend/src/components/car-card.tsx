@@ -21,7 +21,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
     <article className="overflow-hidden rounded-[2rem] border border-[#e9e9e9] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/8">
       {/* Car image area */}
       <div className={`relative min-h-60 bg-gradient-to-br ${car.imageGradient} p-5`}>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#616161] shadow-sm">
             Šiauliai pickup
           </span>
@@ -51,7 +51,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
         <button
           type="button"
           onClick={selectCarForRental}
-          className="absolute bottom-5 left-5 rounded-full bg-[#0b0b0b] px-5 py-2.5 font-heading text-lg font-black tracking-[0.16em] text-white shadow-xl transition hover:bg-[#ff3600]"
+          className="absolute bottom-4 left-4 rounded-full bg-[#0b0b0b] px-4 py-2.5 font-heading text-base font-black tracking-[0.14em] text-white shadow-xl transition hover:bg-[#ff3600] sm:px-5 sm:text-lg"
           aria-label={`Book car ${plateNumber}`}
         >
           {plateNumber}
@@ -60,7 +60,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
 
       {/* Card body */}
       <div className="p-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[#616161]">
               {car.year} · {car.brand} {car.model}
@@ -85,7 +85,7 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
           )}
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-3 text-sm font-medium text-[#616161]">
+        <div className="mt-5 grid grid-cols-2 gap-3 text-sm font-medium text-[#616161] sm:grid-cols-3">
           <div className="rounded-2xl bg-[#fff7f4] p-3">
             <Fuel className="mb-1.5 size-4 text-[#ff3600]" />{car.fuelType}
           </div>

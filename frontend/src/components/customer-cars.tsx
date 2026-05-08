@@ -36,7 +36,7 @@ export function CustomerCars() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center rounded-[2rem] border border-[#e9e9e9] bg-white p-10 text-[#616161]">
+      <div className="flex items-center justify-center rounded-[2rem] border border-[#e9e9e9] bg-white p-6 text-center text-[#616161] sm:p-10">
         <Loader2 className="mr-3 size-5 animate-spin text-[#ff3600]" /> Loading available rental cars...
       </div>
     );
@@ -44,7 +44,7 @@ export function CustomerCars() {
 
   if (cars.length === 0) {
     return (
-      <div className="rounded-[2rem] border border-dashed border-[#e9e9e9] bg-white p-10 text-center">
+      <div className="rounded-[2rem] border border-dashed border-[#e9e9e9] bg-white p-6 text-center sm:p-10">
         <h3 className="font-heading text-2xl font-black text-[#0b0b0b]">No cars available right now</h3>
         <p className="mt-3 text-[#616161]">Please check again later or contact PriusGo directly.</p>
       </div>
@@ -52,7 +52,7 @@ export function CustomerCars() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-5 lg:grid-cols-2">
       {cars.map((car) => <CarCard key={car.id} car={car} bookingBlocks={blocksByCar[car.id] ?? []} />)}
     </div>
   );

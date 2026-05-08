@@ -389,8 +389,8 @@ function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpda
   const canSave = Number.isFinite(parsedPrice) && parsedPrice > 0;
 
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
+    <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3">
           <span className="flex size-12 items-center justify-center rounded-2xl bg-slate-950 text-white"><CarFront className="size-6" /></span>
           <div>
@@ -435,16 +435,16 @@ function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpda
         </label>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status, maintenanceNote, nextAvailableDate })} className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <button disabled={isUpdating || !canSave} onClick={() => onUpdate(car.id, { pricePerDay: parsedPrice, status, maintenanceNote, nextAvailableDate })} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
           {isUpdating ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Save car
         </button>
 
         {!hasBookings && (
           confirmDelete ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <span className="text-sm font-bold text-red-700">Remove this car?</span>
-              <button onClick={() => { onDelete(car.id); setConfirmDelete(false); }} disabled={isDeleting} className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700 disabled:opacity-60">
+              <button onClick={() => { onDelete(car.id); setConfirmDelete(false); }} disabled={isDeleting} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-700 disabled:opacity-60 sm:w-auto">
                 {isDeleting ? <Loader2 className="size-4 animate-spin" /> : null} Yes, remove
               </button>
               <button onClick={() => setConfirmDelete(false)} className="rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-100">
@@ -452,7 +452,7 @@ function CarAdminCard({ car, blocks, isUpdating, isDeleting, hasBookings, onUpda
               </button>
             </div>
           ) : (
-            <button onClick={() => setConfirmDelete(true)} className="inline-flex items-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-black text-red-700 hover:bg-red-50">
+            <button onClick={() => setConfirmDelete(true)} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-black text-red-700 hover:bg-red-50 sm:w-auto">
               <Trash2 className="size-4" /> Remove car
             </button>
           )

@@ -385,7 +385,7 @@ export function BookingForm() {
           <p className="mt-1.5 text-xs text-white/35">Weekly discount applied automatically: €{pricePerWeek}/week + daily rate for extra days.</p>
         </div>
 
-        <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff3600] px-6 py-4 font-semibold text-white transition hover:bg-[#cc2b00] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2">
+        <button disabled={isSubmitting} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#ff3600] px-6 py-4 font-semibold text-white transition hover:bg-[#cc2b00] disabled:cursor-not-allowed disabled:opacity-50 md:col-span-2">
           {isSubmitting && <Loader2 className="size-5 animate-spin" />} Submit rental request for {selectedCar.plateNumber ?? selectedCar.id.toUpperCase()}
         </button>
       </form>
@@ -398,14 +398,14 @@ function Field({ label, children }: { label: string; children: React.ReactElemen
   return (
     <label className="grid gap-2">
       <span className="text-sm font-medium text-white/60">{label}</span>
-      <div className="[&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/8 [&_input]:bg-white/8 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-[#ff3600] [&_input]:transition [&_input]:placeholder:text-white/25 [&_input]:focus:ring-2">{children}</div>
+      <div className="[&_input]:min-h-11 [&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/8 [&_input]:bg-white/8 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-[#ff3600] [&_input]:transition [&_input]:placeholder:text-white/25 [&_input]:focus:ring-2">{children}</div>
     </label>
   );
 }
 
 function CheckItem({ name, label, defaultChecked }: { name: string; label: string; defaultChecked: boolean }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-sm text-white/75 transition hover:border-white/20">
+    <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-sm text-white/75 transition hover:border-white/20">
       <input
         name={name}
         type="checkbox"

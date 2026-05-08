@@ -80,20 +80,22 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
   return (
     <div className="mt-5 overflow-hidden rounded-2xl border border-[#e9e9e9] bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#e9e9e9] px-4 py-3">
+      <div className="flex items-center justify-between border-b border-[#e9e9e9] px-3 py-3 sm:px-4">
         <button
+          type="button"
           onClick={prevMonth}
           disabled={isPrevDisabled}
-          className="flex size-7 items-center justify-center rounded-full transition hover:bg-[#fff7f4] disabled:cursor-not-allowed disabled:opacity-30"
+          className="flex size-10 items-center justify-center rounded-full transition hover:bg-[#fff7f4] disabled:cursor-not-allowed disabled:opacity-30 touch-manipulation"
         >
           <ChevronLeft className="size-4 text-[#0b0b0b]" />
         </button>
-        <p className="text-sm font-black text-[#0b0b0b]">
+        <p className="px-2 text-sm font-black text-[#0b0b0b] sm:px-0">
           {MONTHS[month]} {year}
         </p>
         <button
+          type="button"
           onClick={nextMonth}
-          className="flex size-7 items-center justify-center rounded-full transition hover:bg-[#fff7f4]"
+          className="flex size-10 items-center justify-center rounded-full transition hover:bg-[#fff7f4] touch-manipulation"
         >
           <ChevronRight className="size-4 text-[#0b0b0b]" />
         </button>
@@ -114,7 +116,7 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
           const style = getDayStyle(date, current);
           return (
             <div key={i} className="flex items-center justify-center py-0.5">
-              <span className={`flex size-7 items-center justify-center text-xs transition ${style}`}>
+              <span className={`flex size-8 items-center justify-center text-xs transition sm:size-7 ${style}`}>
                 {current ? date.getDate() : ""}
               </span>
             </div>
@@ -123,7 +125,7 @@ export function BookingCalendar({ blocks }: { blocks: CarBookingBlock[] }) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 border-t border-[#e9e9e9] px-4 py-2.5">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-[#e9e9e9] px-4 py-2.5">
         <div className="flex items-center gap-1.5">
           <span className="size-3 rounded-full bg-emerald-100 ring-1 ring-emerald-200" />
           <span className="text-[11px] font-semibold text-[#616161]">Available</span>

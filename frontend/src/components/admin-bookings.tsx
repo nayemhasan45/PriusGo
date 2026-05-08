@@ -487,7 +487,7 @@ export function AdminBookings() {
       ) : (
         <div className="grid gap-4">
           {visibleBookings.map((booking) => (
-            <article key={booking.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article key={booking.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
               <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
@@ -508,7 +508,7 @@ export function AdminBookings() {
                   <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                     <a
                       href={`tel:${formatTelPhone(booking.phone)}`}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 sm:w-auto"
                     >
                       <Phone className="size-4" /> Call
                     </a>
@@ -516,20 +516,20 @@ export function AdminBookings() {
                       href={`https://wa.me/${formatWhatsAppPhone(booking.phone)}?text=${encodeURIComponent(buildContactBody(booking))}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 sm:w-auto"
                     >
                       <span className="text-base font-black">WA</span> WhatsApp
                     </a>
                     <a
                       href={`mailto:${booking.email}?subject=${encodeURIComponent(buildContactSubject(booking))}&body=${encodeURIComponent(buildContactBody(booking))}`}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 sm:w-auto"
                     >
                       <Mail className="size-4" /> Email
                     </a>
                     <button
                       type="button"
                       onClick={() => void copyPhoneNumber(booking.id, booking.phone)}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-emerald-200 hover:text-emerald-700 sm:w-auto"
                     >
                       <Copy className="size-4" /> {copiedPhoneId === booking.id ? "Copied" : "Copy number"}
                     </button>
@@ -557,7 +557,7 @@ export function AdminBookings() {
                           type="button"
                           disabled={isUpdatingId === booking.id}
                           onClick={() => void updateBooking(booking.id, { status: action.status })}
-                          className="rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="w-full rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         >
                           {isUpdatingId === booking.id ? "Updating..." : action.label}
                         </button>
@@ -632,7 +632,7 @@ export function AdminBookings() {
                         </select>
                       </label>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
                         <label className="grid gap-2 text-sm font-bold text-slate-700">
                           Deposit amount
                           <input
@@ -661,7 +661,7 @@ export function AdminBookings() {
                         </label>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
                         <label className="grid gap-2 text-sm font-bold text-slate-700">
                           Rental total
                           <input
@@ -725,7 +725,7 @@ export function AdminBookings() {
                       Deposit agreed
                     </label>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid gap-3 sm:grid-cols-2">
                       <label className="grid gap-2 text-sm font-bold text-slate-700">
                         Pickup time
                         <input
@@ -763,7 +763,7 @@ export function AdminBookings() {
                     <button
                       type="submit"
                       disabled={isUpdatingId === booking.id}
-                      className="rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="w-full rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isUpdatingId === booking.id ? "Saving..." : "Save workflow"}
                     </button>

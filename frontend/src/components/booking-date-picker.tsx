@@ -151,20 +151,20 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
       </div>
 
       {/* Month nav */}
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-3 py-3 sm:px-4">
         <button
           type="button"
           onClick={() => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
           disabled={isPrevDisabled}
-          className="flex size-7 items-center justify-center rounded-full transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-20"
+          className="flex size-10 items-center justify-center rounded-full transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-20 touch-manipulation"
         >
           <ChevronLeft className="size-4 text-white" />
         </button>
-        <p className="text-sm font-black text-white">{MONTHS[month]} {year}</p>
+        <p className="px-2 text-sm font-black text-white sm:px-0">{MONTHS[month]} {year}</p>
         <button
           type="button"
           onClick={() => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
-          className="flex size-7 items-center justify-center rounded-full transition hover:bg-white/10"
+          className="flex size-10 items-center justify-center rounded-full transition hover:bg-white/10 touch-manipulation"
         >
           <ChevronRight className="size-4 text-white" />
         </button>
@@ -188,21 +188,26 @@ export function BookingDatePicker({ blocks, startDate, endDate, onStartDateChang
           const { cell, inner } = getDayClasses(date, current);
 
           return (
-            <div key={i} className={`flex items-center justify-center py-0.5 ${cell}`}
+            <button
+              key={i}
+              type="button"
+              className={`flex items-center justify-center py-0.5 ${cell}`}
               onClick={() => clickable && handleDayClick(dateStr)}
               onMouseEnter={() => startDate && !endDate && current && !isPast && !blocked && !invalidRangeEnd ? setHoverDate(dateStr) : undefined}
               onMouseLeave={() => setHoverDate(null)}
+              disabled={!clickable}
+              aria-label={current ? formatLocalDate(date) : "Unavailable day"}
             >
-              <span className={`flex size-7 items-center justify-center transition ${inner}`}>
+              <span className={`flex size-9 items-center justify-center transition sm:size-7 ${inner}`}>
                 {current ? date.getDate() : ""}
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 border-t border-white/8 px-4 py-2.5">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-white/8 px-4 py-2.5">
         <div className="flex items-center gap-1.5">
           <span className="size-3 rounded-full bg-emerald-500/30 ring-1 ring-emerald-500/50" />
           <span className="text-[11px] font-semibold text-white/40">Available</span>

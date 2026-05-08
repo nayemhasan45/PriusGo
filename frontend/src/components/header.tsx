@@ -79,7 +79,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#e9e9e9] bg-white/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1320px] items-center justify-between px-5 py-4 sm:px-6 lg:px-10">
+      <div className="mx-auto flex max-w-[1320px] items-center justify-between px-5 py-3 sm:px-6 sm:py-4 lg:px-10">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex size-9 items-center justify-center rounded-full bg-[#ff3600] text-[11px] font-black text-white">
             P
@@ -93,11 +93,12 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-          {showAuthState && isAdmin && (
-            <>
-              <Link href="/admin/bookings" className="transition-colors hover:text-[#0b0b0b]">Admin bookings</Link>
-              <Link href="/admin/cars" className="transition-colors hover:text-[#0b0b0b]">Admin cars</Link>
-            </>
+            {showAuthState && isAdmin && (
+              <>
+                <Link href="/admin" className="transition-colors hover:text-[#0b0b0b]">Admin overview</Link>
+                <Link href="/admin/bookings" className="transition-colors hover:text-[#0b0b0b]">Admin bookings</Link>
+                <Link href="/admin/cars" className="transition-colors hover:text-[#0b0b0b]">Admin cars</Link>
+              </>
           )}
         </nav>
 
@@ -138,7 +139,7 @@ export function Header() {
         </div>
 
         <button
-          className="rounded-full border border-[#e9e9e9] p-2 text-[#0b0b0b] md:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-full border border-[#e9e9e9] text-[#0b0b0b] md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle menu"
         >
@@ -148,14 +149,15 @@ export function Header() {
 
       {mobileOpen && (
         <div className="border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 md:hidden">
-          <nav className="flex flex-col gap-4 text-sm font-medium text-[#616161]">
+          <nav className="flex flex-col gap-4 text-base font-medium text-[#616161]">
             {navItems.map((item) => (
-              <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">
+              <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#0b0b0b]">
                 {item.label}
               </Link>
             ))}
             {showAuthState && isAdmin && (
               <>
+                <Link href="/admin" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin overview</Link>
                 <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin bookings</Link>
                 <Link href="/admin/cars" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin cars</Link>
               </>
@@ -167,10 +169,10 @@ export function Header() {
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileOpen(false)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0b0b0b] py-2 pl-2 pr-5 text-center text-sm font-semibold text-white"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0b0b0b] px-4 py-3 text-center text-sm font-semibold text-white"
                   aria-label={`${userLabel} dashboard`}
                 >
-                  <span className="flex size-9 shrink-0 overflow-hidden rounded-full border border-white/30 bg-white/15">
+                  <span className="flex size-8 shrink-0 overflow-hidden rounded-full border border-white/30 bg-white/15">
                     {userAvatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={userAvatarUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
@@ -182,7 +184,7 @@ export function Header() {
                   </span>
                   Dashboard
                 </Link>
-                <button onClick={signOut} className="text-sm text-[#616161]">Sign out</button>
+                <button onClick={signOut} className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#e9e9e9] px-4 text-sm text-[#616161]">Sign out</button>
               </>
             ) : (
               <>
