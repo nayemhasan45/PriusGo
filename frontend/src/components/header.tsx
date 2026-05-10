@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Menu, User, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, Moon, Sun, User, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -29,12 +29,20 @@ function getUserLabel(sessionUser: { user_metadata?: Record<string, unknown>; em
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "light";
+    return window.localStorage.getItem("priusgo-theme") === "dark" ? "dark" : "light";
+  });
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [userLabel, setUserLabel] = useState("Signed-in customer");
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const supabase = useMemo(() => createClient(), []);
   const showAuthState = !supabase || isAuthReady;
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("site-dark", theme === "dark");
+  }, [theme]);
 
   useEffect(() => {
     if (!supabase) return;
@@ -78,6 +86,27 @@ export function Header() {
     window.location.href = "/";
   }
 
+  function toggleTheme() {
+    setTheme((current) => {
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.classList.toggle("site-dark", next === "dark");
+      window.localStorage.setItem("priusgo-theme", next);
+      return next;
+    });
+  }
+
+  const themeToggle = (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className="site-theme-toggle inline-flex size-11 items-center justify-center rounded-full border border-[#e9e9e9] bg-white text-[#0b0b0b] transition hover:border-[#ff3600]/30 hover:text-[#ff3600]"
+      aria-label={theme === "dark" ? "Switch to normal mode" : "Switch to dark mode"}
+      title={theme === "dark" ? "Normal mode" : "Dark mode"}
+    >
+      {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+    </button>
+  );
+
   return (
     <header className="sticky top-0 z-50 border-b border-[#e9e9e9] bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1320px] items-center justify-between px-5 py-3 sm:px-6 sm:py-4 lg:px-10">
@@ -94,16 +123,18 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-            {showAuthState && isAdmin && (
-              <>
-                <Link href="/admin" className="transition-colors hover:text-[#0b0b0b]">Admin overview</Link>
-                <Link href="/admin/bookings" className="transition-colors hover:text-[#0b0b0b]">Admin bookings</Link>
-                <Link href="/admin/cars" className="transition-colors hover:text-[#0b0b0b]">Admin cars</Link>
-              </>
-          )}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          {themeToggle}
+          {showAuthState && isAdmin && (
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-2 rounded-full border border-[#e9e9e9] px-4 py-2.5 text-sm font-semibold text-[#0b0b0b] transition hover:border-[#ff3600]/30 hover:text-[#ff3600]"
+            >
+              <LayoutDashboard className="size-4" /> Admin dashboard
+            </Link>
+          )}
           {showAuthState && isLoggedIn ? (
             <>
               <Link
@@ -157,14 +188,20 @@ export function Header() {
               </Link>
             ))}
             {showAuthState && isAdmin && (
-              <>
-                <Link href="/admin" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin overview</Link>
-                <Link href="/admin/bookings" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin bookings</Link>
-                <Link href="/admin/cars" onClick={() => setMobileOpen(false)} className="hover:text-[#0b0b0b]">Admin cars</Link>
-              </>
+              <Link href="/admin" onClick={() => setMobileOpen(false)} className="inline-flex items-center gap-2 py-1.5 hover:text-[#0b0b0b]">
+                <LayoutDashboard className="size-4" /> Admin dashboard
+              </Link>
             )}
           </nav>
           <div className="mt-6 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="site-theme-toggle inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#e9e9e9] px-4 text-sm font-semibold text-[#0b0b0b]"
+            >
+              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              {theme === "dark" ? "Normal mode" : "Dark mode"}
+            </button>
             {showAuthState && isLoggedIn ? (
               <>
                 <Link
