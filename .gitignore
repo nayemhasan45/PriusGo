@@ -7,3 +7,16 @@
 .DS_Store
 .vscode/
 .idea/
+
+# Local agent/planning artifacts
+.hermes/
+.superpowers/
+docs/
+launch-video/
+
+# Local markdown notes/docs
+*.md
+**/*.md
+CLAUDE.md
+**/CLAUDE.md
+**/AGENTS.md

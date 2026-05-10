@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAdminOverviewMetrics, getTodayReturnBookings } from "./admin-overview";
+import { getAdminControlBoard, getAdminOperations, getAdminOverviewMetrics, getTodayReturnBookings } from "./admin-overview";
 
 describe("admin overview metrics", () => {
   const bookings = [
@@ -112,5 +112,30 @@ describe("admin overview metrics", () => {
 
   it("returns today's bookings", () => {
     expect(getTodayReturnBookings(bookings, "2026-05-10")).toHaveLength(1);
+  });
+
+  it("builds daily operations queues for the admin command center", () => {
+    const operations = getAdminOperations(bookings, cars, "2026-05-10");
+
+    expect(operations.pendingApprovals.map((booking) => booking.id)).toEqual(["2"]);
+    expect(operations.pickupsToday.map((booking) => booking.id)).toEqual(["2"]);
+    expect(operations.returnsToday.map((booking) => booking.id)).toEqual(["1"]);
+    expect(operations.paymentAttention.map((booking) => booking.id)).toEqual(["2"]);
+    expect(operations.fleetAttention.map((car) => car.id)).toEqual(["car-2"]);
+  });
+
+  it("summarizes the admin control board for a client demo", () => {
+    const board = getAdminControlBoard(bookings, cars, "2026-05-10");
+
+    expect(board.conversionRate).toBe(50);
+    expect(board.expectedRevenue).toBe(181);
+    expect(board.openActionCount).toBe(3);
+    expect(board.availableFleetLabel).toBe("1 of 2 ready");
+    expect(board.nextHandoffs.map((booking) => booking.id)).toEqual(["2", "1"]);
+    expect(board.businessProof).toEqual([
+      "Live availability prevents double-booking",
+      "Admin can approve, reject, or complete rentals",
+      "Deposits and payment status stay visible before pickup",
+    ]);
   });
 });

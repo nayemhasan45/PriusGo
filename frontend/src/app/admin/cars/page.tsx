@@ -1,20 +1,21 @@
+import Link from "next/link";
+import { AdminShell } from "@/components/admin-shell";
 import { AdminCars } from "@/components/admin-cars";
-import { Header } from "@/components/header";
 
 export default function AdminCarsPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <Header />
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8 max-w-3xl">
-          <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-600">Fleet management</p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">Admin cars</h1>
-          <p className="mt-4 text-lg leading-8 text-slate-600">
-            Control rental prices, car availability, and see each car&apos;s approved rental calendar.
-          </p>
-        </div>
+    <AdminShell
+      title="Fleet readiness"
+      description="Control car availability, maintenance notes, rental prices, photos, and approved booking blocks."
+      actions={
+        <Link href="/admin" className="rounded-2xl border border-white/10 px-4 py-2.5 text-sm font-black text-white/70 transition hover:border-[#ff6a3d]/50 hover:text-white">
+          Back to dashboard
+        </Link>
+      }
+    >
+      <div className="admin-legacy">
         <AdminCars />
-      </section>
-    </main>
+      </div>
+    </AdminShell>
   );
 }
