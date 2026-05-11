@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, CarFront, CheckCircle2, Loader2 } from "lucide-react";
+import { CalendarDays, CarFront, CheckCircle2, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
@@ -32,6 +32,17 @@ const carColumns = "id,name,brand,model,year,fuel_type,transmission,seats,price_
 const pricePerWeek = 100;
 
 const DRAFT_KEY = "priusgo:booking-draft";
+
+const rentalRules = [
+  "Valid driving license and ID or passport are required at pickup.",
+  "Booking requests are not final until PriusGo confirms them.",
+  "A deposit may be required before handoff.",
+  "Pickup and return are arranged in Šiauliai unless agreed otherwise.",
+  "Fuel level, cleanliness, mileage, and visible damage are checked at handoff and return.",
+  "Smoking in the car is not allowed.",
+  "Late return should be communicated as early as possible.",
+  "The customer is responsible for fines, damage, and misuse during the rental period.",
+];
 
 type BookingDraft = {
   carId?: string;
@@ -69,6 +80,7 @@ export function BookingForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
 
   const selectedCar = availableCars.find((car) => car.id === selectedCarId);
   const supabaseReady = Boolean(createClient());
@@ -292,6 +304,59 @@ export function BookingForm() {
           </div>
         </div>
       )}
+      {isRulesModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rental-rules-modal-title"
+        >
+          <div className="max-h-[86vh] w-full max-w-2xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#161616] text-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-5 sm:px-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Rules and conditions</p>
+                <h3 id="rental-rules-modal-title" className="mt-2 font-heading text-2xl font-black text-white">
+                  PriusGo rental terms
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">
+                  Review these before submitting your booking request. The rental is confirmed only after admin approval.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsRulesModalOpen(false)}
+                className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-white/25 hover:text-white"
+                aria-label="Close rental rules"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[58vh] overflow-y-auto px-5 py-5 sm:px-6">
+              <div className="grid gap-3">
+                {rentalRules.map((rule) => (
+                  <div key={rule} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3">
+                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#ff3600] text-white">
+                      <CheckCircle2 className="size-3.5" />
+                    </span>
+                    <span className="text-sm leading-relaxed text-white/75">{rule}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 px-5 py-4 sm:px-6">
+              <button
+                type="button"
+                onClick={() => setIsRulesModalOpen(false)}
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#ff3600] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#cc2b00]"
+              >
+                I understand
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {error && (
         <div className="mb-6 rounded-2xl bg-red-500/10 p-4 text-sm font-semibold text-red-300 ring-1 ring-red-500/20">{error}</div>
       )}
@@ -366,6 +431,13 @@ export function BookingForm() {
               label="I accept PriusGo rental rules, pickup/return terms, and deposit conditions."
               defaultChecked={draft?.rentalRulesAccepted ?? false}
             />
+            <button
+              type="button"
+              onClick={() => setIsRulesModalOpen(true)}
+              className="-mt-1 ml-9 w-fit text-sm font-semibold text-[#ff6a3d] underline underline-offset-4 transition hover:text-[#ff8a66] focus:outline-none focus:ring-2 focus:ring-[#ff3600] focus:ring-offset-2 focus:ring-offset-[#161616]"
+            >
+              Click here
+            </button>
             <CheckItem
               name="bookingNotFinalAcknowledged"
               label="I understand this booking is not final until the admin confirms it."

@@ -93,6 +93,18 @@ export function AdminShell({ eyebrow = "PriusGo admin", title, description, acti
 
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-20 border-b border-white/10 bg-[#07090d]/86 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-black text-white/75 transition hover:border-[#ff6a3d]/40 hover:text-white">
+                <Home className="size-4 text-[#ff6a3d]" />
+                Website
+              </Link>
+              {hasSession && (
+                <button onClick={() => void signOut()} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-black text-white/60 transition hover:border-white/20 hover:text-white">
+                  <LogOut className="size-4" />
+                  Sign out
+                </button>
+              )}
+            </div>
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-3">
