@@ -371,16 +371,34 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
       )}
 
       {!selectedCar ? (
-        <div className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 p-6 text-center sm:p-8">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#ff3600] text-white">
-            <CarFront className="size-7" />
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#ff3600] text-white">
+              <CarFront className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff3600]">How it works</p>
+              <h3 className="mt-0.5 font-heading text-xl font-black text-white">Complete these steps to book</h3>
+            </div>
           </div>
-          <h3 className="mt-5 font-heading text-2xl font-black text-white">Choose a car from the fleet first</h3>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/55">
-            Booking is car-specific. Pick an available car from the fleet above, then this form will lock to that exact car.
-          </p>
+          <ol className="mt-6 grid gap-3">
+            {[
+              { n: "01", title: "Choose a car", desc: "Pick an available car from the fleet above." },
+              { n: "02", title: "Pick your dates", desc: "Select rental start and end dates." },
+              { n: "03", title: "Sign in", desc: "Link the booking to your account." },
+              { n: "04", title: "Submit request", desc: "We review and confirm within hours." },
+            ].map((step, i) => (
+              <li key={step.n} className={`flex items-start gap-4 rounded-2xl px-4 py-3.5 ${i === 0 ? "bg-[#ff3600]/15 ring-1 ring-[#ff3600]/25" : "bg-white/[0.04]"}`}>
+                <span className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${i === 0 ? "bg-[#ff3600] text-white" : "bg-white/10 text-white/40"}`}>{step.n}</span>
+                <div>
+                  <p className={`text-sm font-black ${i === 0 ? "text-white" : "text-white/50"}`}>{step.title}</p>
+                  <p className={`mt-0.5 text-xs leading-relaxed ${i === 0 ? "text-white/70" : "text-white/30"}`}>{step.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
           <a href="#cars" className="mt-6 inline-flex rounded-full bg-[#ff3600] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#cc2b00]">
-            View fleet
+            Browse fleet →
           </a>
         </div>
       ) : (

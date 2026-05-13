@@ -6,6 +6,19 @@ import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getSafeRedirectPath } from "@/lib/auth-redirect";
 
+function mapAuthError(err: unknown): string {
+  if (!(err instanceof Error)) return "Authentication failed. Please try again.";
+  const msg = err.message;
+  if (msg.includes("Invalid login credentials")) return "Incorrect email or password. Please try again.";
+  if (msg.includes("Email not confirmed")) return "Please confirm your email first — check your inbox for the link.";
+  if (msg.includes("already registered") || msg.includes("already been registered")) return "An account with this email already exists. Sign in instead.";
+  if (msg.includes("rate limit") || msg.includes("Email rate limit exceeded")) return "Too many attempts. Please wait a few minutes and try again.";
+  if (msg.includes("Password should be") || msg.includes("password")) return "Password must be at least 6 characters.";
+  if (msg.includes("Unable to validate email") || msg.includes("invalid format")) return "Please enter a valid email address.";
+  if (msg.includes("Supabase keys") || msg.includes("NEXT_PUBLIC_SUPABASE")) return msg;
+  return "Something went wrong. Please try again.";
+}
+
 export function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,7 +53,7 @@ export function AuthForm() {
 
       if (googleError) throw googleError;
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Google sign in failed. Please try again.");
+      setError(mapAuthError(caughtError));
       setIsGoogleSubmitting(false);
     }
   }
@@ -69,7 +82,7 @@ export function AuthForm() {
 
       setMessage("Password reset email sent. Open the link in your email to create a new password.");
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Password reset failed. Please try again.");
+      setError(mapAuthError(caughtError));
     } finally {
       setIsResetSubmitting(false);
     }
@@ -114,7 +127,7 @@ export function AuthForm() {
       router.push(redirectTo);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Authentication failed. Please try again.");
+      setError(mapAuthError(caughtError));
     } finally {
       setIsSubmitting(false);
     }
@@ -150,7 +163,7 @@ export function AuthForm() {
       </h2>
       <p className="mt-2 text-sm leading-6 text-slate-500">
         {supabaseReady
-          ? "Supabase Auth is enabled. Your bookings will be linked to your account."
+          ? "Your bookings are saved to your account and visible in your dashboard."
           : "Supabase keys are not configured yet. Add .env.local to activate real login."}
       </p>
 

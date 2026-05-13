@@ -55,7 +55,7 @@ export function CustomerCars() {
 
   return (
     <>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
         {cars.map((car) => (
           <CarCard
             key={car.id}

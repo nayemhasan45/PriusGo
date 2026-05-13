@@ -80,7 +80,7 @@ export default function Home() {
               Available now · Šiauliai, Lithuania
             </div>
 
-            <h1 className="fade-up fade-up-2 mt-6 font-heading text-[2.5rem] font-black leading-[1.04] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-6xl lg:text-[4.5rem]">
+            <h1 className="fade-up fade-up-2 mt-6 font-heading text-[2.5rem] font-black leading-[1.04] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem]">
               Rent a Toyota<br />
               <span className="text-[#ff3600]">Prius</span> in<br />
               Šiauliai.
@@ -151,7 +151,7 @@ export default function Home() {
 
       {/* ── FLEET ── */}
       <section id="cars" className="bg-[#fff7f4] py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10 xl:max-w-[1600px] xl:px-16">
           <div className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Available fleet</p>

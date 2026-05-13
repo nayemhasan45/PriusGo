@@ -127,7 +127,7 @@ export function Header() {
           <span className="font-heading text-xl font-black tracking-tight text-[#0b0b0b]">PriusGo</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-[#616161] md:flex">
+        <nav className="hidden items-center gap-8 text-sm font-medium text-[#616161] lg:flex">
           {navItems.map((item) => (
             <Link key={item.label} href={item.href} className="transition-colors hover:text-[#0b0b0b]">
               {item.label}
@@ -135,7 +135,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           {themeToggle}
           {showAuthState && isAdmin && (
             <Link
@@ -181,7 +181,7 @@ export function Header() {
         </div>
 
         <button
-          className="inline-flex size-11 items-center justify-center rounded-full border border-[#e9e9e9] text-[#0b0b0b] md:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-full border border-[#e9e9e9] text-[#0b0b0b] lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle menu"
         >
@@ -190,7 +190,7 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="site-mobile-menu border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 md:hidden">
+        <div className="site-mobile-menu border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 lg:hidden">
           <nav className="flex flex-col gap-4 text-base font-medium text-[#616161]">
             {navItems.map((item) => (
               <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="site-mobile-link py-1.5 hover:text-[#0b0b0b]">

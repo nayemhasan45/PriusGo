@@ -4,22 +4,24 @@ import type { Car } from "@/lib/types";
 import type { CarBookingBlock } from "@/lib/supabase/cars";
 import { getCustomerCarAvailability } from "@/lib/supabase/cars";
 import { BookingCalendar } from "@/components/booking-calendar";
-import { CheckCircle2, Fuel, Gauge, Users, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, Fuel, Gauge, Users, XCircle } from "lucide-react";
+import { useState } from "react";
 
 export function CarCard({ car, bookingBlocks = [], onSelect }: { car: Car; bookingBlocks?: CarBookingBlock[]; onSelect?: (car: Car) => void }) {
   const availability = getCustomerCarAvailability(car.status);
   const isAvailable = availability.canRent;
   const plateNumber = car.plateNumber ?? car.id.toUpperCase();
   const hasMaintenanceInfo = Boolean(car.maintenanceNote || car.nextAvailableDate);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   function selectCarForRental() {
     if (!isAvailable) return;
+    window.dispatchEvent(new CustomEvent("priusgo:select-car", { detail: { carId: car.id } }));
     if (onSelect) {
       onSelect(car);
-      return;
+    } else {
+      document.getElementById("booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    window.dispatchEvent(new CustomEvent("priusgo:select-car", { detail: { carId: car.id } }));
-    document.getElementById("booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (
@@ -105,7 +107,19 @@ export function CarCard({ car, bookingBlocks = [], onSelect }: { car: Car; booki
           ))}
         </ul>
 
-        <BookingCalendar blocks={bookingBlocks} />
+        <button
+          type="button"
+          onClick={() => setShowCalendar((v) => !v)}
+          className="mt-5 flex w-full items-center justify-between rounded-2xl border border-[#e9e9e9] px-4 py-3 text-sm font-semibold text-[#616161] transition hover:border-[#ff3600]/30 hover:text-[#ff3600]"
+        >
+          <span>{showCalendar ? "Hide availability calendar" : "Check available dates"}</span>
+          <ChevronDown className={`size-4 transition-transform duration-200 ${showCalendar ? "rotate-180" : ""}`} />
+        </button>
+        {showCalendar && (
+          <div className="mt-3">
+            <BookingCalendar blocks={bookingBlocks} />
+          </div>
+        )}
 
         {isAvailable ? (
           <button

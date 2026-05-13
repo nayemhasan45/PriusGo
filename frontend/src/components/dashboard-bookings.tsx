@@ -71,16 +71,28 @@ export function DashboardBookings() {
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-red-200 bg-red-50 p-6 font-bold text-red-700">{error}</div>;
+    return (
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-center">
+        <p className="font-black text-red-800">Could not load your bookings</p>
+        <p className="mt-2 text-sm text-red-700">Something went wrong. Please refresh the page or contact us if the problem continues.</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="mt-5 inline-flex rounded-full bg-red-700 px-6 py-3 font-black text-white hover:bg-red-800"
+        >
+          Refresh page
+        </button>
+      </div>
+    );
   }
 
   if (needsLogin) {
     return (
       <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
         <h2 className="text-2xl font-black text-slate-950">Sign in to view your bookings</h2>
-        <p className="mt-3 text-slate-600">Supabase is enabled, so bookings are protected by account login.</p>
+        <p className="mt-3 text-slate-600">Your bookings are linked to your account for security. Sign in to see them.</p>
         <Link href="/login" className="mt-6 inline-flex rounded-full bg-emerald-600 px-6 py-3 font-black text-white hover:bg-emerald-700">
-          Login / Register
+          Sign in or register
         </Link>
       </div>
     );
@@ -91,9 +103,7 @@ export function DashboardBookings() {
       <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
         {userEmail && <p className="mb-3 text-sm font-bold text-emerald-700">Signed in as {userEmail}</p>}
         <h2 className="text-2xl font-black text-slate-950">No booking requests yet</h2>
-        <p className="mt-3 text-slate-600">
-          {supabaseReady ? "Submit a booking request and it will appear here from Supabase." : "Submit a demo booking request first. Local bookings appear here."}
-        </p>
+        <p className="mt-3 text-slate-600">Choose a car and submit a booking request to get started.</p>
         <div className="mt-6 flex justify-center gap-3">
           <Link href="/#booking" className="inline-flex rounded-full bg-emerald-600 px-6 py-3 font-black text-white hover:bg-emerald-700">
             Create booking

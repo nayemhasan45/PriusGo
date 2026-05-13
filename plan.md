@@ -82,7 +82,7 @@ Fix anything that could directly lose bookings, confuse renters, or break operat
 
 ### Tasks
 
-#### Task 1.1 — Reproduce and fix the selected-car booking flow
+#### Task 1.1 — Reproduce and fix the selected-car booking flow ✅ DONE
 **Why:** This is the highest-risk issue found in the live review.
 
 **Implementation notes:**
@@ -109,7 +109,7 @@ Fix anything that could directly lose bookings, confuse renters, or break operat
 
 ---
 
-#### Task 1.2 — Audit the auth handoff around booking submission
+#### Task 1.2 — Audit the auth handoff around booking submission ✅ DONE
 **Why:** Real customers should never lose entered data or get stuck.
 
 **Inspect carefully:**
@@ -135,7 +135,7 @@ Fix anything that could directly lose bookings, confuse renters, or break operat
 
 ---
 
-#### Task 1.3 — Make loading/empty/error states business-polished
+#### Task 1.3 — Make loading/empty/error states business-polished ✅ DONE
 **Why:** Real business apps are judged heavily by edge states.
 
 **Targets:**
@@ -156,7 +156,7 @@ Fix anything that could directly lose bookings, confuse renters, or break operat
 
 ---
 
-#### Task 1.4 — Fix lint hygiene and generated-folder handling
+#### Task 1.4 — Fix lint hygiene and generated-folder handling ✅ DONE
 **Why:** You need reliable quality checks before launch.
 
 **Files:**
@@ -190,7 +190,7 @@ Make the site feel deliberate on mobile, tablet, laptop, and large monitors.
 
 ### Tasks
 
-#### Task 2.1 — Rework header breakpoints for tablet
+#### Task 2.1 — Rework header breakpoints for tablet ✅ DONE
 **Problem:** The current header shows full nav from `md`, which is likely too crowded on tablet.
 
 **What to change:**
@@ -204,7 +204,7 @@ Make the site feel deliberate on mobile, tablet, laptop, and large monitors.
 
 ---
 
-#### Task 2.2 — Simplify car cards for scanability
+#### Task 2.2 — Simplify car cards for scanability ✅ DONE
 **Problem:** Car cards currently carry too much information at once.
 
 **What to change:**
@@ -224,7 +224,7 @@ Make the site feel deliberate on mobile, tablet, laptop, and large monitors.
 
 ---
 
-#### Task 2.3 — Strengthen booking section layout across breakpoints
+#### Task 2.3 — Strengthen booking section layout across breakpoints ✅ DONE
 **Problem:** The booking area currently feels sparse before selection and heavy after selection.
 
 **What to change:**
@@ -239,7 +239,7 @@ Make the site feel deliberate on mobile, tablet, laptop, and large monitors.
 
 ---
 
-#### Task 2.4 — Tune large-screen composition
+#### Task 2.4 — Tune large-screen composition ✅ DONE
 **Problem:** The site is fine on large monitors, but not yet “premium wide-screen deliberate.”
 
 **What to change:**
