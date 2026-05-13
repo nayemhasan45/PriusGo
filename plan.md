@@ -266,7 +266,7 @@ Make renters feel safe enough to submit a real booking.
 
 ### Tasks
 
-#### Task 3.1 — Upgrade trust copy and contact clarity
+#### Task 3.1 — Upgrade trust copy and contact clarity ✅ DONE
 **What to improve:**
 - Clarify exactly how approval works.
 - Clarify expected response time if known.
@@ -281,7 +281,7 @@ Make renters feel safe enough to submit a real booking.
 
 ---
 
-#### Task 3.2 — Add stronger social proof / operational proof
+#### Task 3.2 — Add stronger social proof / operational proof ✅ DONE
 **Possible additions depending on available real data:**
 - renter testimonials
 - number of successful rentals
@@ -299,7 +299,7 @@ Make renters feel safe enough to submit a real booking.
 
 ---
 
-#### Task 3.3 — Tighten CTA funnel
+#### Task 3.3 — Tighten CTA funnel ✅ DONE
 **Current issue:** Many CTAs compete with each other.
 
 **What to do:**
@@ -315,7 +315,7 @@ Make renters feel safe enough to submit a real booking.
 
 ---
 
-#### Task 3.4 — SEO and metadata production pass
+#### Task 3.4 — SEO and metadata production pass ✅ DONE
 **Files:**
 - `frontend/src/app/layout.tsx`
 - `frontend/src/app/page.tsx`
