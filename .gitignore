@@ -15,8 +15,8 @@ docs/
 launch-video/
 
 # Local markdown notes/docs
-*.md
 **/*.md
+!plan.md
 CLAUDE.md
 **/CLAUDE.md
 **/AGENTS.md
