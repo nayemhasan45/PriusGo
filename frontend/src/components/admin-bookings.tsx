@@ -234,6 +234,7 @@ export function AdminBookings() {
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [copiedTemplateKey, setCopiedTemplateKey] = useState<string | null>(null);
   const [isExportingCsv, setIsExportingCsv] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<{ bookingId: string; status: BookingStatus; label: string } | null>(null);
   const [needsLogin, setNeedsLogin] = useState(false);
   const [isForbidden, setIsForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -626,20 +627,70 @@ export function AdminBookings() {
 
                 <div className="grid gap-3 lg:w-64">
                   <p className="text-3xl font-black text-emerald-600">€{booking.estimatedTotal}</p>
+                  {booking.status === "pending" && (() => {
+                    const conflicts = bookings.filter(
+                      (b) =>
+                        b.id !== booking.id &&
+                        b.carId === booking.carId &&
+                        (b.status === "approved" || b.status === "picked_up") &&
+                        b.startDate <= booking.endDate &&
+                        b.endDate >= booking.startDate,
+                    );
+                    return conflicts.length > 0 ? (
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+                        <p className="font-black text-amber-800">Date conflict</p>
+                        <p className="mt-1 text-amber-700">
+                          {conflicts.length === 1
+                            ? `${conflicts[0].fullName} has an approved booking for this car on overlapping dates (${conflicts[0].startDate} → ${conflicts[0].endDate}).`
+                            : `${conflicts.length} approved bookings overlap these dates for this car.`}
+                        </p>
+                      </div>
+                    ) : null;
+                  })()}
                   <div className="grid gap-2">
                     <p className="text-sm font-bold text-slate-700">Quick actions</p>
                     <div className="flex flex-wrap gap-2">
-                      {getQuickStatusActions(booking.status).map((action) => (
-                        <button
-                          key={action.status}
-                          type="button"
-                          disabled={isUpdatingId === booking.id}
-                          onClick={() => void updateBooking(booking.id, { status: action.status })}
-                          className="w-full rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                        >
-                          {isUpdatingId === booking.id ? "Updating..." : action.label}
-                        </button>
-                      ))}
+                      {getQuickStatusActions(booking.status).map((action) => {
+                        const isRisky = (["rejected", "cancelled", "completed"] as BookingStatus[]).includes(action.status);
+                        const isAwaitingConfirm = pendingConfirm?.bookingId === booking.id && pendingConfirm?.status === action.status;
+
+                        if (isRisky && isAwaitingConfirm) {
+                          return (
+                            <div key={action.status} className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                disabled={isUpdatingId === booking.id}
+                                onClick={() => { void updateBooking(booking.id, { status: action.status }); setPendingConfirm(null); }}
+                                className="rounded-full bg-red-600 px-4 py-2 text-xs font-black text-white transition hover:bg-red-700 disabled:opacity-60"
+                              >
+                                Confirm {action.label}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPendingConfirm(null)}
+                                className="rounded-full border border-slate-200 px-4 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-100"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <button
+                            key={action.status}
+                            type="button"
+                            disabled={isUpdatingId === booking.id}
+                            onClick={() => {
+                              if (isRisky) { setPendingConfirm({ bookingId: booking.id, status: action.status, label: action.label }); }
+                              else { void updateBooking(booking.id, { status: action.status }); }
+                            }}
+                            className={`w-full rounded-full px-4 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto ${isRisky ? "border border-red-200 bg-white text-red-700 hover:bg-red-50" : "bg-slate-950 text-white hover:bg-emerald-700"}`}
+                          >
+                            {isUpdatingId === booking.id ? "Updating..." : action.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   <form
@@ -667,10 +718,10 @@ export function AdminBookings() {
                     <label className="grid gap-2 text-sm font-bold text-slate-700">
                       Manual status
                       <select
+                        key={`status-${booking.id}-${booking.status}`}
                         name="status"
-                        value={booking.status}
+                        defaultValue={booking.status}
                         disabled={isUpdatingId === booking.id}
-                        onChange={(event) => void updateBooking(booking.id, { status: event.target.value as BookingStatus })}
                         className="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {adminBookingStatuses.map((status) => (
