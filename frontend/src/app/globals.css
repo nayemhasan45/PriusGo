@@ -163,3 +163,21 @@ textarea {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
+
+.site-dark header .site-mobile-menu {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #07090d;
+}
+
+.site-dark header .site-mobile-link {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.site-dark header .site-mobile-link:hover {
+  color: #ffffff;
+}
+
+.site-dark header .site-mobile-action {
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.82);
+}

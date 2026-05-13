@@ -60,7 +60,13 @@ type BookingDraft = {
   message?: string;
 };
 
-export function BookingForm() {
+type BookingFormProps = {
+  initialCar?: Car | null;
+  initialBookingBlocks?: CarBookingBlock[];
+  variant?: "inline" | "modal";
+};
+
+export function BookingForm({ initialCar = null, initialBookingBlocks = [], variant = "inline" }: BookingFormProps = {}) {
   const [draft] = useState<BookingDraft | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -71,9 +77,12 @@ export function BookingForm() {
     } catch { return null; }
   });
 
-  const [availableCars, setAvailableCars] = useState<Car[]>(fallbackCars.filter((car) => car.status === "available"));
-  const [selectedCarId, setSelectedCarId] = useState(draft?.carId ?? "");
-  const [bookingBlocks, setBookingBlocks] = useState<CarBookingBlock[]>([]);
+  const [availableCars, setAvailableCars] = useState<Car[]>(() => {
+    const cars = fallbackCars.filter((car) => car.status === "available");
+    return initialCar && !cars.some((car) => car.id === initialCar.id) ? [initialCar, ...cars] : cars;
+  });
+  const [selectedCarId, setSelectedCarId] = useState(initialCar?.id ?? draft?.carId ?? "");
+  const [bookingBlocks, setBookingBlocks] = useState<CarBookingBlock[]>(initialCar ? initialBookingBlocks : []);
   const [startDate, setStartDate] = useState(draft?.startDate ?? "");
   const [endDate, setEndDate] = useState(draft?.endDate ?? "");
   const [success, setSuccess] = useState(false);
@@ -95,11 +104,11 @@ export function BookingForm() {
 
       const mappedCars = (data as CarRow[]).map(mapCarRowToCar);
       setAvailableCars(mappedCars);
-      setSelectedCarId((current) => (mappedCars.some((car) => car.id === current) ? current : ""));
+      setSelectedCarId((current) => (mappedCars.some((car) => car.id === current) || current === initialCar?.id ? current : ""));
     }
 
     void loadAvailableCars();
-  }, []);
+  }, [initialCar?.id]);
 
   useEffect(() => {
     function handleCarSelection(event: Event) {
@@ -259,7 +268,7 @@ export function BookingForm() {
   }
 
   return (
-    <div id="booking" className="relative rounded-[2rem] bg-[#161616] p-6 text-white ring-1 ring-white/5 sm:p-8">
+    <div id={variant === "inline" ? "booking" : undefined} className={`${variant === "inline" ? "rounded-[2rem] p-6 sm:p-8" : "p-0"} relative bg-[#161616] text-white ring-1 ring-white/5`}>
       {isRedirecting && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 rounded-[2rem] bg-[#161616]/90 backdrop-blur-sm">
           <Loader2 className="size-10 animate-spin text-[#ff3600]" />

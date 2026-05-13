@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { LayoutDashboard, LogOut, Menu, Moon, Sun, User, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
@@ -26,13 +26,24 @@ function getUserLabel(sessionUser: { user_metadata?: Record<string, unknown>; em
   return sessionUser?.email ?? "Signed-in customer";
 }
 
+function getStoredTheme() {
+  if (typeof window === "undefined") return "light";
+  return window.localStorage.getItem("priusgo-theme") === "dark" ? "dark" : "light";
+}
+
+function subscribeToThemeChanges(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("priusgo-theme-change", onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("priusgo-theme-change", onStoreChange);
+  };
+}
+
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    return window.localStorage.getItem("priusgo-theme") === "dark" ? "dark" : "light";
-  });
+  const theme = useSyncExternalStore(subscribeToThemeChanges, getStoredTheme, () => "light");
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [userLabel, setUserLabel] = useState("Signed-in customer");
   const [isAuthReady, setIsAuthReady] = useState(false);
@@ -86,19 +97,18 @@ export function Header() {
     window.location.href = "/";
   }
 
-  function toggleTheme() {
-    setTheme((current) => {
-      const next = current === "dark" ? "light" : "dark";
-      document.documentElement.classList.toggle("site-dark", next === "dark");
-      window.localStorage.setItem("priusgo-theme", next);
-      return next;
-    });
+  function toggleTheme({ closeMobileMenu = false }: { closeMobileMenu?: boolean } = {}) {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.toggle("site-dark", next === "dark");
+    window.localStorage.setItem("priusgo-theme", next);
+    window.dispatchEvent(new Event("priusgo-theme-change"));
+    if (closeMobileMenu) setMobileOpen(false);
   }
 
   const themeToggle = (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={() => toggleTheme()}
       className="site-theme-toggle inline-flex size-11 items-center justify-center rounded-full border border-[#e9e9e9] bg-white text-[#0b0b0b] transition hover:border-[#ff3600]/30 hover:text-[#ff3600]"
       aria-label={theme === "dark" ? "Switch to normal mode" : "Switch to dark mode"}
       title={theme === "dark" ? "Normal mode" : "Dark mode"}
@@ -180,15 +190,15 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 md:hidden">
+        <div className="site-mobile-menu border-t border-[#e9e9e9] bg-white px-5 py-6 sm:px-6 md:hidden">
           <nav className="flex flex-col gap-4 text-base font-medium text-[#616161]">
             {navItems.map((item) => (
-              <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#0b0b0b]">
+              <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)} className="site-mobile-link py-1.5 hover:text-[#0b0b0b]">
                 {item.label}
               </Link>
             ))}
             {showAuthState && isAdmin && (
-              <Link href="/admin" onClick={() => setMobileOpen(false)} className="inline-flex items-center gap-2 py-1.5 hover:text-[#0b0b0b]">
+              <Link href="/admin" onClick={() => setMobileOpen(false)} className="site-mobile-link inline-flex items-center gap-2 py-1.5 hover:text-[#0b0b0b]">
                 <LayoutDashboard className="size-4" /> Admin dashboard
               </Link>
             )}
@@ -196,7 +206,7 @@ export function Header() {
           <div className="mt-6 flex flex-col gap-3">
             <button
               type="button"
-              onClick={toggleTheme}
+              onClick={() => toggleTheme({ closeMobileMenu: true })}
               className="site-theme-toggle inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#e9e9e9] px-4 text-sm font-semibold text-[#0b0b0b]"
             >
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
@@ -222,14 +232,14 @@ export function Header() {
                   </span>
                   Dashboard
                 </Link>
-                <button onClick={signOut} className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#e9e9e9] px-4 text-sm text-[#616161]">Sign out</button>
+                <button onClick={signOut} className="site-mobile-action inline-flex min-h-11 items-center justify-center rounded-full border border-[#e9e9e9] px-4 text-sm text-[#616161]">Sign out</button>
               </>
             ) : (
               <>
                 <Link href="/#cars" onClick={() => setMobileOpen(false)} className="rounded-full bg-[#ff3600] px-5 py-3 text-center text-sm font-semibold text-white">
                   Book Now
                 </Link>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-full border border-[#e9e9e9] px-5 py-3 text-center text-sm font-medium text-[#0b0b0b]">
+                <Link href="/login" onClick={() => setMobileOpen(false)} className="site-mobile-action rounded-full border border-[#e9e9e9] px-5 py-3 text-center text-sm font-medium text-[#0b0b0b]">
                   Login
                 </Link>
               </>

@@ -6,13 +6,18 @@ import { getCustomerCarAvailability } from "@/lib/supabase/cars";
 import { BookingCalendar } from "@/components/booking-calendar";
 import { CheckCircle2, Fuel, Gauge, Users, XCircle } from "lucide-react";
 
-export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?: CarBookingBlock[] }) {
+export function CarCard({ car, bookingBlocks = [], onSelect }: { car: Car; bookingBlocks?: CarBookingBlock[]; onSelect?: (car: Car) => void }) {
   const availability = getCustomerCarAvailability(car.status);
   const isAvailable = availability.canRent;
   const plateNumber = car.plateNumber ?? car.id.toUpperCase();
   const hasMaintenanceInfo = Boolean(car.maintenanceNote || car.nextAvailableDate);
 
   function selectCarForRental() {
+    if (!isAvailable) return;
+    if (onSelect) {
+      onSelect(car);
+      return;
+    }
     window.dispatchEvent(new CustomEvent("priusgo:select-car", { detail: { carId: car.id } }));
     document.getElementById("booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -48,14 +53,9 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={selectCarForRental}
-          className="absolute bottom-4 left-4 rounded-full bg-[#0b0b0b] px-4 py-2.5 font-heading text-base font-black tracking-[0.14em] text-white shadow-xl transition hover:bg-[#ff3600] sm:px-5 sm:text-lg"
-          aria-label={`Book car ${plateNumber}`}
-        >
+        <span className="absolute bottom-4 left-4 rounded-full bg-[#0b0b0b] px-4 py-2.5 font-heading text-base font-black tracking-[0.14em] text-white shadow-xl sm:px-5 sm:text-lg">
           {plateNumber}
-        </button>
+        </span>
       </div>
 
       {/* Card body */}
@@ -112,8 +112,9 @@ export function CarCard({ car, bookingBlocks = [] }: { car: Car; bookingBlocks?:
             type="button"
             onClick={selectCarForRental}
             className="group mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#ff3600] px-5 py-4 text-sm font-semibold text-white transition hover:bg-[#cc2b00]"
+            aria-label={`Choose ${car.name}`}
           >
-            Rent this car
+            Choose this car
             <span className="flex size-5 items-center justify-center rounded-full bg-white/20 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                 <path d="M1 7L7 1M7 1H2M7 1V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
