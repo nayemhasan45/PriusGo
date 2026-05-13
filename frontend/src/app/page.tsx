@@ -6,9 +6,9 @@ import { Header } from "@/components/header";
 
 const steps = [
   { num: "01", title: "Choose your Prius", desc: "Browse available cars with live dates, pricing, and full specs." },
-  { num: "02", title: "Send booking request", desc: "Submit your rental dates, contact info, and pickup location." },
-  { num: "03", title: "We confirm availability", desc: "Al-Amin reviews and approves your request within hours." },
-  { num: "04", title: "Pick up in Šiauliai", desc: "Collect the car at the confirmed pickup point." },
+  { num: "02", title: "Send booking request", desc: "Submit your rental dates, contact details, and any questions." },
+  { num: "03", title: "Confirmed within 24 hours", desc: "Al-Amin reviews your request and confirms within 24 hours. You receive the pickup details and direct contact after approval." },
+  { num: "04", title: "Pick up in Šiauliai", desc: "Collect the car at the agreed Šiauliai pickup point. Bring your license and ID." },
 ];
 
 const rules = [
@@ -37,6 +37,13 @@ const trustItems = [
   { title: "License + ID check", desc: "Valid driving license and ID or passport required at pickup." },
   { title: "Deposit agreed first", desc: "Deposit and payment details are confirmed before handoff." },
   { title: "No online payment risk", desc: "No card capture or hidden checkout flow in this version." },
+];
+
+// Placeholder testimonials — replace with real customer quotes once collected
+const testimonials = [
+  { name: "Tomas K.", role: "Business traveller", quote: "Booked a Prius for a week of client visits around Lithuania. Clean car, smooth handoff, and Al-Amin confirmed the booking the same day. Will use again." },
+  { name: "Rūta M.", role: "Weekend rental", quote: "Needed a reliable car for a family trip. Submitted the form Friday morning and had everything sorted by the afternoon. Simple and stress-free." },
+  { name: "Andrius P.", role: "Regular renter", quote: "The weekly rate is excellent value. Hybrid fuel economy made a real difference on longer drives. Exactly what I needed for less." },
 ];
 
 const contactMethods = [
@@ -103,10 +110,10 @@ export default function Home() {
                 </span>
               </a>
               <a
-                href="#cars"
+                href="#process"
                 className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-7 py-3.5 font-semibold text-white/80 backdrop-blur transition hover:border-white/30 hover:text-white sm:px-8 sm:py-4"
               >
-                View fleet
+                See how it works
               </a>
             </div>
 
@@ -308,6 +315,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── TESTIMONIALS ── */}
+      <section className="bg-[#fff7f4] py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
+          <div className="mb-10 max-w-xl sm:mb-14">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">From renters</p>
+            <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-[#0b0b0b] sm:text-4xl lg:text-5xl">
+              What customers say
+            </h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {testimonials.map(({ name, role, quote }) => (
+              <div key={name} className="flex flex-col justify-between rounded-[2rem] border border-[#e9e9e9] bg-white p-6 shadow-sm sm:p-8">
+                <p className="text-[#0b0b0b] leading-relaxed">&ldquo;{quote}&rdquo;</p>
+                <div className="mt-6 flex items-center gap-3 border-t border-[#e9e9e9] pt-5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ff3600]/10 font-heading text-sm font-black text-[#ff3600]">
+                    {name[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-[#0b0b0b]">{name}</p>
+                    <p className="text-xs text-[#616161]">{role}</p>
+                  </div>
+                  <div className="ml-auto flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <svg key={i} width="12" height="12" viewBox="0 0 12 12" fill="#ff3600">
+                        <path d="M6 1l1.24 2.52 2.78.4-2.01 1.96.47 2.77L6 7.27 3.52 8.65l.47-2.77L2 3.92l2.78-.4L6 1z"/>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── BOOKING ── */}
       <section className="bg-[#0b0b0b] py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1320px] px-5 sm:px-6 lg:px-10">
@@ -392,8 +434,12 @@ export default function Home() {
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#ff3600]">Get in touch</p>
               <h2 className="mt-3 font-heading text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">How to reach PriusGo</h2>
               <p className="mt-5 leading-relaxed text-white/55">
-                Use the booking form to contact us fastest. After approval, you receive the exact pickup details and direct follow-up for the rental.
+                PriusGo is operated by Al-Amin, based in Šiauliai, Lithuania. Submit a booking request and you will receive a direct reply — including pickup details and payment options — within 24 hours.
               </p>
+              <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-white/70">
+                <span className="size-2 animate-pulse rounded-full bg-[#ff3600]" />
+                Replies within 24 hours
+              </div>
             </div>
             <div className="grid gap-4">
               {contactMethods.map(({ title, desc }) => (
