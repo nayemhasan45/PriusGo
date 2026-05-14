@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BookingForm } from "./booking-form";
 import type { Car } from "@/lib/types";
@@ -85,5 +85,59 @@ describe("BookingForm", () => {
 
     expect((screen.getByPlaceholderText("Al Amin") as HTMLInputElement).value).toBe("");
     expect((screen.getByPlaceholderText("you@email.com") as HTMLInputElement).value).toBe("");
+  });
+});
+
+describe("BookingForm validation", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it("shows 'Name is required' when submitted with an empty name", async () => {
+    render(<BookingForm initialCar={testCar} />);
+    fireEvent.submit(document.querySelector("form") as HTMLFormElement);
+    expect(await screen.findByText("Name is required")).toBeInTheDocument();
+  });
+
+  it("shows 'Start date is required' when name/email/phone are filled but dates are missing", async () => {
+    render(<BookingForm initialCar={testCar} />);
+    fireEvent.change(screen.getByPlaceholderText("Al Amin"), { target: { value: "John Doe" } });
+    fireEvent.change(screen.getByPlaceholderText("you@email.com"), { target: { value: "john@example.com" } });
+    fireEvent.change(screen.getByPlaceholderText("+370 ..."), { target: { value: "+37061234567" } });
+    fireEvent.submit(document.querySelector("form") as HTMLFormElement);
+    expect(await screen.findByText("Start date is required")).toBeInTheDocument();
+  });
+
+  it("shows 'Confirm your valid driving license' when all fields are set but checkboxes untouched", async () => {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+      carId: testCar.id,
+      fullName: "John Doe",
+      email: "john@example.com",
+      phone: "+37061234567",
+      startDate: "2026-06-01",
+      endDate: "2026-06-03",
+      pickupTime: "09:00",
+      returnTime: "18:00",
+    }));
+    render(<BookingForm initialCar={testCar} />);
+    fireEvent.submit(document.querySelector("form") as HTMLFormElement);
+    expect(await screen.findByText("Confirm your valid driving license")).toBeInTheDocument();
+  });
+
+  it("shows 'Accept the rental rules' when license is confirmed but rules are not accepted", async () => {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+      carId: testCar.id,
+      fullName: "John Doe",
+      email: "john@example.com",
+      phone: "+37061234567",
+      startDate: "2026-06-01",
+      endDate: "2026-06-03",
+      pickupTime: "09:00",
+      returnTime: "18:00",
+    }));
+    render(<BookingForm initialCar={testCar} />);
+    fireEvent.click(screen.getByLabelText(/I have a valid driving license/i));
+    fireEvent.submit(document.querySelector("form") as HTMLFormElement);
+    expect(await screen.findByText("Accept the rental rules")).toBeInTheDocument();
   });
 });

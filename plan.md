@@ -351,7 +351,7 @@ Ensure the owner/admin side is reliable for day-to-day business use.
 
 ### Tasks
 
-#### Task 4.1 — Review admin journeys as real operator workflows
+#### Task 4.1 — Review admin journeys as real operator workflows ✅ DONE
 **Check flows:**
 - review new booking
 - approve/reject booking
@@ -367,7 +367,7 @@ Ensure the owner/admin side is reliable for day-to-day business use.
 
 ---
 
-#### Task 4.2 — Add missing guardrails for operational mistakes
+#### Task 4.2 — Add missing guardrails for operational mistakes ✅ DONE
 **Ideas to assess:**
 - stronger status-change confirmation for risky actions
 - clearer payment/deposit labels
@@ -380,7 +380,7 @@ Ensure the owner/admin side is reliable for day-to-day business use.
 
 ---
 
-#### Task 4.3 — Align schema/docs with real operations
+#### Task 4.3 — Align schema/docs with real operations ✅ DONE
 **What to review:**
 - does schema support all required booking/payment/deposit fields?
 - do names in SQL, frontend mapping, and docs still match?
@@ -407,7 +407,7 @@ Move from “works on my machine” to repeatable release confidence.
 
 ### Tasks
 
-#### Task 5.1 — Expand automated coverage where business risk is highest
+#### Task 5.1 — Expand automated coverage where business risk is highest ✅ DONE
 **Add tests for:**
 - selected car → booking form flow
 - booking draft survives auth redirect
@@ -423,7 +423,7 @@ Move from “works on my machine” to repeatable release confidence.
 
 ---
 
-#### Task 5.2 — Create a production smoke-test checklist
+#### Task 5.2 — Create a production smoke-test checklist ✅ DONE
 **Document in repo:**
 - homepage load
 - fleet data visible
@@ -445,7 +445,7 @@ Move from “works on my machine” to repeatable release confidence.
 
 ---
 
-#### Task 5.3 — Make quality commands mandatory before release
+#### Task 5.3 — Make quality commands mandatory before release ✅ DONE
 **Target commands:**
 - `npm run lint`
 - `npm test`
