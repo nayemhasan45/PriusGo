@@ -2,7 +2,7 @@
 
 import { CalendarDays, CarFront, CheckCircle2, Loader2, X } from "lucide-react";
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { dateRangeOverlapsBlocks, estimateBookingPrice } from "@/lib/booking";
 import { cars as fallbackCars } from "@/lib/cars";
@@ -87,12 +87,19 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
   const [endDate, setEndDate] = useState(draft?.endDate ?? "");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationAlert, setValidationAlert] = useState<{ message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
+  const validationDialogButtonRef = useRef<HTMLButtonElement>(null);
+  const invalidFieldRef = useRef<HTMLElement | null>(null);
 
   const selectedCar = availableCars.find((car) => car.id === selectedCarId);
   const supabaseReady = Boolean(createClient());
+
+  useEffect(() => {
+    if (validationAlert) validationDialogButtonRef.current?.focus({ preventScroll: true });
+  }, [validationAlert]);
 
   useEffect(() => {
     async function loadAvailableCars() {
@@ -160,12 +167,13 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setIsSubmitting(true);
     setError(null);
+    setValidationAlert(null);
     setSuccess(false);
 
     try {
-      const form = event.currentTarget;
       const formData = new FormData(form);
       const values = bookingSchema.parse({
         carId: selectedCarId,
@@ -258,7 +266,16 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
       setEndDate("");
     } catch (caughtError) {
       if (caughtError instanceof z.ZodError) {
-        setError(caughtError.issues[0]?.message ?? "Please check the form.");
+        const issue = caughtError.issues[0];
+        const fieldName = String(issue?.path[0] ?? "");
+        const message = issue?.message ?? "Please check the form.";
+        const field = fieldName === "startDate" || fieldName === "endDate"
+          ? formFieldTarget(form, "dates")
+          : formFieldTarget(form, fieldName);
+        invalidFieldRef.current = field?.querySelector<HTMLElement>("input:not([type='hidden']), button:not(:disabled)") ?? field;
+        field?.scrollIntoView({ behavior: "smooth", block: "center" });
+        setValidationAlert({ message });
+        setError(message);
       } else {
         setError(caughtError instanceof Error ? caughtError.message : "Booking failed. Please try again.");
       }
@@ -310,6 +327,38 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {validationAlert && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="booking-validation-title"
+          aria-describedby="booking-validation-message"
+        >
+          <div className="w-full max-w-md rounded-[1.75rem] border border-white/10 bg-[#161616] p-6 text-white shadow-2xl sm:p-8">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-[#ff3600]/15 text-[#ff6a3d] ring-1 ring-[#ff3600]/30">
+              <X className="size-6" />
+            </div>
+            <h3 id="booking-validation-title" className="mt-5 font-heading text-2xl font-black">
+              Please check your booking details
+            </h3>
+            <p id="booking-validation-message" className="mt-2 text-sm leading-relaxed text-white/60">
+              {validationAlert.message}
+            </p>
+            <button
+              type="button"
+              ref={validationDialogButtonRef}
+              onClick={() => {
+                setValidationAlert(null);
+                requestAnimationFrame(() => invalidFieldRef.current?.focus({ preventScroll: true }));
+              }}
+              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#ff3600] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#cc2b00] focus:outline-none focus:ring-2 focus:ring-[#ff6a3d] focus:ring-offset-2 focus:ring-offset-[#161616]"
+            >
+              Go to missing information
+            </button>
           </div>
         </div>
       )}
@@ -366,7 +415,7 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
           </div>
         </div>
       )}
-      {error && (
+      {error && !validationAlert && (
         <div className="mb-6 rounded-2xl bg-red-500/10 p-4 text-sm font-semibold text-red-300 ring-1 ring-red-500/20">{error}</div>
       )}
 
@@ -402,7 +451,7 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
           </a>
         </div>
       ) : (
-      <form onSubmit={onSubmit} className="grid gap-5 md:grid-cols-2">
+      <form noValidate onSubmit={onSubmit} className="grid gap-5 md:grid-cols-2">
         <input type="hidden" name="carId" value={selectedCar.id} />
 
         <div className="md:col-span-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
@@ -436,13 +485,15 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
         <input type="hidden" name="startDate" value={startDate} />
         <input type="hidden" name="endDate" value={endDate} />
         <div className="md:col-span-2">
-          <BookingDatePicker
-            blocks={bookingBlocks}
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-          />
+          <div data-booking-field="dates">
+            <BookingDatePicker
+              blocks={bookingBlocks}
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+            />
+          </div>
         </div>
 
         <div className="md:col-span-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
@@ -495,7 +546,7 @@ export function BookingForm({ initialCar = null, initialBookingBlocks = [], vari
 
 function Field({ label, children }: { label: string; children: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> }) {
   return (
-    <label className="grid gap-2">
+    <label className="grid gap-2" data-booking-field={children.props.name}>
       <span className="text-sm font-medium text-white/60">{label}</span>
       <div className="[&_input]:min-h-11 [&_input]:w-full [&_input]:rounded-2xl [&_input]:border [&_input]:border-white/8 [&_input]:bg-white/8 [&_input]:px-4 [&_input]:py-3 [&_input]:text-white [&_input]:outline-none [&_input]:ring-[#ff3600] [&_input]:transition [&_input]:placeholder:text-white/25 [&_input]:focus:ring-2">{children}</div>
     </label>
@@ -504,7 +555,7 @@ function Field({ label, children }: { label: string; children: React.ReactElemen
 
 function CheckItem({ name, label, defaultChecked }: { name: string; label: string; defaultChecked: boolean }) {
   return (
-    <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-sm text-white/75 transition hover:border-white/20">
+    <label data-booking-field={name} className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-sm text-white/75 transition hover:border-white/20">
       <input
         name={name}
         type="checkbox"
@@ -514,4 +565,8 @@ function CheckItem({ name, label, defaultChecked }: { name: string; label: strin
       <span className="leading-relaxed">{label}</span>
     </label>
   );
+}
+
+function formFieldTarget(form: HTMLFormElement, fieldName: string) {
+  return form.querySelector<HTMLElement>(`[data-booking-field="${fieldName}"]`);
 }

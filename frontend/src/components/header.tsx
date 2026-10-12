@@ -12,7 +12,7 @@ const navItems = [
   { href: "/#trust", label: "Trust" },
   { href: "/#cars", label: "Book" },
   { href: "/#faq", label: "FAQ" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#contact", label: "Contact" },  
 ];
 
 function getUserAvatar(sessionUser: { user_metadata?: Record<string, unknown>; email?: string } | null | undefined) {

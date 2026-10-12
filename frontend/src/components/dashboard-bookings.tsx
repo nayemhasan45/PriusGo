@@ -32,7 +32,7 @@ export function DashboardBookings() {
         }
 
         const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
+        if (userError) throw userError; 
 
         if (!userData.user) {
           setNeedsLogin(true);

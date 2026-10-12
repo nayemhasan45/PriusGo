@@ -94,9 +94,27 @@ describe("BookingForm validation", () => {
   });
 
   it("shows 'Name is required' when submitted with an empty name", async () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: scrollIntoView });
     render(<BookingForm initialCar={testCar} />);
     fireEvent.submit(document.querySelector("form") as HTMLFormElement);
     expect(await screen.findByText("Name is required")).toBeInTheDocument();
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    expect(scrollIntoView).toHaveBeenCalled();
+  });
+
+  it("shows a validation dialog for an invalid email and scrolls to the email field", async () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: scrollIntoView });
+    render(<BookingForm initialCar={testCar} />);
+    fireEvent.change(screen.getByPlaceholderText("Al Amin"), { target: { value: "John Doe" } });
+    fireEvent.change(screen.getByPlaceholderText("you@email.com"), { target: { value: "not-an-email" } });
+    fireEvent.submit(document.querySelector("form") as HTMLFormElement);
+
+    expect(await screen.findByText("Valid email is required")).toBeInTheDocument();
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "center" });
+    expect(screen.getByRole("button", { name: "Go to missing information" })).toBeInTheDocument();
   });
 
   it("shows 'Start date is required' when name/email/phone are filled but dates are missing", async () => {

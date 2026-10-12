@@ -312,7 +312,7 @@ as $$
     bookings.created_at
   from public.bookings
   where bookings.user_id = auth.uid()
-  order by bookings.created_at desc;
+  order by bookings.created_at desc; 
 $$;
 
 grant usage on schema public to anon, authenticated;
