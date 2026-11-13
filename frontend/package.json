@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:selenium": "node selenium-tests/homepage.test.cjs && node selenium-tests/ui.test.cjs && node selenium-tests/booking.test.cjs",
     "check": "eslint && vitest run --run && next build"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "jsdom": "^29.1.0",
+    "selenium-webdriver": "^4.51.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.5"

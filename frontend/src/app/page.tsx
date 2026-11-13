@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookingForm } from "@/components/booking-form";
 import { CustomerCars } from "@/components/customer-cars";
-import { FleetCount } from "@/components/fleet-count";
+import { CarHero } from "@/components/hero/car-hero";
 import { Header } from "@/components/header";
 
 const steps = [
@@ -70,91 +70,7 @@ export default function Home() {
     <main className="min-h-screen bg-white">
       <Header />
 
-      {/* ── HERO ── */}
-      <section className="bg-[#0b0b0b]">
-        <div
-          className="relative w-full overflow-hidden bg-[#0b0b0b] bg-cover bg-center px-5 pt-14 pb-0 sm:px-6 sm:pt-20 lg:grid lg:min-h-[720px] lg:grid-cols-2 lg:items-end lg:gap-16 lg:px-10 lg:pt-28 xl:px-[calc((100vw-1320px)/2+2.5rem)]"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(11,11,11,0.95) 0%, rgba(11,11,11,0.78) 44%, rgba(11,11,11,0.32) 100%), url('/images/prius-hero.jpg')",
-            backgroundPosition: "center 56%",
-          }}
-        >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(255,54,0,0.22),transparent_32%)]" />
-          <div className="relative z-10 pb-14 sm:pb-20 lg:pb-28">
-            <div className="fade-up fade-up-1 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs text-white/70 backdrop-blur sm:text-sm">
-              <span className="size-2 animate-pulse rounded-full bg-[#ff3600]" />
-              Available now · Šiauliai, Lithuania
-            </div>
-
-            <h1 className="fade-up fade-up-2 mt-6 font-heading text-[2.5rem] font-black leading-[1.04] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem]">
-              Rent a Toyota<br />
-              <span className="text-[#ff3600]">Prius</span> in<br />
-              Šiauliai.
-            </h1>
-
-            <p className="fade-up fade-up-3 mt-5 max-w-md text-base leading-relaxed text-white/65 sm:mt-6 sm:text-lg">
-              Affordable hybrid car rental for daily use, business trips, and city movement. Simple booking, direct contact, no hassle.
-            </p>
-
-            <div className="fade-up fade-up-4 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
-              <a
-                href="#cars"
-                className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#ff3600] px-7 py-3.5 font-semibold text-white transition hover:bg-[#cc2b00] sm:px-8 sm:py-4"
-              >
-                Choose a car
-                <span className="flex size-6 items-center justify-center rounded-full bg-white/15 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                    <path d="M1 8L8 1M8 1H2.5M8 1V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <a
-                href="#process"
-                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-7 py-3.5 font-semibold text-white/80 backdrop-blur transition hover:border-white/30 hover:text-white sm:px-8 sm:py-4"
-              >
-                See how it works
-              </a>
-            </div>
-
-            <div className="fade-up fade-up-5 mt-10 grid grid-cols-3 gap-3 border-t border-white/15 pt-8 sm:mt-12 sm:gap-4 sm:pt-10">
-              <div>
-                <p className="font-heading text-2xl font-black text-white sm:text-3xl">€20</p>
-                <p className="mt-1 text-xs text-white/50 sm:text-sm">per day</p>
-              </div>
-              <div>
-                <p className="font-heading text-2xl font-black text-white sm:text-3xl">€100</p>
-                <p className="mt-1 text-xs text-white/50 sm:text-sm">per week</p>
-              </div>
-              <div>
-                <p className="font-heading text-2xl font-black text-white sm:text-3xl"><FleetCount /></p>
-                <p className="mt-1 text-xs text-white/50 sm:text-sm">cars in fleet</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Hero car info */}
-          <div className="fade-up fade-up-3 relative z-10 hidden lg:flex lg:justify-end lg:pb-10">
-            <div className="w-full max-w-md rounded-[2.25rem] border border-white/15 bg-black/35 p-6 text-white shadow-2xl backdrop-blur-md">
-              <div className="mb-6 flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-widest text-white/50">Featured car</p>
-                  <h3 className="mt-1.5 font-heading text-2xl font-black text-white">Toyota Prius</h3>
-                </div>
-                <span className="rounded-full bg-[#ff3600] px-3 py-1 text-xs font-semibold text-white">Available</span>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[["Hybrid", "fuel"], ["Auto", "gearbox"], ["5", "seats"]].map(([val, label]) => (
-                  <div key={label} className="rounded-2xl bg-white/10 p-3 text-center ring-1 ring-white/10">
-                    <p className="font-heading text-lg font-black text-white">{val}</p>
-                    <p className="text-xs text-white/45">{label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CarHero />
 
       {/* ── FLEET ── */}
       <section id="cars" className="bg-[#fff7f4] py-16 sm:py-20 lg:py-24">

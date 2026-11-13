@@ -1,0 +1,238 @@
+- generic [ref=e2]:
+  - banner:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - paragraph:
+              - link "SAKAMOTODAYS":
+                - /url: ./
+                - img "SAKAMOTODAYS"
+            - navigation:
+              - generic:
+                - generic:
+                  - list:
+                    - listitem:
+                      - text: PAGE 01
+                      - link "TOP":
+                        - /url: "#top"
+                    - listitem:
+                      - text: PAGE 03
+                      - link "INTRODUCTION":
+                        - /url: "#introduction"
+                    - listitem:
+                      - text: PAGE 04
+                      - link "CHARACTER":
+                        - /url: ./character/
+                    - listitem:
+                      - text: PAGE 05
+                      - link "STAFF&CAST":
+                        - /url: ./staffcast/
+                    - listitem:
+                      - text: PAGE 06
+                      - link "MOVIE":
+                        - /url: ./movie/
+                    - listitem:
+                      - link "1ST SEASON":
+                        - /url: https://sakamotodays.jp/1st/en/
+            - generic:
+              - generic:
+                - paragraph: LANGUAGE
+                - list:
+                  - listitem:
+                    - link "JPN":
+                      - /url: ../
+                  - listitem:
+                    - link "ENG":
+                      - /url: ./
+              - generic:
+                - paragraph: OFFICIAL SNS
+                - list:
+                  - listitem:
+                    - link "X":
+                      - /url: https://x.com/sakamotodays_pr
+                  - listitem:
+                    - link "TikTok":
+                      - /url: https://www.tiktok.com/@sakamotodays_pr
+    - button [ref=e19] [cursor=pointer]
+  - main [ref=e23]:
+    - generic [ref=e24]:
+      - paragraph [ref=e25]:
+        - img "SAKAMOTODAYS" [ref=e26]
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - term: LANGUAGE
+              - definition:
+                - list:
+                  - listitem:
+                    - link "JPN" [ref=e27] [cursor=pointer]:
+                      - /url: ../
+                  - listitem:
+                    - link "ENG":
+                      - /url: ./
+            - generic:
+              - term: MENU
+              - definition:
+                - list:
+                  - listitem:
+                    - link "TOP":
+                      - /url: ./
+                  - listitem:
+                    - link "CHARACTER" [ref=e29] [cursor=pointer]:
+                      - /url: ./character/
+                  - listitem:
+                    - link "STAFF&CAST" [ref=e31] [cursor=pointer]:
+                      - /url: ./staffcast/
+                  - listitem:
+                    - link "MOVIE" [ref=e33] [cursor=pointer]:
+                      - /url: "#movie"
+                  - listitem:
+                    - link "1ST SEASON" [ref=e35] [cursor=pointer]:
+                      - /url: https://sakamotodays.jp/1st/en/
+            - generic:
+              - term: OFFICIAL SNS
+              - definition:
+                - list:
+                  - listitem:
+                    - link "X" [ref=e37] [cursor=pointer]:
+                      - /url: https://x.com/sakamotodays_pr
+                  - listitem:
+                    - link "TikTok" [ref=e38] [cursor=pointer]:
+                      - /url: https://www.tiktok.com/@sakamotodays_pr
+      - generic [ref=e39]:
+        - list [ref=e41]:
+          - group "1 / 3" [ref=e42]
+          - group "2 / 3" [ref=e45]
+          - group "3 / 3" [ref=e48]
+          - group "1 / 3" [ref=e51]
+          - group "2 / 3" [ref=e54]
+          - group "3 / 3" [ref=e57]
+          - group "1 / 3" [ref=e60]
+          - group "2 / 3" [ref=e63]
+          - group "3 / 3" [ref=e66]
+        - generic:
+          - paragraph: OTHER VISUAL
+        - generic:
+          - generic:
+            - paragraph: VISUAL
+            - list:
+              - listitem:
+                - link [ref=e69] [cursor=pointer]:
+                  - /url: javascript:visualSelect(1);
+              - listitem:
+                - link [ref=e72] [cursor=pointer]:
+                  - /url: javascript:visualSelect(2);
+              - listitem:
+                - link [ref=e75] [cursor=pointer]:
+                  - /url: javascript:visualSelect(3);
+      - paragraph [ref=e80]:
+        - img "2027.01.ON AIR" [ref=e81]
+      - generic [ref=e82]:
+        - paragraph [ref=e83]: PICK UP
+        - list [ref=e86]:
+          - listitem [ref=e87]:
+            - link [ref=e88] [cursor=pointer]:
+              - /url: https://www.shonenjump.com/j/rensai/sakamoto.html
+              - img "試し読みはこちら" [ref=e89]
+    - generic [ref=e91]:
+      - heading [level=1] [ref=e92]:
+        - link [ref=e93] [cursor=pointer]:
+          - /url: "#"
+          - img "SAKAMOTODAYS" [ref=e94]
+      - generic [ref=e95]:
+        - button "PLAY MOVIE" [ref=e97] [cursor=pointer]
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - text: SEC 03
+            - heading "INTRO DUCTION" [level=2] [ref=e101]:
+              - generic [ref=e102]: INTRO
+              - generic [ref=e104]: DUCTION
+            - paragraph [ref=e106]:
+              - generic [ref=e107]: イ
+              - generic [ref=e108]: ン
+              - generic [ref=e109]: ト
+              - generic [ref=e110]: ロ
+              - generic [ref=e111]: ダ
+              - generic [ref=e112]: ク
+              - generic [ref=e113]: シ
+              - generic [ref=e114]: ョ
+              - generic [ref=e115]: ン
+          - generic [ref=e116]:
+            - paragraph [ref=e117]:
+              - 'img "Taro Sakamoto: the legendary former hitman." [ref=e118]'
+            - paragraph [ref=e135]: To protect the peaceful life he shares with his beloved family, he steps back onto the battlefield once more! To gather information on the mysterious X (Slur), who operates in the shadows, Sakamoto and Shin begin an undercover investigation at the JCC. Meanwhile, Nagumo, Shishiba, and Osaragi of the Order head to Kyoto on a mission, only to be ambushed by an unexpected assassin...! As conspiracies unfold, the intertwined pasts of a young Sakamoto, Nagumo, Rion, and X (Slur) are finally brought to light.
+            - paragraph [ref=e141]:
+              - img "The action-packed story returns for its highly anticipated second season!" [ref=e144]
+        - iframe [ref=e149]:
+          - generic [ref=f2e1]:
+            - generic "YouTube Video Player" [ref=f2e3]
+            - generic [ref=f2e5]:
+              - generic:
+                - generic:
+                  - generic [ref=f2e6] [cursor=pointer]
+                  - button "Play video" [ref=f2e10] [cursor=pointer]
+                  - button "Hide player controls" [ref=f2e12] [cursor=pointer]
+  - contentinfo [ref=e150]:
+    - link "Back to top" [ref=e152] [cursor=pointer]:
+      - /url: "#"
+    - generic [ref=e154]:
+      - generic [ref=e155]:
+        - paragraph [ref=e156]: SITE MAP
+        - list [ref=e157]:
+          - listitem [ref=e158]:
+            - link "TOP":
+              - /url: ./
+          - listitem [ref=e159]:
+            - link "INTRODUCTION" [ref=e160] [cursor=pointer]:
+              - /url: "#introduction"
+          - listitem [ref=e162]:
+            - link "CHARACTER" [ref=e163] [cursor=pointer]:
+              - /url: ./character/
+          - listitem [ref=e165]:
+            - link "STAFF&CAST" [ref=e166] [cursor=pointer]:
+              - /url: ./staffcast/
+          - listitem [ref=e168]:
+            - link "MOVIE" [ref=e169] [cursor=pointer]:
+              - /url: ./movie/
+          - listitem [ref=e171]:
+            - link "1ST SEASON" [ref=e172] [cursor=pointer]:
+              - /url: https://sakamotodays.jp/1st/en/
+      - generic [ref=e174]:
+        - paragraph [ref=e175]: SHARE
+        - list [ref=e176]:
+          - listitem [ref=e177]:
+            - link "Share on X" [ref=e178] [cursor=pointer]:
+              - /url: https://twitter.com/intent/tweet?url=https://sakamotodays.jp/en/&text=The greatest hitman of all—his name was Taro Sakamoto. This action-packed story of the ordinary and extraordinary begins here! Scheduled to air on TV Tokyo and other networks from January 2025, and to be streamed on NETFLIX and other platforms.&hashtags=SAKAMOTODAYS
+          - listitem [ref=e179]:
+            - link "Share on Facebook" [ref=e180] [cursor=pointer]:
+              - /url: https://www.facebook.com/share.php?u=https://sakamotodays.jp/en/
+          - listitem [ref=e181]:
+            - link "Share on LINE" [ref=e182] [cursor=pointer]:
+              - /url: https://line.me/R/msg/text/?The greatest hitman of all—his name was Taro Sakamoto. This action-packed story of the ordinary and extraordinary begins here! Scheduled to air on TV Tokyo and other networks from January 2025, and to be streamed on NETFLIX and other platforms. https://sakamotodays.jp/en/
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - paragraph [ref=e185]: LANGUAGE
+          - list [ref=e186]:
+            - listitem [ref=e187]:
+              - link "JPN" [ref=e188] [cursor=pointer]:
+                - /url: ../
+            - listitem [ref=e190]:
+              - link "ENG":
+                - /url: ./
+        - generic [ref=e191]:
+          - paragraph [ref=e192]: OFFICIAL SNS
+          - list [ref=e193]:
+            - listitem [ref=e194]:
+              - link "X" [ref=e195] [cursor=pointer]:
+                - /url: https://x.com/sakamotodays_pr
+            - listitem [ref=e196]:
+              - link "TikTok" [ref=e197] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@sakamotodays_pr
+    - generic [ref=e198]:
+      - paragraph [ref=e199]:
+        - link [ref=e200] [cursor=pointer]:
+          - /url: https://www.shonenjump.com/j/rensai/sakamoto.html
+          - img "Weekly Shonen Jump" [ref=e201]
+      - paragraph [ref=e202]: ©Yuto Suzuki/SHUEISHA, SAKAMOTO DAYS PROJECT

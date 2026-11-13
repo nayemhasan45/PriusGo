@@ -1,0 +1,621 @@
+- generic [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e4]:
+      - link "P PriusGo" [ref=f1e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f1e6]: P
+        - generic [ref=f1e7]: PriusGo
+      - button "Toggle menu" [ref=f1e8]
+    - region [ref=f1e10]:
+      - generic [ref=f1e11]:
+        - generic [ref=f1e12]: Hybrid car rental
+        - generic [ref=f1e13]: Šiauliai, Lithuania
+      - generic [ref=f1e14]:
+        - generic [ref=f1e15]:
+          - paragraph [ref=f1e16]: Your next move starts here
+          - heading "Rent a Toyota Prius in Šiauliai." [level=1] [ref=f1e18]
+          - paragraph [ref=f1e19]: Affordable hybrid car rental for daily use, business trips, and city movement. Simple booking, direct contact, no hassle.
+          - generic [ref=f1e20]:
+            - link "Choose a car" [ref=f1e21] [cursor=pointer]:
+              - /url: "#cars"
+              - text: Choose a car
+              - generic [aria-hidden] [ref=f1e22]: ↗
+            - link "See how it works" [ref=f1e23] [cursor=pointer]:
+              - /url: "#process"
+              - text: See how it works ↓
+          - generic [ref=f1e24]:
+            - generic [ref=f1e25]:
+              - term [ref=f1e26]: per day
+              - definition [ref=f1e27]: €20
+            - generic [ref=f1e28]:
+              - term [ref=f1e29]: per week
+              - definition [ref=f1e30]: €100
+            - generic [ref=f1e31]:
+              - term [ref=f1e32]: cars in fleet
+              - definition [ref=f1e33]: "2"
+        - figure "Toyota Prius Hybrid / Automatic / 5 seats" [ref=f1e34]:
+          - generic [aria-hidden] [ref=f1e35]: PRIUS
+          - img "Black Toyota Prius on a city street — photograph" [ref=f1e37]
+          - generic [ref=f1e38]:
+            - generic [ref=f1e39]: Toyota Prius
+            - generic [ref=f1e40]: Hybrid / Automatic / 5 seats
+          - paragraph [ref=f1e41]: Vehicle photograph
+      - generic [ref=f1e42]:
+        - generic [ref=f1e43]: Less fuel. More possibilities.
+        - link "Explore the fleet" [ref=f1e44] [cursor=pointer]:
+          - /url: "#cars"
+          - text: Explore the fleet ↓
+    - generic [ref=f1e46]:
+      - generic [ref=f1e47]:
+        - generic [ref=f1e48]:
+          - paragraph [ref=f1e49]: Available fleet
+          - heading "Choose your car" [level=2] [ref=f1e50]
+        - paragraph [ref=f1e51]: Each car shown with real-time availability, pricing, and blocked rental dates.
+      - generic [ref=f1e52]:
+        - article [ref=f1e386]:
+          - generic [ref=f1e387]:
+            - generic [ref=f1e388]:
+              - generic [ref=f1e389]: Šiauliai pickup
+              - generic [ref=f1e390]: Available
+            - img "Toyota Prius MJO146 rental car" [ref=f1e395]
+            - generic [ref=f1e396]: MJO146
+          - generic [ref=f1e397]:
+            - generic [ref=f1e398]:
+              - generic [ref=f1e399]:
+                - paragraph [ref=f1e400]: 2006 · Toyota Prius
+                - heading "Toyota Prius MJO146" [level=3] [ref=f1e401]
+              - generic [ref=f1e402]:
+                - paragraph [ref=f1e403]: €20
+                - paragraph [ref=f1e404]: per day
+                - paragraph [ref=f1e405]: €100 / week
+            - generic [ref=f1e406]:
+              - paragraph [ref=f1e407]: Available
+              - paragraph [ref=f1e408]: Ready to rent. Choose dates and request this car directly.
+            - generic [ref=f1e409]:
+              - generic [ref=f1e410]: Hybrid petrol
+              - generic [ref=f1e414]: Automatic
+              - generic [ref=f1e418]: 5 seats
+            - list [ref=f1e424]:
+              - listitem [ref=f1e425]: Hybrid economy
+              - listitem [ref=f1e429]: Automatic
+              - listitem [ref=f1e433]: 5 seats
+              - listitem [ref=f1e437]: Daily rental
+            - button "Check available dates" [ref=f1e441]
+            - button "Choose Toyota Prius MJO146" [active] [ref=f1e445]: Choose this car
+        - article [ref=f1e449]:
+          - generic [ref=f1e450]:
+            - generic [ref=f1e451]:
+              - generic [ref=f1e452]: Šiauliai pickup
+              - generic [ref=f1e453]: Available
+            - img "Toyota Prius MHP235 rental car" [ref=f1e458]
+            - generic [ref=f1e459]: MHP235
+          - generic [ref=f1e460]:
+            - generic [ref=f1e461]:
+              - generic [ref=f1e462]:
+                - paragraph [ref=f1e463]: 2005 · Toyota Prius
+                - heading "Toyota Prius MHP235" [level=3] [ref=f1e464]
+              - generic [ref=f1e465]:
+                - paragraph [ref=f1e466]: €20
+                - paragraph [ref=f1e467]: per day
+                - paragraph [ref=f1e468]: €100 / week
+            - generic [ref=f1e469]:
+              - paragraph [ref=f1e470]: Available
+              - paragraph [ref=f1e471]: Ready to rent. Choose dates and request this car directly.
+            - generic [ref=f1e472]:
+              - generic [ref=f1e473]: Hybrid petrol
+              - generic [ref=f1e477]: Automatic
+              - generic [ref=f1e481]: 5 seats
+            - list [ref=f1e487]:
+              - listitem [ref=f1e488]: Hybrid economy
+              - listitem [ref=f1e492]: Automatic
+              - listitem [ref=f1e496]: 5 seats
+              - listitem [ref=f1e500]: Daily rental
+            - button "Check available dates" [ref=f1e504]
+            - button "Choose Toyota Prius MHP235" [ref=f1e508]: Choose this car
+      - dialog "Book Toyota Prius MJO146" [ref=f1e531]:
+        - generic [ref=f1e532]:
+          - generic [ref=f1e533]:
+            - generic [ref=f1e534]:
+              - paragraph [ref=f1e535]: Selected fleet car
+              - heading "Book Toyota Prius MJO146" [level=2] [ref=f1e536]
+            - button "Close booking modal" [ref=f1e537]
+          - generic [ref=f1e542]:
+            - generic [ref=f1e547]:
+              - heading "Request your rental" [level=2] [ref=f1e548]
+              - paragraph [ref=f1e549]: Sign in first, then submit your rental request.
+            - generic [ref=f1e550]:
+              - generic [ref=f1e551]:
+                - generic [ref=f1e552]:
+                  - generic [ref=f1e553]:
+                    - paragraph [ref=f1e554]: Selected car
+                    - heading "MJO146 — Toyota Prius MJO146" [level=3] [ref=f1e555]
+                    - paragraph [ref=f1e556]: 2006 · Hybrid petrol · Automatic · 5 seats
+                  - generic [ref=f1e557]:
+                    - paragraph [ref=f1e558]: €20
+                    - paragraph [ref=f1e559]: per day · €100/week
+                - link "Change car" [ref=f1e560] [cursor=pointer]:
+                  - /url: "#cars"
+              - generic [ref=f1e561]:
+                - generic [ref=f1e562]: Full name
+                - textbox "Full name" [ref=f1e564]:
+                  - /placeholder: Al Amin
+              - generic [ref=f1e565]:
+                - generic [ref=f1e566]: Email
+                - textbox "Email" [ref=f1e568]:
+                  - /placeholder: you@email.com
+              - generic [ref=f1e569]:
+                - generic [ref=f1e570]: Phone
+                - textbox "Phone" [ref=f1e572]:
+                  - /placeholder: +370 ...
+              - generic [ref=f1e573]:
+                - generic [ref=f1e574]: Pickup location
+                - textbox "Pickup location" [ref=f1e576]: Šiauliai
+              - generic [ref=f1e577]:
+                - generic [ref=f1e578]: Pickup time
+                - textbox "Pickup time" [ref=f1e580]
+              - generic [ref=f1e581]:
+                - generic [ref=f1e582]: Return time
+                - textbox "Return time" [ref=f1e584]
+              - generic [ref=f1e587]:
+                - generic [ref=f1e588]:
+                  - paragraph [ref=f1e589]: Rental period
+                  - paragraph [ref=f1e590]: Click a date to start
+                - generic [ref=f1e591]:
+                  - button [disabled] [ref=f1e592]
+                  - paragraph [ref=f1e595]: October 2026
+                  - button [ref=f1e596]
+                - generic [ref=f1e599]:
+                  - generic [ref=f1e600]: Mo
+                  - generic [ref=f1e601]: Tu
+                  - generic [ref=f1e602]: We
+                  - generic [ref=f1e603]: Th
+                  - generic [ref=f1e604]: Fr
+                  - generic [ref=f1e605]: Sa
+                  - generic [ref=f1e606]: Su
+                - generic [ref=f1e607]:
+                  - button "Unavailable day" [disabled]
+                  - button "Unavailable day" [disabled]
+                  - button "Unavailable day" [disabled]
+                  - button "2026-10-01" [disabled] [ref=f1e608]:
+                    - generic [ref=f1e609]: "1"
+                  - button "2026-10-02" [disabled] [ref=f1e610]:
+                    - generic [ref=f1e611]: "2"
+                  - button "2026-10-03" [disabled] [ref=f1e612]:
+                    - generic [ref=f1e613]: "3"
+                  - button "2026-10-04" [disabled] [ref=f1e614]:
+                    - generic [ref=f1e615]: "4"
+                  - button "2026-10-05" [disabled] [ref=f1e616]:
+                    - generic [ref=f1e617]: "5"
+                  - button "2026-10-06" [disabled] [ref=f1e618]:
+                    - generic [ref=f1e619]: "6"
+                  - button "2026-10-07" [disabled] [ref=f1e620]:
+                    - generic [ref=f1e621]: "7"
+                  - button "2026-10-08" [disabled] [ref=f1e622]:
+                    - generic [ref=f1e623]: "8"
+                  - button "2026-10-09" [disabled] [ref=f1e624]:
+                    - generic [ref=f1e625]: "9"
+                  - button "2026-10-10" [disabled] [ref=f1e626]:
+                    - generic [ref=f1e627]: "10"
+                  - button "2026-10-11" [disabled] [ref=f1e628]:
+                    - generic [ref=f1e629]: "11"
+                  - button "2026-10-12" [disabled] [ref=f1e630]:
+                    - generic [ref=f1e631]: "12"
+                  - button "2026-10-13" [disabled] [ref=f1e632]:
+                    - generic [ref=f1e633]: "13"
+                  - button "2026-10-14" [disabled] [ref=f1e634]:
+                    - generic [ref=f1e635]: "14"
+                  - button "2026-10-15" [disabled] [ref=f1e636]:
+                    - generic [ref=f1e637]: "15"
+                  - button "2026-10-16" [disabled] [ref=f1e638]:
+                    - generic [ref=f1e639]: "16"
+                  - button "2026-10-17" [disabled] [ref=f1e640]:
+                    - generic [ref=f1e641]: "17"
+                  - button "2026-10-18" [disabled] [ref=f1e642]:
+                    - generic [ref=f1e643]: "18"
+                  - button "2026-10-19" [disabled] [ref=f1e644]:
+                    - generic [ref=f1e645]: "19"
+                  - button "2026-10-20" [disabled] [ref=f1e646]:
+                    - generic [ref=f1e647]: "20"
+                  - button "2026-10-21" [disabled] [ref=f1e648]:
+                    - generic [ref=f1e649]: "21"
+                  - button "2026-10-22" [disabled] [ref=f1e650]:
+                    - generic [ref=f1e651]: "22"
+                  - button "2026-10-23" [ref=f1e652] [cursor=pointer]:
+                    - generic [ref=f1e653]: "23"
+                  - button "2026-10-24" [ref=f1e654] [cursor=pointer]:
+                    - generic [ref=f1e655]: "24"
+                  - button "2026-10-25" [ref=f1e656] [cursor=pointer]:
+                    - generic [ref=f1e657]: "25"
+                  - button "2026-10-26" [ref=f1e658] [cursor=pointer]:
+                    - generic [ref=f1e659]: "26"
+                  - button "2026-10-27" [ref=f1e660] [cursor=pointer]:
+                    - generic [ref=f1e661]: "27"
+                  - button "2026-10-28" [ref=f1e662] [cursor=pointer]:
+                    - generic [ref=f1e663]: "28"
+                  - button "2026-10-29" [ref=f1e664] [cursor=pointer]:
+                    - generic [ref=f1e665]: "29"
+                  - button "2026-10-30" [ref=f1e666] [cursor=pointer]:
+                    - generic [ref=f1e667]: "30"
+                  - button "2026-10-31" [ref=f1e668] [cursor=pointer]:
+                    - generic [ref=f1e669]: "31"
+                  - button "Unavailable day" [disabled]
+                - generic [ref=f1e670]:
+                  - generic [ref=f1e671]: Available
+                  - generic [ref=f1e674]: Booked
+                  - generic [ref=f1e677]: Selected
+              - generic [ref=f1e680]:
+                - paragraph [ref=f1e681]: "Before submitting, confirm:"
+                - generic [ref=f1e682]:
+                  - generic [ref=f1e683] [cursor=pointer]:
+                    - checkbox "I have a valid driving license and can present it when needed." [ref=f1e684]
+                    - generic [ref=f1e685]: I have a valid driving license and can present it when needed.
+                  - generic [ref=f1e686] [cursor=pointer]:
+                    - checkbox "I accept PriusGo rental rules, pickup/return terms, and deposit conditions." [ref=f1e687]
+                    - generic [ref=f1e688]: I accept PriusGo rental rules, pickup/return terms, and deposit conditions.
+                  - button "Click here" [ref=f1e689]
+                  - generic [ref=f1e690] [cursor=pointer]:
+                    - checkbox "I understand this booking is not final until the admin confirms it." [ref=f1e691]
+                    - generic [ref=f1e692]: I understand this booking is not final until the admin confirms it.
+              - generic [ref=f1e693]:
+                - generic [ref=f1e694]: Message
+                - textbox "Message" [ref=f1e695]:
+                  - /placeholder: Pickup time, rental purpose, questions...
+              - generic [ref=f1e696]:
+                - paragraph [ref=f1e697]: Estimated total
+                - paragraph [ref=f1e698]: €0
+                - paragraph [ref=f1e699]: "Weekly discount applied automatically: €100/week + daily rate for extra days."
+              - button "Submit rental request for MJO146" [ref=f1e700]
+    - generic [ref=f1e56]:
+      - generic [ref=f1e57]:
+        - paragraph [ref=f1e58]: Simple process
+        - heading "How it works" [level=2] [ref=f1e59]
+      - generic [ref=f1e60]:
+        - generic [ref=f1e61]:
+          - paragraph [ref=f1e62]: "01"
+          - heading "Choose your Prius" [level=3] [ref=f1e63]
+          - paragraph [ref=f1e64]: Browse available cars with live dates, pricing, and full specs.
+        - generic [ref=f1e65]:
+          - paragraph [ref=f1e66]: "02"
+          - heading "Send booking request" [level=3] [ref=f1e67]
+          - paragraph [ref=f1e68]: Submit your rental dates, contact details, and any questions.
+        - generic [ref=f1e69]:
+          - paragraph [ref=f1e70]: "03"
+          - heading "Confirmed within 24 hours" [level=3] [ref=f1e71]
+          - paragraph [ref=f1e72]: Al-Amin reviews your request and confirms within 24 hours. You receive the pickup details and direct contact after approval.
+        - generic [ref=f1e73]:
+          - paragraph [ref=f1e74]: "04"
+          - heading "Pick up in Šiauliai" [level=3] [ref=f1e75]
+          - paragraph [ref=f1e76]: Collect the car at the agreed Šiauliai pickup point. Bring your license and ID.
+    - generic [ref=f1e78]:
+      - generic [ref=f1e79]:
+        - paragraph [ref=f1e80]: Transparent rates
+        - heading "Simple pricing" [level=2] [ref=f1e81]
+      - generic [ref=f1e82]:
+        - generic [ref=f1e83]:
+          - paragraph [ref=f1e84]: Daily rate
+          - paragraph [ref=f1e85]: €20
+          - paragraph [ref=f1e86]: per day
+          - list [ref=f1e87]:
+            - listitem [ref=f1e88]: Hybrid fuel economy
+            - listitem [ref=f1e90]: 5 seats
+            - listitem [ref=f1e92]: Automatic transmission
+        - generic [ref=f1e94]:
+          - generic [ref=f1e95]: Best value
+          - paragraph [ref=f1e96]: Weekly rate
+          - paragraph [ref=f1e97]: €100
+          - paragraph [ref=f1e98]: per week
+          - list [ref=f1e99]:
+            - listitem [ref=f1e100]: Save vs daily rate
+            - listitem [ref=f1e102]: Extra days at daily rate
+            - listitem [ref=f1e104]: Flexible pickup & return
+        - generic [ref=f1e106]:
+          - paragraph [ref=f1e107]: Payment options
+          - paragraph [ref=f1e108]: Flexible payment
+          - list [ref=f1e109]:
+            - listitem [ref=f1e110]: Cash on pickup
+            - listitem [ref=f1e112]: Bank transfer
+            - listitem [ref=f1e114]: Revolut
+          - link "Choose car →" [ref=f1e116] [cursor=pointer]:
+            - /url: "#cars"
+    - generic [ref=f1e118]:
+      - generic [ref=f1e119]:
+        - paragraph [ref=f1e120]: Trust first
+        - heading "Why renters trust PriusGo" [level=2] [ref=f1e121]
+        - paragraph [ref=f1e122]: Clear pricing, manual approval, and local handoff keep the process simple and safe for both sides.
+      - generic [ref=f1e123]:
+        - generic [ref=f1e124]:
+          - paragraph [ref=f1e125]: "01"
+          - heading "Transparent pricing" [level=3] [ref=f1e126]
+          - paragraph [ref=f1e127]: €20/day or €100/week, shown before booking.
+        - generic [ref=f1e128]:
+          - paragraph [ref=f1e129]: "02"
+          - heading "Manual approval" [level=3] [ref=f1e130]
+          - paragraph [ref=f1e131]: Every request is reviewed before the rental becomes final.
+        - generic [ref=f1e132]:
+          - paragraph [ref=f1e133]: "03"
+          - heading "Šiauliai pickup" [level=3] [ref=f1e134]
+          - paragraph [ref=f1e135]: Pickup and return are arranged locally in Šiauliai.
+        - generic [ref=f1e136]:
+          - paragraph [ref=f1e137]: "04"
+          - heading "License + ID check" [level=3] [ref=f1e138]
+          - paragraph [ref=f1e139]: Valid driving license and ID or passport required at pickup.
+        - generic [ref=f1e140]:
+          - paragraph [ref=f1e141]: "05"
+          - heading "Deposit agreed first" [level=3] [ref=f1e142]
+          - paragraph [ref=f1e143]: Deposit and payment details are confirmed before handoff.
+        - generic [ref=f1e144]:
+          - paragraph [ref=f1e145]: "06"
+          - heading "No online payment risk" [level=3] [ref=f1e146]
+          - paragraph [ref=f1e147]: No card capture or hidden checkout flow in this version.
+    - generic [ref=f1e150]:
+      - generic [ref=f1e151]:
+        - paragraph [ref=f1e152]: Šiauliai car rental
+        - heading "Local Prius rental for Šiauliai, Lithuania" [level=2] [ref=f1e153]
+        - paragraph [ref=f1e154]: PriusGo is built for drivers in Šiauliai who want a reliable Toyota Prius for daily movement, business travel, airport runs, or weekend plans. Pickup is arranged locally in Šiauliai, and every request is reviewed before the rental is confirmed.
+      - generic [ref=f1e155]:
+        - generic [ref=f1e156]:
+          - paragraph [ref=f1e157]: Pickup area
+          - paragraph [ref=f1e158]: Šiauliai, Lithuania
+        - generic [ref=f1e159]:
+          - paragraph [ref=f1e160]: Rental type
+          - paragraph [ref=f1e161]: Toyota Prius hybrid
+        - generic [ref=f1e162]:
+          - paragraph [ref=f1e163]: Best for
+          - paragraph [ref=f1e164]: City and business trips
+    - generic [ref=f1e166]:
+      - generic [ref=f1e167]:
+        - paragraph [ref=f1e168]: From renters
+        - heading "What customers say" [level=2] [ref=f1e169]
+      - generic [ref=f1e170]:
+        - generic [ref=f1e171]:
+          - paragraph [ref=f1e172]: “Booked a Prius for a week of client visits around Lithuania. Clean car, smooth handoff, and Al-Amin confirmed the booking the same day. Will use again.”
+          - generic [ref=f1e173]:
+            - generic [ref=f1e174]: T
+            - generic [ref=f1e175]:
+              - paragraph [ref=f1e176]: Tomas K.
+              - paragraph [ref=f1e177]: Business traveller
+        - generic [ref=f1e189]:
+          - paragraph [ref=f1e190]: “Needed a reliable car for a family trip. Submitted the form Friday morning and had everything sorted by the afternoon. Simple and stress-free.”
+          - generic [ref=f1e191]:
+            - generic [ref=f1e192]: R
+            - generic [ref=f1e193]:
+              - paragraph [ref=f1e194]: Rūta M.
+              - paragraph [ref=f1e195]: Weekend rental
+        - generic [ref=f1e207]:
+          - paragraph [ref=f1e208]: “The weekly rate is excellent value. Hybrid fuel economy made a real difference on longer drives. Exactly what I needed for less.”
+          - generic [ref=f1e209]:
+            - generic [ref=f1e210]: A
+            - generic [ref=f1e211]:
+              - paragraph [ref=f1e212]: Andrius P.
+              - paragraph [ref=f1e213]: Regular renter
+    - generic [ref=f1e226]:
+      - generic [ref=f1e227]:
+        - paragraph [ref=f1e228]: Request a rental
+        - heading "Book your Prius" [level=2] [ref=f1e229]
+      - generic [ref=f1e230]:
+        - generic [ref=f1e235]:
+          - heading "Request your rental" [level=2] [ref=f1e236]
+          - paragraph [ref=f1e237]: Sign in first, then submit your rental request.
+        - generic [ref=f1e701]:
+          - generic [ref=f1e702]:
+            - generic [ref=f1e703]:
+              - generic [ref=f1e704]:
+                - paragraph [ref=f1e705]: Selected car
+                - heading "MJO146 — Toyota Prius MJO146" [level=3] [ref=f1e706]
+                - paragraph [ref=f1e707]: 2006 · Hybrid petrol · Automatic · 5 seats
+              - generic [ref=f1e708]:
+                - paragraph [ref=f1e709]: €20
+                - paragraph [ref=f1e710]: per day · €100/week
+            - link "Change car" [ref=f1e711] [cursor=pointer]:
+              - /url: "#cars"
+          - generic [ref=f1e712]:
+            - generic [ref=f1e713]: Full name
+            - textbox "Full name" [ref=f1e715]:
+              - /placeholder: Al Amin
+          - generic [ref=f1e716]:
+            - generic [ref=f1e717]: Email
+            - textbox "Email" [ref=f1e719]:
+              - /placeholder: you@email.com
+          - generic [ref=f1e720]:
+            - generic [ref=f1e721]: Phone
+            - textbox "Phone" [ref=f1e723]:
+              - /placeholder: +370 ...
+          - generic [ref=f1e724]:
+            - generic [ref=f1e725]: Pickup location
+            - textbox "Pickup location" [ref=f1e727]: Šiauliai
+          - generic [ref=f1e728]:
+            - generic [ref=f1e729]: Pickup time
+            - textbox "Pickup time" [ref=f1e731]
+          - generic [ref=f1e732]:
+            - generic [ref=f1e733]: Return time
+            - textbox "Return time" [ref=f1e735]
+          - generic [ref=f1e738]:
+            - generic [ref=f1e739]:
+              - paragraph [ref=f1e740]: Rental period
+              - paragraph [ref=f1e741]: Click a date to start
+            - generic [ref=f1e742]:
+              - button [disabled] [ref=f1e743]
+              - paragraph [ref=f1e746]: October 2026
+              - button [ref=f1e747]
+            - generic [ref=f1e750]:
+              - generic [ref=f1e751]: Mo
+              - generic [ref=f1e752]: Tu
+              - generic [ref=f1e753]: We
+              - generic [ref=f1e754]: Th
+              - generic [ref=f1e755]: Fr
+              - generic [ref=f1e756]: Sa
+              - generic [ref=f1e757]: Su
+            - generic [ref=f1e758]:
+              - button "Unavailable day" [disabled]
+              - button "Unavailable day" [disabled]
+              - button "Unavailable day" [disabled]
+              - button "2026-10-01" [disabled] [ref=f1e759]:
+                - generic [ref=f1e760]: "1"
+              - button "2026-10-02" [disabled] [ref=f1e761]:
+                - generic [ref=f1e762]: "2"
+              - button "2026-10-03" [disabled] [ref=f1e763]:
+                - generic [ref=f1e764]: "3"
+              - button "2026-10-04" [disabled] [ref=f1e765]:
+                - generic [ref=f1e766]: "4"
+              - button "2026-10-05" [disabled] [ref=f1e767]:
+                - generic [ref=f1e768]: "5"
+              - button "2026-10-06" [disabled] [ref=f1e769]:
+                - generic [ref=f1e770]: "6"
+              - button "2026-10-07" [disabled] [ref=f1e771]:
+                - generic [ref=f1e772]: "7"
+              - button "2026-10-08" [disabled] [ref=f1e773]:
+                - generic [ref=f1e774]: "8"
+              - button "2026-10-09" [disabled] [ref=f1e775]:
+                - generic [ref=f1e776]: "9"
+              - button "2026-10-10" [disabled] [ref=f1e777]:
+                - generic [ref=f1e778]: "10"
+              - button "2026-10-11" [disabled] [ref=f1e779]:
+                - generic [ref=f1e780]: "11"
+              - button "2026-10-12" [disabled] [ref=f1e781]:
+                - generic [ref=f1e782]: "12"
+              - button "2026-10-13" [disabled] [ref=f1e783]:
+                - generic [ref=f1e784]: "13"
+              - button "2026-10-14" [disabled] [ref=f1e785]:
+                - generic [ref=f1e786]: "14"
+              - button "2026-10-15" [disabled] [ref=f1e787]:
+                - generic [ref=f1e788]: "15"
+              - button "2026-10-16" [disabled] [ref=f1e789]:
+                - generic [ref=f1e790]: "16"
+              - button "2026-10-17" [disabled] [ref=f1e791]:
+                - generic [ref=f1e792]: "17"
+              - button "2026-10-18" [disabled] [ref=f1e793]:
+                - generic [ref=f1e794]: "18"
+              - button "2026-10-19" [disabled] [ref=f1e795]:
+                - generic [ref=f1e796]: "19"
+              - button "2026-10-20" [disabled] [ref=f1e797]:
+                - generic [ref=f1e798]: "20"
+              - button "2026-10-21" [disabled] [ref=f1e799]:
+                - generic [ref=f1e800]: "21"
+              - button "2026-10-22" [disabled] [ref=f1e801]:
+                - generic [ref=f1e802]: "22"
+              - button "2026-10-23" [ref=f1e803] [cursor=pointer]:
+                - generic [ref=f1e804]: "23"
+              - button "2026-10-24" [ref=f1e805] [cursor=pointer]:
+                - generic [ref=f1e806]: "24"
+              - button "2026-10-25" [ref=f1e807] [cursor=pointer]:
+                - generic [ref=f1e808]: "25"
+              - button "2026-10-26" [ref=f1e809] [cursor=pointer]:
+                - generic [ref=f1e810]: "26"
+              - button "2026-10-27" [ref=f1e811] [cursor=pointer]:
+                - generic [ref=f1e812]: "27"
+              - button "2026-10-28" [ref=f1e813] [cursor=pointer]:
+                - generic [ref=f1e814]: "28"
+              - button "2026-10-29" [ref=f1e815] [cursor=pointer]:
+                - generic [ref=f1e816]: "29"
+              - button "2026-10-30" [ref=f1e817] [cursor=pointer]:
+                - generic [ref=f1e818]: "30"
+              - button "2026-10-31" [ref=f1e819] [cursor=pointer]:
+                - generic [ref=f1e820]: "31"
+              - button "Unavailable day" [disabled]
+            - generic [ref=f1e821]:
+              - generic [ref=f1e822]: Available
+              - generic [ref=f1e825]: Booked
+              - generic [ref=f1e828]: Selected
+          - generic [ref=f1e831]:
+            - paragraph [ref=f1e832]: "Before submitting, confirm:"
+            - generic [ref=f1e833]:
+              - generic [ref=f1e834] [cursor=pointer]:
+                - checkbox "I have a valid driving license and can present it when needed." [ref=f1e835]
+                - generic [ref=f1e836]: I have a valid driving license and can present it when needed.
+              - generic [ref=f1e837] [cursor=pointer]:
+                - checkbox "I accept PriusGo rental rules, pickup/return terms, and deposit conditions." [ref=f1e838]
+                - generic [ref=f1e839]: I accept PriusGo rental rules, pickup/return terms, and deposit conditions.
+              - button "Click here" [ref=f1e840]
+              - generic [ref=f1e841] [cursor=pointer]:
+                - checkbox "I understand this booking is not final until the admin confirms it." [ref=f1e842]
+                - generic [ref=f1e843]: I understand this booking is not final until the admin confirms it.
+          - generic [ref=f1e844]:
+            - generic [ref=f1e845]: Message
+            - textbox "Message" [ref=f1e846]:
+              - /placeholder: Pickup time, rental purpose, questions...
+          - generic [ref=f1e847]:
+            - paragraph [ref=f1e848]: Estimated total
+            - paragraph [ref=f1e849]: €0
+            - paragraph [ref=f1e850]: "Weekly discount applied automatically: €100/week + daily rate for extra days."
+          - button "Submit rental request for MJO146" [ref=f1e851]
+    - generic [ref=f1e271]:
+      - generic [ref=f1e272]:
+        - paragraph [ref=f1e273]: Before you rent
+        - heading "Rental rules" [level=2] [ref=f1e274]
+        - paragraph [ref=f1e275]: Please read these before submitting a booking. Clear rules protect both you and the car owner.
+        - link [ref=f1e276] [cursor=pointer]:
+          - /url: /rental-rules
+      - list [ref=f1e280]:
+        - listitem [ref=f1e281]:
+          - generic [ref=f1e285]: Valid driving license required
+        - listitem [ref=f1e286]:
+          - generic [ref=f1e290]: ID or passport required
+        - listitem [ref=f1e291]:
+          - generic [ref=f1e295]: Pickup and return in Šiauliai
+        - listitem [ref=f1e296]:
+          - generic [ref=f1e300]: Fuel policy confirmed before pickup
+        - listitem [ref=f1e301]:
+          - generic [ref=f1e305]: Customer responsible for fines and damage during rental
+        - listitem [ref=f1e306]:
+          - generic [ref=f1e310]: No smoking in the car
+        - listitem [ref=f1e311]:
+          - generic [ref=f1e315]: Late return must be reported early
+    - generic [ref=f1e317]:
+      - generic [ref=f1e318]:
+        - paragraph [ref=f1e319]: Common questions
+        - heading "FAQ" [level=2] [ref=f1e320]
+      - generic [ref=f1e321]:
+        - group [ref=f1e322]:
+          - generic "Do I pay online now? +" [ref=f1e323] [cursor=pointer]:
+            - generic [ref=f1e324]: Do I pay online now?
+            - generic [ref=f1e325]: +
+        - group [ref=f1e326]:
+          - generic "Where is the pickup point? +" [ref=f1e327] [cursor=pointer]:
+            - generic [ref=f1e328]: Where is the pickup point?
+            - generic [ref=f1e329]: +
+        - group [ref=f1e330]:
+          - generic "What documents do I need? +" [ref=f1e331] [cursor=pointer]:
+            - generic [ref=f1e332]: What documents do I need?
+            - generic [ref=f1e333]: +
+        - group [ref=f1e334]:
+          - generic "Can I rent for a full week? +" [ref=f1e335] [cursor=pointer]:
+            - generic [ref=f1e336]: Can I rent for a full week?
+            - generic [ref=f1e337]: +
+        - group [ref=f1e338]:
+          - generic "Can I extend my booking? +" [ref=f1e339] [cursor=pointer]:
+            - generic [ref=f1e340]: Can I extend my booking?
+            - generic [ref=f1e341]: +
+        - group [ref=f1e342]:
+          - generic "Can I drive outside Lithuania? +" [ref=f1e343] [cursor=pointer]:
+            - generic [ref=f1e344]: Can I drive outside Lithuania?
+            - generic [ref=f1e345]: +
+    - generic [ref=f1e348]:
+      - generic [ref=f1e349]:
+        - paragraph [ref=f1e350]: Get in touch
+        - heading "How to reach PriusGo" [level=2] [ref=f1e351]
+        - paragraph [ref=f1e352]: PriusGo is operated by Al-Amin, based in Šiauliai, Lithuania. Submit a booking request and you will receive a direct reply — including pickup details and payment options — within 24 hours.
+        - generic [ref=f1e353]: Replies within 24 hours
+      - generic [ref=f1e355]:
+        - generic [ref=f1e356]:
+          - paragraph [ref=f1e357]: Booking request form
+          - paragraph [ref=f1e358]: Fastest way to contact PriusGo and reserve a car.
+        - generic [ref=f1e359]:
+          - paragraph [ref=f1e360]: Approval follow-up
+          - paragraph [ref=f1e361]: After approval, you receive the pickup details and direct contact for the rental.
+        - generic [ref=f1e362]:
+          - paragraph [ref=f1e363]: Customer dashboard
+          - paragraph [ref=f1e364]: Signed-in customers can track requests and rental status in one place.
+        - generic [ref=f1e365]:
+          - paragraph [ref=f1e366]: Location
+          - paragraph [ref=f1e367]: Šiauliai, Lithuania
+        - link "Submit booking request →" [ref=f1e368] [cursor=pointer]:
+          - /url: "#booking"
+    - generic [ref=f1e370]:
+      - generic [ref=f1e371]:
+        - generic [ref=f1e372]: P
+        - generic [ref=f1e373]: PriusGo
+      - paragraph [ref=f1e374]: © 2026 PriusGo · Toyota Prius rental in Šiauliai, Lithuania
+      - link "Login / Register" [ref=f1e375] [cursor=pointer]:
+        - /url: /login
+  - button "Open Next.js Dev Tools" [ref=f1e381] [cursor=pointer]
+  - alert [ref=f1e385]

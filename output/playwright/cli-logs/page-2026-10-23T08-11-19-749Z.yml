@@ -1,0 +1,312 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - link "P PriusGo" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: P
+        - generic [ref=e7]: PriusGo
+      - navigation [ref=e8]:
+        - link "Fleet" [ref=e9] [cursor=pointer]:
+          - /url: /#cars
+        - link "Pricing" [ref=e10] [cursor=pointer]:
+          - /url: /#pricing
+        - link "Rules" [ref=e11] [cursor=pointer]:
+          - /url: /rental-rules
+        - link "Trust" [ref=e12] [cursor=pointer]:
+          - /url: /#trust
+        - link "Book" [ref=e13] [cursor=pointer]:
+          - /url: /#cars
+        - link "FAQ" [ref=e14] [cursor=pointer]:
+          - /url: /#faq
+        - link "Contact" [ref=e15] [cursor=pointer]:
+          - /url: /#contact
+      - generic [ref=e16]:
+        - button "Switch to dark mode" [ref=e17]
+        - link "Login" [ref=e20] [cursor=pointer]:
+          - /url: /login
+        - link "Book Now" [ref=e21] [cursor=pointer]:
+          - /url: /#cars
+    - region [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]: Hybrid car rental
+        - generic [ref=e25]: Šiauliai, Lithuania
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - paragraph [ref=e28]: Your next move starts here
+          - heading "Rent a Toyota Prius in Šiauliai." [level=1] [ref=e30]
+          - paragraph [ref=e31]: Affordable hybrid car rental for daily use, business trips, and city movement. Simple booking, direct contact, no hassle.
+          - generic [ref=e32]:
+            - link "Choose a car" [ref=e33] [cursor=pointer]:
+              - /url: "#cars"
+              - text: Choose a car
+              - generic [aria-hidden] [ref=e34]: ↗
+            - link "See how it works" [ref=e35] [cursor=pointer]:
+              - /url: "#process"
+              - text: See how it works ↓
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - term [ref=e38]: per day
+              - definition [ref=e39]: €20
+            - generic [ref=e40]:
+              - term [ref=e41]: per week
+              - definition [ref=e42]: €100
+            - generic [ref=e43]:
+              - term [ref=e44]: cars in fleet
+              - definition [ref=e45]: —
+        - figure "Toyota Prius Hybrid / Automatic / 5 seats" [ref=e46]:
+          - generic [aria-hidden] [ref=e47]: PRIUS
+          - img "Black Toyota Prius on a city street — photograph" [ref=e49]
+          - generic [ref=e50]:
+            - generic [ref=e51]: Toyota Prius
+            - generic [ref=e52]: Hybrid / Automatic / 5 seats
+          - paragraph [ref=e53]: Vehicle photograph
+      - generic [ref=e54]:
+        - generic [ref=e55]: Less fuel. More possibilities.
+        - link "Explore the fleet" [ref=e56] [cursor=pointer]:
+          - /url: "#cars"
+          - text: Explore the fleet ↓
+    - generic [ref=e58]:
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - paragraph [ref=e61]: Available fleet
+          - heading "Choose your car" [level=2] [ref=e62]
+        - paragraph [ref=e63]: Each car shown with real-time availability, pricing, and blocked rental dates.
+      - generic [ref=e64]: Loading available rental cars...
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - paragraph [ref=e70]: Simple process
+        - heading "How it works" [level=2] [ref=e71]
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - paragraph [ref=e74]: "01"
+          - heading "Choose your Prius" [level=3] [ref=e75]
+          - paragraph [ref=e76]: Browse available cars with live dates, pricing, and full specs.
+        - generic [ref=e77]:
+          - paragraph [ref=e78]: "02"
+          - heading "Send booking request" [level=3] [ref=e79]
+          - paragraph [ref=e80]: Submit your rental dates, contact details, and any questions.
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: "03"
+          - heading "Confirmed within 24 hours" [level=3] [ref=e83]
+          - paragraph [ref=e84]: Al-Amin reviews your request and confirms within 24 hours. You receive the pickup details and direct contact after approval.
+        - generic [ref=e85]:
+          - paragraph [ref=e86]: "04"
+          - heading "Pick up in Šiauliai" [level=3] [ref=e87]
+          - paragraph [ref=e88]: Collect the car at the agreed Šiauliai pickup point. Bring your license and ID.
+    - generic [ref=e90]:
+      - generic [ref=e91]:
+        - paragraph [ref=e92]: Transparent rates
+        - heading "Simple pricing" [level=2] [ref=e93]
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - paragraph [ref=e96]: Daily rate
+          - paragraph [ref=e97]: €20
+          - paragraph [ref=e98]: per day
+          - list [ref=e99]:
+            - listitem [ref=e100]: Hybrid fuel economy
+            - listitem [ref=e102]: 5 seats
+            - listitem [ref=e104]: Automatic transmission
+        - generic [ref=e106]:
+          - generic [ref=e107]: Best value
+          - paragraph [ref=e108]: Weekly rate
+          - paragraph [ref=e109]: €100
+          - paragraph [ref=e110]: per week
+          - list [ref=e111]:
+            - listitem [ref=e112]: Save vs daily rate
+            - listitem [ref=e114]: Extra days at daily rate
+            - listitem [ref=e116]: Flexible pickup & return
+        - generic [ref=e118]:
+          - paragraph [ref=e119]: Payment options
+          - paragraph [ref=e120]: Flexible payment
+          - list [ref=e121]:
+            - listitem [ref=e122]: Cash on pickup
+            - listitem [ref=e124]: Bank transfer
+            - listitem [ref=e126]: Revolut
+          - link "Choose car →" [ref=e128] [cursor=pointer]:
+            - /url: "#cars"
+    - generic [ref=e130]:
+      - generic [ref=e131]:
+        - paragraph [ref=e132]: Trust first
+        - heading "Why renters trust PriusGo" [level=2] [ref=e133]
+        - paragraph [ref=e134]: Clear pricing, manual approval, and local handoff keep the process simple and safe for both sides.
+      - generic [ref=e135]:
+        - generic [ref=e136]:
+          - paragraph [ref=e137]: "01"
+          - heading "Transparent pricing" [level=3] [ref=e138]
+          - paragraph [ref=e139]: €20/day or €100/week, shown before booking.
+        - generic [ref=e140]:
+          - paragraph [ref=e141]: "02"
+          - heading "Manual approval" [level=3] [ref=e142]
+          - paragraph [ref=e143]: Every request is reviewed before the rental becomes final.
+        - generic [ref=e144]:
+          - paragraph [ref=e145]: "03"
+          - heading "Šiauliai pickup" [level=3] [ref=e146]
+          - paragraph [ref=e147]: Pickup and return are arranged locally in Šiauliai.
+        - generic [ref=e148]:
+          - paragraph [ref=e149]: "04"
+          - heading "License + ID check" [level=3] [ref=e150]
+          - paragraph [ref=e151]: Valid driving license and ID or passport required at pickup.
+        - generic [ref=e152]:
+          - paragraph [ref=e153]: "05"
+          - heading "Deposit agreed first" [level=3] [ref=e154]
+          - paragraph [ref=e155]: Deposit and payment details are confirmed before handoff.
+        - generic [ref=e156]:
+          - paragraph [ref=e157]: "06"
+          - heading "No online payment risk" [level=3] [ref=e158]
+          - paragraph [ref=e159]: No card capture or hidden checkout flow in this version.
+    - generic [ref=e162]:
+      - generic [ref=e163]:
+        - paragraph [ref=e164]: Šiauliai car rental
+        - heading "Local Prius rental for Šiauliai, Lithuania" [level=2] [ref=e165]
+        - paragraph [ref=e166]: PriusGo is built for drivers in Šiauliai who want a reliable Toyota Prius for daily movement, business travel, airport runs, or weekend plans. Pickup is arranged locally in Šiauliai, and every request is reviewed before the rental is confirmed.
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: Pickup area
+          - paragraph [ref=e170]: Šiauliai, Lithuania
+        - generic [ref=e171]:
+          - paragraph [ref=e172]: Rental type
+          - paragraph [ref=e173]: Toyota Prius hybrid
+        - generic [ref=e174]:
+          - paragraph [ref=e175]: Best for
+          - paragraph [ref=e176]: City and business trips
+    - generic [ref=e178]:
+      - generic [ref=e179]:
+        - paragraph [ref=e180]: From renters
+        - heading "What customers say" [level=2] [ref=e181]
+      - generic [ref=e182]:
+        - generic [ref=e183]:
+          - paragraph [ref=e184]: “Booked a Prius for a week of client visits around Lithuania. Clean car, smooth handoff, and Al-Amin confirmed the booking the same day. Will use again.”
+          - generic [ref=e185]:
+            - generic [ref=e186]: T
+            - generic [ref=e187]:
+              - paragraph [ref=e188]: Tomas K.
+              - paragraph [ref=e189]: Business traveller
+        - generic [ref=e201]:
+          - paragraph [ref=e202]: “Needed a reliable car for a family trip. Submitted the form Friday morning and had everything sorted by the afternoon. Simple and stress-free.”
+          - generic [ref=e203]:
+            - generic [ref=e204]: R
+            - generic [ref=e205]:
+              - paragraph [ref=e206]: Rūta M.
+              - paragraph [ref=e207]: Weekend rental
+        - generic [ref=e219]:
+          - paragraph [ref=e220]: “The weekly rate is excellent value. Hybrid fuel economy made a real difference on longer drives. Exactly what I needed for less.”
+          - generic [ref=e221]:
+            - generic [ref=e222]: A
+            - generic [ref=e223]:
+              - paragraph [ref=e224]: Andrius P.
+              - paragraph [ref=e225]: Regular renter
+    - generic [ref=e238]:
+      - generic [ref=e239]:
+        - paragraph [ref=e240]: Request a rental
+        - heading "Book your Prius" [level=2] [ref=e241]
+      - generic [ref=e242]:
+        - generic [ref=e247]:
+          - heading "Request your rental" [level=2] [ref=e248]
+          - paragraph [ref=e249]: Sign in first, then submit your rental request.
+        - generic [ref=e250]:
+          - generic [ref=e256]:
+            - paragraph [ref=e257]: How it works
+            - heading "Complete these steps to book" [level=3] [ref=e258]
+          - list [ref=e259]:
+            - listitem [ref=e260]:
+              - generic [ref=e261]: "01"
+              - generic [ref=e262]:
+                - paragraph [ref=e263]: Choose a car
+                - paragraph [ref=e264]: Pick an available car from the fleet above.
+            - listitem [ref=e265]:
+              - generic [ref=e266]: "02"
+              - generic [ref=e267]:
+                - paragraph [ref=e268]: Pick your dates
+                - paragraph [ref=e269]: Select rental start and end dates.
+            - listitem [ref=e270]:
+              - generic [ref=e271]: "03"
+              - generic [ref=e272]:
+                - paragraph [ref=e273]: Sign in
+                - paragraph [ref=e274]: Link the booking to your account.
+            - listitem [ref=e275]:
+              - generic [ref=e276]: "04"
+              - generic [ref=e277]:
+                - paragraph [ref=e278]: Submit request
+                - paragraph [ref=e279]: We review and confirm within hours.
+          - link "Browse fleet →" [ref=e280] [cursor=pointer]:
+            - /url: "#cars"
+    - generic [ref=e283]:
+      - generic [ref=e284]:
+        - paragraph [ref=e285]: Before you rent
+        - heading "Rental rules" [level=2] [ref=e286]
+        - paragraph [ref=e287]: Please read these before submitting a booking. Clear rules protect both you and the car owner.
+        - link [ref=e288] [cursor=pointer]:
+          - /url: /rental-rules
+      - list [ref=e292]:
+        - listitem [ref=e293]:
+          - generic [ref=e297]: Valid driving license required
+        - listitem [ref=e298]:
+          - generic [ref=e302]: ID or passport required
+        - listitem [ref=e303]:
+          - generic [ref=e307]: Pickup and return in Šiauliai
+        - listitem [ref=e308]:
+          - generic [ref=e312]: Fuel policy confirmed before pickup
+        - listitem [ref=e313]:
+          - generic [ref=e317]: Customer responsible for fines and damage during rental
+        - listitem [ref=e318]:
+          - generic [ref=e322]: No smoking in the car
+        - listitem [ref=e323]:
+          - generic [ref=e327]: Late return must be reported early
+    - generic [ref=e329]:
+      - generic [ref=e330]:
+        - paragraph [ref=e331]: Common questions
+        - heading "FAQ" [level=2] [ref=e332]
+      - generic [ref=e333]:
+        - group [ref=e334]:
+          - generic "Do I pay online now? +" [ref=e335] [cursor=pointer]:
+            - generic [ref=e336]: Do I pay online now?
+            - generic [ref=e337]: +
+        - group [ref=e338]:
+          - generic "Where is the pickup point? +" [ref=e339] [cursor=pointer]:
+            - generic [ref=e340]: Where is the pickup point?
+            - generic [ref=e341]: +
+        - group [ref=e342]:
+          - generic "What documents do I need? +" [ref=e343] [cursor=pointer]:
+            - generic [ref=e344]: What documents do I need?
+            - generic [ref=e345]: +
+        - group [ref=e346]:
+          - generic "Can I rent for a full week? +" [ref=e347] [cursor=pointer]:
+            - generic [ref=e348]: Can I rent for a full week?
+            - generic [ref=e349]: +
+        - group [ref=e350]:
+          - generic "Can I extend my booking? +" [ref=e351] [cursor=pointer]:
+            - generic [ref=e352]: Can I extend my booking?
+            - generic [ref=e353]: +
+        - group [ref=e354]:
+          - generic "Can I drive outside Lithuania? +" [ref=e355] [cursor=pointer]:
+            - generic [ref=e356]: Can I drive outside Lithuania?
+            - generic [ref=e357]: +
+    - generic [ref=e360]:
+      - generic [ref=e361]:
+        - paragraph [ref=e362]: Get in touch
+        - heading "How to reach PriusGo" [level=2] [ref=e363]
+        - paragraph [ref=e364]: PriusGo is operated by Al-Amin, based in Šiauliai, Lithuania. Submit a booking request and you will receive a direct reply — including pickup details and payment options — within 24 hours.
+        - generic [ref=e365]: Replies within 24 hours
+      - generic [ref=e367]:
+        - generic [ref=e368]:
+          - paragraph [ref=e369]: Booking request form
+          - paragraph [ref=e370]: Fastest way to contact PriusGo and reserve a car.
+        - generic [ref=e371]:
+          - paragraph [ref=e372]: Approval follow-up
+          - paragraph [ref=e373]: After approval, you receive the pickup details and direct contact for the rental.
+        - generic [ref=e374]:
+          - paragraph [ref=e375]: Customer dashboard
+          - paragraph [ref=e376]: Signed-in customers can track requests and rental status in one place.
+        - generic [ref=e377]:
+          - paragraph [ref=e378]: Location
+          - paragraph [ref=e379]: Šiauliai, Lithuania
+        - link "Submit booking request →" [ref=e380] [cursor=pointer]:
+          - /url: "#booking"
+    - generic [ref=e382]:
+      - generic [ref=e383]:
+        - generic [ref=e384]: P
+        - generic [ref=e385]: PriusGo
+      - paragraph [ref=e386]: © 2026 PriusGo · Toyota Prius rental in Šiauliai, Lithuania
+      - link "Login / Register" [ref=e387] [cursor=pointer]:
+        - /url: /login
+  - alert [ref=e388]

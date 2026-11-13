@@ -181,3 +181,72 @@ textarea {
   border-color: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.82);
 }
+
+/* Public homepage hero only. Keep the same cinematic palette in both themes. */
+.car-hero {
+  position: relative;
+  overflow: hidden;
+  background: #0b0b0b;
+  color: #fff;
+  padding: 0 max(24px, calc((100vw - 1360px) / 2));
+}
+.car-hero__topline, .car-hero__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 0;
+  color: #b9b9b9;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.car-hero__topline { border-bottom: 1px solid #303030; }
+.car-hero__layout { display: grid; grid-template-columns: .95fr 1.2fr; align-items: center; gap: 36px; padding: 60px 0 48px; }
+.car-hero__copy { position: relative; z-index: 1; }
+.car-hero__eyebrow { display: flex; align-items: center; gap: 9px; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: #c5c5c5; }
+.car-hero__eyebrow > span { width: 6px; height: 6px; background: #ff3600; border-radius: 50%; }
+.car-hero h1 { margin: 26px 0 24px; font-size: clamp(3rem, 6vw, 6rem); font-weight: 900; line-height: .99; letter-spacing: -.065em; }
+.car-hero h1 > span { color: #ff3600; }
+.car-hero__description { max-width: 370px; color: #b9b9b9; line-height: 1.75; font-size: 15px; }
+.car-hero__actions { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-top: 30px; }
+.car-hero__primary { display: inline-flex; gap: 26px; align-items: center; border-radius: 100px; background: #ff3600; color: #0b0b0b; font-size: 14px; font-weight: 700; padding: 17px 24px; transition: background .2s; }
+.car-hero__primary:hover { background: #ff704a; }
+.car-hero__primary > span { font-size: 22px; line-height: 1; }
+.car-hero__secondary { font-size: 13px; color: #e0e0e0; padding: 14px 0; }
+.car-hero__secondary > span { margin-left: 12px; }
+.car-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 6px; }
+.car-hero__rates { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 410px; border-top: 1px solid #303030; margin-top: 36px; padding-top: 24px; }
+.car-hero__rates > div { display: flex; flex-direction: column-reverse; gap: 5px; }
+.car-hero__rates dt { color: #b9b9b9; font-size: 12px; }
+.car-hero__rates dd { margin: 0; font-family: var(--font-epilogue), sans-serif; font-size: 27px; font-weight: 800; letter-spacing: -.04em; }
+.car-hero__stage { position: relative; min-width: 0; margin: 0; padding-top: 104px; }
+.car-hero__wordmark { position: absolute; top: 0; left: -14px; color: transparent; -webkit-text-stroke: 1px #696969; font-size: clamp(100px, 12.8vw, 195px); line-height: 1; font-weight: 900; letter-spacing: -.08em; user-select: none; }
+.car-hero__photo { position: relative; aspect-ratio: 1.35; border-left: 3px solid #ff3600; box-shadow: 0 30px 75px #0008; }
+.car-hero__photo img { object-fit: cover; object-position: center 60%; }
+.car-hero__caption { display: flex; justify-content: space-between; gap: 16px; margin-top: 22px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #b9b9b9; }
+.car-hero__caption > span:first-child { color: #fff; font-weight: 700; }
+.car-hero__photo-label { margin-top: 10px; color: #a0a0a0; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.car-hero__footer { border-top: 1px solid #303030; font-size: 10px; }
+.car-hero__footer a { color: #e0e0e0; }
+.car-hero__footer a > span { margin-left: 24px; color: #ff3600; }
+@media (max-width: 1023px) {
+  .car-hero__layout { grid-template-columns: 1fr; gap: 38px; padding-top: 40px; }
+  .car-hero h1 { font-size: clamp(3rem, 10vw, 5.5rem); }
+  .car-hero__description { max-width: 480px; }
+  .car-hero__stage { width: 100%; max-width: 680px; justify-self: center; padding-top: 75px; }
+  .car-hero__wordmark { font-size: clamp(100px, 22vw, 170px); left: 0; }
+}
+@media (max-width: 480px) {
+  .car-hero { padding-inline: 20px; }
+  .car-hero__topline { font-size: 9px; letter-spacing: .08em; padding-block: 20px; }
+  .car-hero__eyebrow { font-size: 10px; }
+  .car-hero__actions { gap: 12px 18px; }
+  .car-hero__primary { gap: 20px; padding: 15px 20px; }
+  .car-hero__secondary { font-size: 12px; }
+  .car-hero__caption { flex-direction: column; gap: 6px; }
+  .car-hero__footer { font-size: 9px; letter-spacing: .04em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .car-hero *, .car-hero *::before, .car-hero *::after { animation: none !important; transition: none !important; }
+  html:has(.car-hero) { scroll-behavior: auto; }
+}
